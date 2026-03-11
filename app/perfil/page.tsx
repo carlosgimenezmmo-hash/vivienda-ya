@@ -195,10 +195,3 @@ export default function PerfilPage() {
     </div>
   )
 }
-```
-
-Guardá y ejecutá:
-```
-git add .
-git commit -m "fix perfil page"
-git push
