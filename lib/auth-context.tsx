@@ -1,9 +1,10 @@
 "use client"
 
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react"
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react"
 import type { User, Transaction } from "./types"
 import { mockUser, mockTransactions } from "./mock-data"
 import { addRevenue } from "./revenue"
+import { supabase } from "./supabaseClient"
 
 interface AuthContextType {
   user: User | null
@@ -12,7 +13,6 @@ interface AuthContextType {
   login: () => void
   logout: () => void
   toggleAuth: () => void
-  // priceUSD optional for purchases; descriptions containing "Recompensa" are ignored
   addCredits: (amount: number, description: string, priceUSD?: number) => void
   spendCredits: (amount: number, description: string) => boolean
   likedProperties: Set<string>
@@ -27,50 +27,82 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions)
   const [likedProperties, setLikedProperties] = useState<Set<string>>(new Set())
-  const [savedProperties, setSavedProperties] = useState<Set<string>>(new Set(["p3", "p8"]))
+  const [savedProperties, setSavedProperties] = useState<Set<string>>(new Set())
 
   const isLoggedIn = user !== null && user.isLoggedIn
 
-  const login = useCallback(() => {
-    setUser({ ...mockUser, isLoggedIn: true })
+  // Al arrancar, verificar si hay sesión activa en Supabase
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        const meta = session.user.user_metadata
+        setUser({
+          ...mockUser,
+          id: session.user.id,
+          name: `${meta.nombre || ''} ${meta.apellido || ''}`.trim() || session.user.email || 'Usuario',
+          email: session.user.email || '',
+          isLoggedIn: true,
+        })
+      }
+    })
+
+    // Escuchar cambios de sesión (login/logout)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        const meta = session.user.user_metadata
+        setUser({
+          ...mockUser,
+          id: session.user.id,
+          name: `${meta.nombre || ''} ${meta.apellido || ''}`.trim() || session.user.email || 'Usuario',
+          email: session.user.email || '',
+          isLoggedIn: true,
+        })
+      } else {
+        setUser(null)
+      }
+    })
+
+    return () => subscription.unsubscribe()
   }, [])
 
-  const logout = useCallback(() => {
+  const login = useCallback(() => {
+    // El login real lo maneja onAuthStateChange arriba
+    // Este método queda para compatibilidad
+  }, [])
+
+  const logout = useCallback(async () => {
+    await supabase.auth.signOut()
     setUser(null)
   }, [])
 
-  const toggleAuth = useCallback(() => {
+  const toggleAuth = useCallback(async () => {
     if (isLoggedIn) {
+      await supabase.auth.signOut()
       setUser(null)
     } else {
       setUser({ ...mockUser, isLoggedIn: true })
     }
   }, [isLoggedIn])
 
-  const addCredits = useCallback(
-    (amount: number, description: string, priceUSD?: number) => {
-      // accumulate revenue when a real purchase occurs
-      if (priceUSD && !description.toLowerCase().includes("recompensa")) {
-        addRevenue(priceUSD)
+  const addCredits = useCallback((amount: number, description: string, priceUSD?: number) => {
+    if (priceUSD && !description.toLowerCase().includes("recompensa")) {
+      addRevenue(priceUSD)
+    }
+    setUser((prev) => {
+      if (!prev) return prev
+      const newBalance = prev.credits + amount
+      const newTransaction: Transaction = {
+        id: `t${Date.now()}`,
+        type: "recompensa",
+        description,
+        amount,
+        date: new Date().toISOString().split("T")[0],
+        balanceAfter: newBalance,
       }
-
-      setUser((prev) => {
-        if (!prev) return prev
-        const newBalance = prev.credits + amount
-        const newTransaction: Transaction = {
-          id: `t${Date.now()}`,
-          type: "recompensa",
-          description,
-          amount,
-          date: new Date().toISOString().split("T")[0],
-          balanceAfter: newBalance,
-        }
-        setTransactions((prevT) => [newTransaction, ...prevT])
-        return { ...prev, credits: newBalance }
-      })
-    },
-    []
-  )
+      setTransactions((prevT) => [newTransaction, ...prevT])
+      return { ...prev, credits: newBalance }
+    })
+  }, [])
 
   const spendCredits = useCallback((amount: number, description: string): boolean => {
     let success = false
@@ -95,11 +127,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const toggleLike = useCallback((propertyId: string) => {
     setLikedProperties((prev) => {
       const next = new Set(prev)
-      if (next.has(propertyId)) {
-        next.delete(propertyId)
-      } else {
-        next.add(propertyId)
-      }
+      next.has(propertyId) ? next.delete(propertyId) : next.add(propertyId)
       return next
     })
   }, [])
@@ -107,32 +135,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const toggleSave = useCallback((propertyId: string) => {
     setSavedProperties((prev) => {
       const next = new Set(prev)
-      if (next.has(propertyId)) {
-        next.delete(propertyId)
-      } else {
-        next.add(propertyId)
-      }
+      next.has(propertyId) ? next.delete(propertyId) : next.add(propertyId)
       return next
     })
   }, [])
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isLoggedIn,
-        transactions,
-        login,
-        logout,
-        toggleAuth,
-        addCredits,
-        spendCredits,
-        likedProperties,
-        savedProperties,
-        toggleLike,
-        toggleSave,
-      }}
-    >
+    <AuthContext.Provider value={{
+      user, isLoggedIn, transactions,
+      login, logout, toggleAuth,
+      addCredits, spendCredits,
+      likedProperties, savedProperties,
+      toggleLike, toggleSave,
+    }}>
       {children}
     </AuthContext.Provider>
   )
@@ -140,8 +155,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext)
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider")
-  }
+  if (context === undefined) throw new Error("useAuth must be used within an AuthProvider")
   return context
 }
