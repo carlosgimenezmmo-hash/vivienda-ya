@@ -197,7 +197,7 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
                 </button>
 
                 {/* CHAT */}
-                <button Click={() => requireLogin(() => setShowComments(showComments === p.id ? null : p.id), 'chatear')}
+                <button onClick={() => requireLogin(() => setShowComments(showComments === p.id ? null : p.id), 'chatear')}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: 0 }}>
                   <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
@@ -206,7 +206,7 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
                 </button>
 
                 {/* GUARDAR */}
-                <button Click={() => requireLogin(() => toggleSave(String(p.id)), 'guardar propiedades')}
+                <button onClick={() => requireLogin(() => toggleSave(String(p.id)), 'guardar propiedades')}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: 0 }}>
                   <svg width="28" height="28" viewBox="0 0 24 24" fill={savedProperties.has(String(p.id)) ? 'white' : 'none'} stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
