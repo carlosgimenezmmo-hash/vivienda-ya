@@ -17,9 +17,8 @@ export default function PerfilPage() {
   const [showLevels, setShowLevels] = useState(false)
   const router = useRouter()
 
-  if (!isLoggedIn || !user) {
-    return (
-      <div className="flex min-h-dvh flex-col items-center justify-center bg-background px-6 pb-20">
+ )
+}
         <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10">
           <LogIn className="h-12 w-12 text-primary" />
         </div>
