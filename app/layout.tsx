@@ -1,18 +1,16 @@
 import type { Metadata, Viewport } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { Geist } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { AuthProvider } from "@/lib/auth-context"
 import { ProtectedActionProvider } from "@/lib/protected-action-context"
 import { BottomNav } from "@/components/bottom-nav"
 import "./globals.css"
 
-const _geist = Geist({ subsets: ["latin"] })
-const _geistMono = Geist_Mono({ subsets: ["latin"] })
+const geist = Geist({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "Vivienda Ya - Propiedades como nunca las viste",
-  description:
-    "La app tipo TikTok de propiedades inmobiliarias. Busca, publica y permuta casas, departamentos y mas con video verificado ARRYSE.",
+  description: "La app tipo TikTok de propiedades inmobiliarias.",
   generator: "v0.app",
   icons: {
     icon: [
@@ -25,7 +23,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: "#1a1a2e",
+  themeColor: "#000000",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -39,11 +37,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className="font-sans antialiased">
+      <body style={{ margin: 0, padding: 0, background: '#000', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' }}>
         <AuthProvider>
           <ProtectedActionProvider>
-           <div className="mx-auto flex min-h-dvh max-w-[430px] flex-col shadow-2xl">
-              <main className="flex-1">{children}</main>
+            <div style={{ width: '100%', minHeight: '100dvh', position: 'relative' }}>
+              <main style={{ flex: 1 }}>{children}</main>
               <BottomNav />
             </div>
           </ProtectedActionProvider>
