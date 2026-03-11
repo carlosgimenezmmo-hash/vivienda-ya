@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
+import { AuthSheet } from '@/components/auth-sheet';
 
 export default function ViviendaYaFull() {
   const [properties, setProperties] = useState<any[]>([]);
@@ -13,6 +14,8 @@ export default function ViviendaYaFull() {
   const videoRefs = useRef<HTMLVideoElement[]>([]);
   const { isLoggedIn, likedProperties, savedProperties, toggleLike, toggleSave } = useAuth();
   const router = useRouter();
+  const [showAuthSheet, setShowAuthSheet] = useState(false);
+  const [authAction, setAuthAction] = useState('');
 
   useEffect(() => {
     async function fetchProperties() {
@@ -52,9 +55,17 @@ export default function ViviendaYaFull() {
     return () => observer.disconnect();
   }, [properties]);
 
-  const requireLogin = (action: () => void) => {
-    if (!isLoggedIn) { router.push('/registro'); } else { action(); }
-  };
+  const [showAuthSheet, setShowAuthSheet] = useState(false);
+const [authAction, setAuthAction] = useState('');
+
+const requireLogin = (action: () => void, actionLabel?: string) => {
+  if (!isLoggedIn) {
+    setAuthAction(actionLabel || '');
+    setShowAuthSheet(true);
+  } else {
+    action();
+  }
+};
 
   const togglePause = (i: number, id: number) => {
     const video = videoRefs.current[i];
@@ -179,7 +190,7 @@ export default function ViviendaYaFull() {
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24,
               }}>
                 {/* LIKE */}
-                <button onClick={() => requireLogin(() => toggleLike(String(p.id)))}
+               onClick={() => requireLogin(() => toggleLike(String(p.id)), 'dar like')}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: 0 }}>
                   <svg width="32" height="32" viewBox="0 0 24 24" fill={likedProperties.has(String(p.id)) ? '#EF4444' : 'none'} stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
@@ -188,7 +199,7 @@ export default function ViviendaYaFull() {
                 </button>
 
                 {/* CHAT */}
-                <button onClick={() => requireLogin(() => setShowComments(showComments === p.id ? null : p.id))}
+                onClick={() => requireLogin(() => setShowComments(showComments === p.id ? null : p.id), 'chatear')}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: 0 }}>
                   <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
@@ -197,7 +208,7 @@ export default function ViviendaYaFull() {
                 </button>
 
                 {/* GUARDAR */}
-                <button onClick={() => requireLogin(() => toggleSave(String(p.id)))}
+                onClick={() => requireLogin(() => toggleSave(String(p.id)), 'guardar propiedades')}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: 0 }}>
                   <svg width="28" height="28" viewBox="0 0 24 24" fill={savedProperties.has(String(p.id)) ? 'white' : 'none'} stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
@@ -306,5 +317,15 @@ export default function ViviendaYaFull() {
         )}
       </div>
     </div>
+    )}
+      </div>
+      <AuthSheet
+        visible={showAuthSheet}
+        onClose={() => setShowAuthSheet(false)}
+        action={authAction}
+      />
+    </div>
+  );
+}
   );
 }
