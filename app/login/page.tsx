@@ -43,7 +43,6 @@ export default function LoginPage() {
       display: "flex", flexDirection: "column", alignItems: "center",
       justifyContent: "center", padding: "0 24px",
     }}>
-      {/* Logo */}
       <div style={{ marginBottom: 32, textAlign: "center" }}>
         <h1 style={{ fontSize: 32, fontWeight: 900, margin: 0 }}>
           Vivienda<span style={{ color: "#22C55E" }}>Ya</span>
@@ -53,14 +52,12 @@ export default function LoginPage() {
         </p>
       </div>
 
-      {/* Card */}
       <div style={{
         width: "100%", maxWidth: 380,
         background: "rgba(255,255,255,0.05)",
         border: "1px solid rgba(255,255,255,0.1)",
         borderRadius: 20, padding: "28px 24px",
       }}>
-        {/* Email */}
         <div style={{ marginBottom: 16 }}>
           <label style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", display: "block", marginBottom: 6 }}>
             Email
@@ -79,7 +76,6 @@ export default function LoginPage() {
           />
         </div>
 
-        {/* Password */}
         <div style={{ marginBottom: 24 }}>
           <label style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", display: "block", marginBottom: 6 }}>
             Contraseña
@@ -99,7 +95,6 @@ export default function LoginPage() {
           />
         </div>
 
-        {/* Error */}
         {error && (
           <div style={{
             background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)",
@@ -110,7 +105,6 @@ export default function LoginPage() {
           </div>
         )}
 
-        {/* Botón */}
         <button
           onClick={handleLogin}
           disabled={loading}
@@ -124,16 +118,12 @@ export default function LoginPage() {
           {loading ? "Ingresando..." : "Ingresar →"}
         </button>
 
-        {/* Link olvidé contraseña */}
         <p style={{ textAlign: "center", marginTop: 16, fontSize: 13, color: "rgba(255,255,255,0.35)" }}>
           ¿Olvidaste tu contraseña?{" "}
-          <span style={{ color: "#2563EB", cursor: "pointer" }}>
-            Recuperar
-          </span>
+          <span style={{ color: "#2563EB", cursor: "pointer" }}>Recuperar</span>
         </p>
       </div>
 
-      {/* Registro */}
       <p style={{ marginTop: 24, fontSize: 14, color: "rgba(255,255,255,0.35)" }}>
         ¿No tenés cuenta?{" "}
         <span
