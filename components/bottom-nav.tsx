@@ -28,7 +28,7 @@ export function BottomNav() {
   return (
     <nav style={{
       position: 'fixed', bottom: 0, left: '50%',
-      transform: 'translateX(-50%)', width: '100%', maxWidth: 430,
+      transform: 'translateX(-50%)', width: '100%', maxWidth: 100%,
       zIndex: 50, display: 'flex', alignItems: 'center',
       justifyContent: 'space-around',
       borderTop: '1px solid rgba(255,255,255,0.1)',

@@ -132,17 +132,20 @@ export default function ViviendaYaFull() {
               />
 
               {/* ICONO PAUSA */}
-              {paused[p.id] && (
-                <div style={{
-                  position: 'absolute', top: '50%', left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  background: 'rgba(0,0,0,0.5)', borderRadius: '50%',
-                  width: 70, height: 70, display: 'flex', alignItems: 'center',
-                  justifyContent: 'center', zIndex: 15, pointerEvents: 'none'
-                }}>
-                  <span style={{ fontSize: 32 }}>⏸</span>
-                </div>
-              )}
+{paused[p.id] && (
+  <div style={{
+    position: 'absolute', top: '50%', left: '50%',
+    transform: 'translate(-50%, -50%)',
+    background: 'rgba(0,0,0,0.4)', borderRadius: '50%',
+    width: 70, height: 70, display: 'flex', alignItems: 'center',
+    justifyContent: 'center', zIndex: 15, pointerEvents: 'none'
+  }}>
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
+      <rect x="5" y="3" width="4" height="18" rx="1"/>
+      <rect x="15" y="3" width="4" height="18" rx="1"/>
+    </svg>
+  </div>
+)}
 
               {/* GRADIENTE */}
               <div style={{
