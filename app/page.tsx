@@ -55,9 +55,6 @@ export default function ViviendaYaFull() {
     return () => observer.disconnect();
   }, [properties]);
 
-  const [showAuthSheet, setShowAuthSheet] = useState(false);
-const [authAction, setAuthAction] = useState('');
-
 const requireLogin = (action: () => void, actionLabel?: string) => {
   if (!isLoggedIn) {
     setAuthAction(actionLabel || '');
@@ -190,16 +187,17 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24,
               }}>
                 {/* LIKE */}
-               onClick={() => requireLogin(() => toggleLike(String(p.id)), 'dar like')}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: 0 }}>
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill={likedProperties.has(String(p.id)) ? '#EF4444' : 'none'} stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                {/* LIKE */}
+                <button onClick={() => requireLogin(() => toggleLike(String(p.id)), 'dar like')} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: 0 }}>
+                
+                 <svg width="32" height="32" viewBox="0 0 24 24" fill={likedProperties.has(String(p.id)) ? '#EF4444' : 'none'} stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                   </svg>
                   <span style={{ color: '#fff', fontSize: 12, fontWeight: 600 }}>{p.likes || 0}</span>
                 </button>
 
                 {/* CHAT */}
-                onClick={() => requireLogin(() => setShowComments(showComments === p.id ? null : p.id), 'chatear')}
+                <button Click={() => requireLogin(() => setShowComments(showComments === p.id ? null : p.id), 'chatear')}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: 0 }}>
                   <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
@@ -208,7 +206,7 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
                 </button>
 
                 {/* GUARDAR */}
-                onClick={() => requireLogin(() => toggleSave(String(p.id)), 'guardar propiedades')}
+                <button Click={() => requireLogin(() => toggleSave(String(p.id)), 'guardar propiedades')}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: 0 }}>
                   <svg width="28" height="28" viewBox="0 0 24 24" fill={savedProperties.has(String(p.id)) ? 'white' : 'none'} stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
@@ -315,17 +313,12 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
             </section>
           ))
         )}
-      </div>
-    </div>
-    )}
-      </div>
+</div>
       <AuthSheet
         visible={showAuthSheet}
         onClose={() => setShowAuthSheet(false)}
         action={authAction}
       />
     </div>
-  );
-}
   );
 }

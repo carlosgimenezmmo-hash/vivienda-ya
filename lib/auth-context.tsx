@@ -24,7 +24,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(mockUser)
+  const [user, setUser] = useState<User | null>(null)
   const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions)
   const [likedProperties, setLikedProperties] = useState<Set<string>>(new Set())
   const [savedProperties, setSavedProperties] = useState<Set<string>>(new Set(["p3", "p8"]))
