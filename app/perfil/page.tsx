@@ -71,7 +71,7 @@ export default function PerfilPage() {
     { emoji: "🔖", label: "Guardados", sub: "Propiedades que te gustaron", href: "#" },
     { emoji: "🔁", label: "Mis Permutas", sub: "Intercambios activos", href: "#" },
     { emoji: "💬", label: "Mensajes", sub: "Conversaciones con propietarios", href: "#" },
-    { emoji: "⚙️", label: "Configuración", sub: "Cuenta y privacidad", href: "/configuracion" },//
+    { emoji: "⚙️", label: "Configuración", sub: "Cuenta y privacidad", href: "/configuracion" },/ ]
   
 
   return (
