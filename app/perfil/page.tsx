@@ -72,9 +72,7 @@ export default function PerfilPage() {
     { emoji: "🔁", label: "Mis Permutas", sub: "Intercambios activos", href: "#" },
     { emoji: "💬", label: "Mensajes", sub: "Conversaciones con propietarios", href: "#" },
     { emoji: "⚙️", label: "Configuración", sub: "Cuenta y privacidad", href: "/configuracion" },/ ]
-  
-
-  return (
+   return (
     <div style={{
       minHeight: "100dvh", background: "#0a0a0a", color: "#fff",
       fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
