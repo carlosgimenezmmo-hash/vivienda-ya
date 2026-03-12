@@ -292,9 +292,37 @@ export default function RegistroPage() {
               </div>
               <input value={telefono} onChange={e => setTelefono(e.target.value)} placeholder="Teléfono" type="tel" style={inp} />
               <div>
-                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12, margin: '0 0 6px' }}>Fecha de nacimiento</p>
-                <input value={fechaNacimiento} onChange={e => setFechaNacimiento(e.target.value)} type="date" style={{ ...inp, colorScheme: 'dark' }} />
-              </div>
+  <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: 12, margin: '0 0 6px' }}>Fecha de nacimiento</p>
+  <div style={{ display: 'flex', gap: 8 }}>
+    <input
+      placeholder="DD" maxLength={2} inputMode="numeric"
+      style={{ ...inp, flex: 1, textAlign: 'center' }}
+      onChange={e => {
+        const d = e.target.value.replace(/\D/g, '')
+        const parts = fechaNacimiento.split('-')
+        setFechaNacimiento(`${parts[0] || ''}${parts[1] ? '-'+parts[1] : ''}-${d}`.replace(/^-|-$/g,'') || `--${d}`)
+      }}
+    />
+    <input
+      placeholder="MM" maxLength={2} inputMode="numeric"
+      style={{ ...inp, flex: 1, textAlign: 'center' }}
+      onChange={e => {
+        const m = e.target.value.replace(/\D/g, '')
+        const parts = fechaNacimiento.split('-')
+        setFechaNacimiento(`${parts[0] || ''}-${m}-${parts[2] || ''}`)
+      }}
+    />
+    <input
+      placeholder="AAAA" maxLength={4} inputMode="numeric"
+      style={{ ...inp, flex: 2, textAlign: 'center' }}
+      onChange={e => {
+        const y = e.target.value.replace(/\D/g, '')
+        const parts = fechaNacimiento.split('-')
+        setFechaNacimiento(`${y}-${parts[1] || ''}-${parts[2] || ''}`)
+      }}
+    />
+  </div>
+</div>
               {fechaNacimiento && calcularEdad(fechaNacimiento) < 18 && (
                 <div style={{ background: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 10, padding: '10px 14px' }}>
                   <p style={{ color: '#EF4444', fontSize: 13, margin: 0 }}>⚠️ Debés ser mayor de 18 años para registrarte</p>
