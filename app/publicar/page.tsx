@@ -1,243 +1,609 @@
 "use client"
 
-import { useState } from "react"
-import { useProtectedAction } from "@/lib/protected-action-context"
-import {
-  Video, Zap, Crown, ShieldCheck, ArrowRight, Check, Coins,
-} from "lucide-react"
-import { cn } from "@/lib/utils"
+import { useState, useRef } from "react"
+import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth-context"
-import { CameraSimulator } from "@/components/camera-simulator"
-import type { ArryseMode } from "@/lib/types"
+import { supabase } from "@/lib/supabaseClient"
 
-const arryseModes: {
-  mode: ArryseMode
-  label: string
-  description: string
-  details: string
-  icon: typeof Video
-  cost: number
-  colorClass: string
-}[] = [
-  {
-    mode: "clasico",
-    label: "ARRYSE Clasico",
-    description: "Video completo de 3 minutos",
-    details: "6 pasos guiados con verificacion GPS",
-    icon: Video,
-    cost: 0,
-    colorClass: "border-vy-green bg-vy-green/5",
-  },
-  {
-    mode: "express",
-    label: "ARRYSE Express",
-    description: "5 clips de 10 segundos",
-    details: "Rapido y efectivo para publicar al instante",
-    icon: Zap,
-    cost: 0,
-    colorClass: "border-vy-blue bg-vy-blue/5",
-  },
-  {
-    mode: "pro",
-    label: "ARRYSE Pro",
-    description: "Video de 5 min + fotos 360",
-    details: "Maxima calidad para propiedades premium",
-    icon: Crown,
-    cost: 5,
-    colorClass: "border-vy-gold bg-vy-gold/5",
-  },
-]
+type Step = 1 | 2 | 3 | 4 | 5 | 6 | 7
+
+const PLAN_LIMITS: Record<string, number> = {
+  basico: 3,
+  pro: 15,
+  premium: 50,
+  plus: 100,
+}
 
 export default function PublicarPage() {
-  const { isLoggedIn, user, spendCredits } = useAuth()
-  const [lang, setLang] = useState<"es" | "pt">(() => {
-    if (typeof navigator !== "undefined") {
-      return navigator.language.startsWith("pt") ? "pt" : "es"
-    }
-    return "es"
-  })
-  const { handleProtectedAction } = useProtectedAction()
-  const [selectedMode, setSelectedMode] = useState<ArryseMode | null>(null)
-  const [isRecording, setIsRecording] = useState(false)
-  const [recordingComplete, setRecordingComplete] = useState(false)
+  const { user, isLoggedIn } = useAuth()
+  const router = useRouter()
 
-  if (!isLoggedIn) {
-    return (
-      <div className="flex min-h-dvh flex-col items-center justify-center bg-background px-6 pb-20">
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
-          <ShieldCheck className="h-10 w-10 text-primary" />
-        </div>
-        <h2 className="mt-4 text-xl font-bold text-foreground">Inicia sesion para publicar</h2>
-        <p className="mt-2 text-center text-sm text-muted-foreground">
-          Necesitas una cuenta para publicar propiedades con el sistema ARRYSE verificado por GPS
-        </p>
-      </div>
-    )
-  }
+  const [step, setStep] = useState<Step>(1)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
 
-  if (isRecording && selectedMode) {
-    return (
-      <CameraSimulator
-        mode={selectedMode}
-        onComplete={() => {
-          setIsRecording(false)
-          setRecordingComplete(true)
-        }}
-        onCancel={() => {
-          setIsRecording(false)
-          setSelectedMode(null)
-        }}
-      />
-    )
-  }
+  // Video
+  const [video, setVideo] = useState<File | null>(null)
+  const [videoPreview, setVideoPreview] = useState<string | null>(null)
+  const [videoDuration, setVideoDuration] = useState(0)
+  const videoRef = useRef<HTMLInputElement>(null)
 
-  if (recordingComplete) {
+  // Duración extra
+  const [duracionExtra, setDuracionExtra] = useState<null | 120 | 180 | 300>(null)
+
+  // Datos propiedad
+  const [operacion, setOperacion] = useState<"venta" | "alquiler" | "temporario" | "permuta">("venta")
+  const [tipoPropiedad, setTipoPropiedad] = useState("departamento")
+  const [precio, setPrecio] = useState("")
+  const [moneda, setMoneda] = useState<"USD" | "ARS">("USD")
+  const [ambientes, setAmbientes] = useState("")
+  const [superficie, setSuperficie] = useState("")
+  const [barrio, setBarrio] = useState("")
+  const [ciudad, setCiudad] = useState("")
+  const [descripcion, setDescripcion] = useState("")
+  const [whatsapp, setWhatsapp] = useState(user?.phone || "")
+
+  // Destacado
+  const [destacado, setDestacado] = useState(false)
+
+  // ARRYSE
+  const [arryseStatus, setArryseStatus] = useState<"pending" | "verifying" | "ok" | "error">("pending")
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null)
+
+  const nivel = user?.level || "basico"
+  const limite = PLAN_LIMITS[nivel] || 3
+  const publicacionesUsadas = 0 // TODO: fetch from Supabase
+  const porcentajeUso = (publicacionesUsadas / limite) * 100
+
+  // ── GUARDS ───────────────────────────────────────────────────────────────
+  if (!isLoggedIn || !user) {
     return (
-      <div className="flex min-h-dvh flex-col items-center justify-center bg-background px-6 pb-20">
-        <div className="flex h-24 w-24 items-center justify-center rounded-full bg-vy-green/10">
-          <Check className="h-12 w-12 text-vy-green" />
-        </div>
-        <h2 className="mt-4 text-xl font-bold text-foreground">Grabacion completada!</h2>
-        <p className="mt-2 text-center text-sm text-muted-foreground">
-          Tu video fue verificado con ARRYSE GPS y esta siendo procesado. Aparecera en el feed en minutos.
-        </p>
-        <div className="mt-3 flex items-center gap-1.5 rounded-full bg-vy-green/10 px-3 py-1.5 text-xs font-semibold text-vy-green">
-          <Coins className="h-3.5 w-3.5" />
-          +1 credito ganado por verificacion ARRYSE
-        </div>
-        <button
-          onClick={() => {
-            setRecordingComplete(false)
-            setSelectedMode(null)
-          }}
-          className="mt-8 rounded-xl bg-primary px-8 py-3 text-sm font-semibold text-primary-foreground"
-        >
-          Publicar otra propiedad
+      <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 24px" }}>
+        <span style={{ fontSize: 48, marginBottom: 16 }}>🔒</span>
+        <h2 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 10px", textAlign: "center" }}>Necesitás una cuenta</h2>
+        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, textAlign: "center", margin: "0 0 28px" }}>Para publicar propiedades tenés que estar registrado.</p>
+        <button onClick={() => router.push("/registro")} style={{ width: "100%", maxWidth: 340, padding: "16px", borderRadius: 14, border: "none", background: "linear-gradient(135deg, #2563EB, #1d4ed8)", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
+          Registrarme gratis →
         </button>
       </div>
     )
   }
 
+  // ── HANDLERS ─────────────────────────────────────────────────────────────
+  const handleVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const url = URL.createObjectURL(file)
+    setVideoPreview(url)
+    setVideo(file)
+    // Obtener duración
+    const vid = document.createElement("video")
+    vid.src = url
+    vid.onloadedmetadata = () => setVideoDuration(Math.round(vid.duration))
+  }
+
+  const handleARRYSE = () => {
+    setArryseStatus("verifying")
+    if (!navigator.geolocation) {
+      setArryseStatus("error")
+      return
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude })
+        setArryseStatus("ok")
+        setTimeout(() => setStep(7), 1200)
+      },
+      () => {
+        setArryseStatus("error")
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    )
+  }
+
+  const handlePublicar = async () => {
+    setLoading(true)
+    setError("")
+    try {
+      let videoUrl = ""
+      if (video) {
+        const ext = video.name.split(".").pop()
+        const path = `${user.id}/${Date.now()}.${ext}`
+        const { error: uploadError } = await supabase.storage
+          .from("videos-app")
+          .upload(path, video, { contentType: video.type })
+        if (uploadError) throw uploadError
+        const { data } = supabase.storage.from("videos-app").getPublicUrl(path)
+        videoUrl = data.publicUrl
+      }
+
+      const { error: insertError } = await supabase.from("properties").insert({
+        user_id: user.id,
+        owner_name: user.name,
+        operation_type: operacion,
+        property_type: tipoPropiedad,
+        price: parseFloat(precio.replace(/\./g, "").replace(",", ".")) || 0,
+        currency: moneda,
+        rooms: parseInt(ambientes) || null,
+        surface: parseInt(superficie) || null,
+        neighborhood: barrio,
+        city: ciudad,
+        location: `${barrio}, ${ciudad}`,
+        description: descripcion,
+        whatsapp_number: whatsapp,
+        video_url: videoUrl,
+        verified: arryseStatus === "ok",
+        lat: location?.lat || null,
+        lng: location?.lng || null,
+        highlighted: destacado,
+        likes: 0,
+      })
+      if (insertError) throw insertError
+      router.push("/")
+    } catch (err: any) {
+      setError(err.message || "Error al publicar")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // ── ESTILOS BASE ──────────────────────────────────────────────────────────
+  const inp: React.CSSProperties = {
+    width: "100%", padding: "14px 16px", borderRadius: 12,
+    background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)",
+    color: "#fff", fontSize: 15, outline: "none", boxSizing: "border-box",
+    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+  }
+
+  const btn: React.CSSProperties = {
+    width: "100%", padding: "16px", borderRadius: 14, border: "none",
+    background: "linear-gradient(135deg, #2563EB, #1d4ed8)",
+    color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer",
+    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+    boxShadow: "0 4px 20px rgba(37,99,235,0.3)",
+  }
+
+  const chip = (active: boolean): React.CSSProperties => ({
+    padding: "8px 16px", borderRadius: 20, border: `1px solid ${active ? "#2563EB" : "rgba(255,255,255,0.12)"}`,
+    background: active ? "rgba(37,99,235,0.2)" : "rgba(255,255,255,0.04)",
+    color: active ? "#60A5FA" : "rgba(255,255,255,0.5)",
+    fontSize: 13, fontWeight: 600, cursor: "pointer",
+    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+  })
+
   return (
-    <div className="flex min-h-dvh flex-col bg-background pb-20">
-      {/* Header */}
-      <header className="border-b border-border px-4 py-3">
-        <h1 className="text-lg font-bold text-foreground">Publicar propiedad</h1>
-        <p className="text-xs text-muted-foreground">
-          Graba tu propiedad con el sistema ARRYSE verificado por GPS
-        </p>
-      </header>
+    <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", display: "flex", flexDirection: "column" }}>
 
-      {/* ARRYSE explanation */}
-      <div className="mx-4 mt-4 flex items-start gap-3 rounded-2xl bg-vy-green/5 border border-vy-green/20 p-4">
-        <ShieldCheck className="mt-0.5 h-8 w-8 shrink-0 text-vy-green" />
-        <div>
-          <h3 className="text-sm font-bold text-foreground">Sistema ARRYSE</h3>
-          <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
-            Usa el GPS de tu celular para verificar que la propiedad existe en la ubicacion donde estas grabando. Seguiras pasos guiados para mostrar cada ambiente.
-          </p>
+      {/* HEADER */}
+      <div style={{ padding: "52px 20px 16px", display: "flex", alignItems: "center", gap: 14 }}>
+        <button onClick={() => step > 1 ? setStep((step - 1) as Step) : router.back()}
+          style={{ background: "rgba(255,255,255,0.08)", border: "none", borderRadius: "50%", width: 38, height: 38, color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
+        <div style={{ flex: 1 }}>
+          <span style={{ fontSize: 18, fontWeight: 800 }}>Publicar propiedad</span>
+        </div>
+        <span style={{ fontSize: 12, color: "rgba(255,255,255,0.35)" }}>Paso {step}/7</span>
+      </div>
+
+      {/* PROGRESS */}
+      <div style={{ padding: "0 20px 20px" }}>
+        <div style={{ display: "flex", gap: 4 }}>
+          {[1,2,3,4,5,6,7].map(s => (
+            <div key={s} style={{ flex: 1, height: 3, borderRadius: 2, background: s <= step ? "#2563EB" : "rgba(255,255,255,0.1)", transition: "background 0.3s" }} />
+          ))}
         </div>
       </div>
 
-      {/* Credits indicator */}
-      <div className="mx-4 mt-3 flex items-center justify-between rounded-xl bg-secondary px-4 py-2.5">
-        <span className="text-xs text-muted-foreground">Tu saldo</span>
-        <span className="flex items-center gap-1 text-sm font-bold text-foreground">
-          <Coins className="h-4 w-4 text-vy-gold" />
-          {user?.credits || 0} creditos
-        </span>
-      </div>
+      <div style={{ flex: 1, padding: "0 20px 40px", overflowY: "auto" }}>
 
-      {/* Mode selection */}
-      <div className="mt-6 px-4">
-        <h2 className="mb-3 text-sm font-bold text-foreground uppercase tracking-wide">
-          Elige tu tipo de grabacion
-        </h2>
-        <div className="flex flex-col gap-3">
-          {arryseModes.map((am) => {
-            const Icon = am.icon
-            const isSelected = selectedMode === am.mode
-            const canAfford = am.cost === 0 || (user?.credits || 0) >= am.cost
+        {/* ── PASO 1: PLAN Y LÍMITE ── */}
+        {step === 1 && (
+          <div>
+            <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 4px" }}>Tu plan actual</h1>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 24px" }}>Verificá tu límite antes de publicar</p>
 
-            return (
-              <button
-                key={am.mode}
-                onClick={() => setSelectedMode(am.mode)}
-                disabled={!canAfford}
-                className={cn(
-                  "flex items-start gap-3 rounded-2xl border-2 p-4 text-left transition-all active:scale-[0.98]",
-                  isSelected ? am.colorClass : "border-border bg-card",
-                  !canAfford && "opacity-50"
-                )}
-              >
+            {/* Plan card */}
+            <div style={{ background: "rgba(37,99,235,0.08)", border: "1px solid rgba(37,99,235,0.2)", borderRadius: 16, padding: "16px", marginBottom: 16 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                <div>
+                  <p style={{ margin: 0, fontWeight: 800, fontSize: 16 }}>Plan {nivel.toUpperCase()}</p>
+                  <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
+                    {publicacionesUsadas} de {limite} videos usados
+                  </p>
+                </div>
+                <div style={{ textAlign: "right" }}>
+                  <p style={{ margin: 0, fontSize: 28, fontWeight: 800, color: porcentajeUso >= 80 ? "#F59E0B" : "#22C55E" }}>
+                    {limite - publicacionesUsadas}
+                  </p>
+                  <p style={{ margin: 0, fontSize: 11, color: "rgba(255,255,255,0.35)" }}>disponibles</p>
+                </div>
+              </div>
+              {/* Barra de progreso */}
+              <div style={{ height: 6, borderRadius: 3, background: "rgba(255,255,255,0.08)" }}>
+                <div style={{ height: "100%", borderRadius: 3, width: `${Math.min(porcentajeUso, 100)}%`, background: porcentajeUso >= 80 ? "#F59E0B" : "#22C55E", transition: "width 0.3s" }} />
+              </div>
+              {porcentajeUso >= 80 && (
+                <p style={{ margin: "10px 0 0", fontSize: 12, color: "#F59E0B" }}>
+                  ⚠️ Ya usaste el {Math.round(porcentajeUso)}% de tu límite. ¿Necesitás más?
+                </p>
+              )}
+            </div>
+
+            {/* Beneficios del plan */}
+            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: "14px 16px", marginBottom: 20 }}>
+              <p style={{ margin: "0 0 10px", fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.6)" }}>Incluido en tu plan:</p>
+              {[
+                "✅ Videos de hasta 60 segundos",
+                "✅ Verificación ARRYSE gratuita",
+                "✅ Chat con interesados",
+                "✅ Estadísticas básicas",
+              ].map(b => <p key={b} style={{ margin: "4px 0", fontSize: 13, color: "rgba(255,255,255,0.5)" }}>{b}</p>)}
+            </div>
+
+            {nivel === "basico" && (
+              <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 14, padding: "14px 16px", marginBottom: 20 }}>
+                <p style={{ margin: "0 0 6px", fontWeight: 700, fontSize: 14, color: "#F59E0B" }}>🚀 Probá PRO 7 días gratis</p>
+                <p style={{ margin: "0 0 10px", fontSize: 13, color: "rgba(255,255,255,0.4)" }}>15 videos · destacados · estadísticas avanzadas</p>
+                <button style={{ ...btn, padding: "12px", fontSize: 14, marginTop: 0 }}>
+                  Activar prueba gratis →
+                </button>
+              </div>
+            )}
+
+            <button onClick={() => setStep(2)} style={btn}>Continuar →</button>
+          </div>
+        )}
+
+        {/* ── PASO 2: VIDEO ── */}
+        {step === 2 && (
+          <div>
+            <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 4px" }}>Subí tu video</h1>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 20px" }}>Grabá la propiedad · máximo 60 segundos</p>
+
+            <input ref={videoRef} type="file" accept="video/*" onChange={handleVideoSelect} style={{ display: "none" }} />
+
+            {videoPreview ? (
+              <div style={{ position: "relative", borderRadius: 14, overflow: "hidden", marginBottom: 16, background: "#000" }}>
+                <video src={videoPreview} controls style={{ width: "100%", maxHeight: 280, objectFit: "contain" }} />
+                <div style={{ position: "absolute", top: 10, right: 10, background: "rgba(0,0,0,0.7)", borderRadius: 20, padding: "4px 10px" }}>
+                  <span style={{ fontSize: 12, color: videoDuration > 60 ? "#EF4444" : "#22C55E", fontWeight: 600 }}>
+                    {videoDuration}s {videoDuration > 60 ? "⚠️" : "✓"}
+                  </span>
+                </div>
+                <button onClick={() => { setVideo(null); setVideoPreview(null) }}
+                  style={{ position: "absolute", top: 10, left: 10, background: "rgba(0,0,0,0.7)", border: "none", borderRadius: "50%", width: 30, height: 30, color: "#fff", cursor: "pointer", fontSize: 14 }}>
+                  ✕
+                </button>
+              </div>
+            ) : (
+              <div onClick={() => videoRef.current?.click()} style={{
+                height: 200, borderRadius: 14, border: "2px dashed rgba(255,255,255,0.2)",
+                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                cursor: "pointer", background: "rgba(255,255,255,0.02)", marginBottom: 16,
+              }}>
+                <span style={{ fontSize: 40, marginBottom: 10 }}>🎬</span>
+                <p style={{ margin: 0, fontWeight: 600, fontSize: 15 }}>Tocá para seleccionar video</p>
+                <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(255,255,255,0.3)" }}>MP4, MOV · máx 60 seg</p>
+              </div>
+            )}
+
+            {videoDuration > 60 && (
+              <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 12, padding: "12px 14px", marginBottom: 16 }}>
+                <p style={{ margin: 0, fontSize: 13, color: "#FCA5A5" }}>
+                  ⚠️ Tu video dura {videoDuration}s. El plan GRATIS permite hasta 60s.
+                </p>
+              </div>
+            )}
+
+            <div style={{ background: "rgba(37,99,235,0.06)", border: "1px solid rgba(37,99,235,0.15)", borderRadius: 12, padding: "12px 14px", marginBottom: 20 }}>
+              <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.4)", lineHeight: 1.5 }}>
+                📍 <strong style={{ color: "rgba(255,255,255,0.7)" }}>ARRYSE</strong> verificará automáticamente que el video fue grabado en la ubicación real de la propiedad mediante GPS.
+              </p>
+            </div>
+
+            <button onClick={() => video && setStep(3)} disabled={!video} style={{ ...btn, opacity: video ? 1 : 0.4 }}>
+              Continuar →
+            </button>
+          </div>
+        )}
+
+        {/* ── PASO 3: DURACIÓN EXTRA ── */}
+        {step === 3 && (
+          <div>
+            <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 4px" }}>¿Necesitás más tiempo?</h1>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 24px" }}>El plan GRATIS incluye hasta 60 segundos</p>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 24 }}>
+              {[
+                { label: "60 segundos", sub: "Incluido en tu plan", price: null, value: null },
+                { label: "120 segundos", sub: "+$1 USD · pago único", price: 1, value: 120 },
+                { label: "180 segundos", sub: "+$1.50 USD · pago único", price: 1.5, value: 180 },
+                { label: "300 segundos (5 min)", sub: "Solo plan PRO o superior", price: null, value: 300, proOnly: true },
+              ].map(opt => (
                 <div
-                  className={cn(
-                    "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl",
-                    am.mode === "pro" ? "bg-vy-gold/20" : am.mode === "express" ? "bg-vy-blue/20" : "bg-vy-green/20"
-                  )}
+                  key={opt.label}
+                  onClick={() => !opt.proOnly && setDuracionExtra(opt.value as any)}
+                  style={{
+                    padding: "14px 16px", borderRadius: 14,
+                    border: `1px solid ${duracionExtra === opt.value ? "#2563EB" : "rgba(255,255,255,0.08)"}`,
+                    background: duracionExtra === opt.value ? "rgba(37,99,235,0.12)" : "rgba(255,255,255,0.03)",
+                    cursor: opt.proOnly ? "not-allowed" : "pointer",
+                    opacity: opt.proOnly ? 0.4 : 1,
+                    display: "flex", justifyContent: "space-between", alignItems: "center",
+                  }}
                 >
-                  <Icon
-                    className={cn(
-                      "h-5 w-5",
-                      am.mode === "pro" ? "text-vy-gold" : am.mode === "express" ? "text-vy-blue" : "text-vy-green"
-                    )}
-                  />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-foreground">{am.label}</span>
-                    {am.cost > 0 ? (
-                      <span className="flex items-center gap-0.5 rounded-full bg-vy-gold/10 px-2 py-0.5 text-[10px] font-bold text-vy-gold">
-                        <Coins className="h-3 w-3" />
-                        {am.cost}
-                      </span>
-                    ) : (
-                      <span className="rounded-full bg-vy-green/10 px-2 py-0.5 text-[10px] font-bold text-vy-green">
-                        GRATIS
-                      </span>
-                    )}
+                  <div>
+                    <p style={{ margin: 0, fontWeight: 600, fontSize: 15 }}>{opt.label}</p>
+                    <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.4)" }}>{opt.sub}</p>
                   </div>
-                  <p className="mt-0.5 text-xs text-muted-foreground">{am.description}</p>
-                  <p className="mt-0.5 text-[10px] text-muted-foreground/70">{am.details}</p>
+                  {duracionExtra === opt.value && <span style={{ color: "#22C55E", fontSize: 18 }}>✓</span>}
                 </div>
-                {isSelected && (
-                  <Check className="mt-2 h-5 w-5 shrink-0 text-primary" />
-                )}
+              ))}
+            </div>
+
+            {duracionExtra && (
+              <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 12, padding: "12px 14px", marginBottom: 16 }}>
+                <p style={{ margin: 0, fontSize: 13, color: "#F59E0B" }}>
+                  💳 Elegiste {duracionExtra} seg. Se agregará el costo al momento de publicar.
+                </p>
+              </div>
+            )}
+
+            <button onClick={() => setStep(4)} style={btn}>Continuar →</button>
+          </div>
+        )}
+
+        {/* ── PASO 4: DATOS PROPIEDAD ── */}
+        {step === 4 && (
+          <div>
+            <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 4px" }}>Datos de la propiedad</h1>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 20px" }}>Se verán superpuestos sobre tu video</p>
+
+            {/* Tipo de operación */}
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Tipo de operación</p>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
+              {(["venta", "alquiler", "temporario", "permuta"] as const).map(op => (
+                <button key={op} onClick={() => setOperacion(op)} style={chip(operacion === op)}>
+                  {op === "venta" ? "🏷️ Venta" : op === "alquiler" ? "🔑 Alquiler" : op === "temporario" ? "📅 Temporario" : "🔁 Permuta"}
+                </button>
+              ))}
+            </div>
+
+            {/* Tipo de propiedad */}
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Tipo de propiedad</p>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
+              {["departamento", "casa", "ph", "local", "oficina", "terreno"].map(t => (
+                <button key={t} onClick={() => setTipoPropiedad(t)} style={chip(tipoPropiedad === t)}>
+                  {t.charAt(0).toUpperCase() + t.slice(1)}
+                </button>
+              ))}
+            </div>
+
+            {/* Precio */}
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Precio</p>
+            <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+              <button onClick={() => setMoneda("USD")} style={{ ...chip(moneda === "USD"), flexShrink: 0 }}>USD</button>
+              <button onClick={() => setMoneda("ARS")} style={{ ...chip(moneda === "ARS"), flexShrink: 0 }}>ARS</button>
+              <input value={precio} onChange={e => setPrecio(e.target.value)} placeholder="Ej: 150000" type="number" inputMode="numeric" style={{ ...inp, flex: 1 }} />
+            </div>
+
+            {/* Ambientes y superficie */}
+            <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Ambientes</p>
+                <input value={ambientes} onChange={e => setAmbientes(e.target.value)} placeholder="Ej: 3" type="number" inputMode="numeric" style={inp} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Superficie m²</p>
+                <input value={superficie} onChange={e => setSuperficie(e.target.value)} placeholder="Ej: 75" type="number" inputMode="numeric" style={inp} />
+              </div>
+            </div>
+
+            {/* Ubicación */}
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Ubicación</p>
+            <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
+              <input value={barrio} onChange={e => setBarrio(e.target.value)} placeholder="Barrio" style={{ ...inp, flex: 1 }} />
+              <input value={ciudad} onChange={e => setCiudad(e.target.value)} placeholder="Ciudad" style={{ ...inp, flex: 1 }} />
+            </div>
+
+            {/* Descripción */}
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Descripción corta</p>
+            <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} placeholder="Describí brevemente la propiedad..." maxLength={150}
+              style={{ ...inp, height: 80, resize: "none" }} />
+            <p style={{ fontSize: 11, color: "rgba(255,255,255,0.2)", margin: "4px 0 16px", textAlign: "right" }}>{descripcion.length}/150</p>
+
+            {/* WhatsApp */}
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>WhatsApp de contacto</p>
+            <input value={whatsapp} onChange={e => setWhatsapp(e.target.value)} placeholder="Ej: 5491112345678" type="tel" style={{ ...inp, marginBottom: 20 }} />
+
+            <button onClick={() => {
+              if (!precio || !barrio || !ciudad) return setError("Completá precio y ubicación")
+              setError("")
+              setStep(5)
+            }} style={btn}>
+              Continuar →
+            </button>
+            {error && <p style={{ color: "#EF4444", fontSize: 13, marginTop: 10 }}>{error}</p>}
+          </div>
+        )}
+
+        {/* ── PASO 5: DESTACADO ── */}
+        {step === 5 && (
+          <div>
+            <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 4px" }}>¿Destacar tu propiedad?</h1>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 24px" }}>Aparecerá primera en el feed por 24 horas</p>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 24 }}>
+              <div onClick={() => setDestacado(false)} style={{
+                padding: "16px", borderRadius: 14,
+                border: `1px solid ${!destacado ? "#22C55E" : "rgba(255,255,255,0.08)"}`,
+                background: !destacado ? "rgba(34,197,94,0.08)" : "rgba(255,255,255,0.03)",
+                cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center",
+              }}>
+                <div>
+                  <p style={{ margin: 0, fontWeight: 700, fontSize: 15 }}>Sin destacar</p>
+                  <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,0.4)" }}>Aparece en orden normal del feed</p>
+                </div>
+                {!destacado && <span style={{ color: "#22C55E", fontSize: 20 }}>✓</span>}
+              </div>
+
+              <div onClick={() => setDestacado(true)} style={{
+                padding: "16px", borderRadius: 14,
+                border: `1px solid ${destacado ? "#F59E0B" : "rgba(255,255,255,0.08)"}`,
+                background: destacado ? "rgba(245,158,11,0.08)" : "rgba(255,255,255,0.03)",
+                cursor: "pointer", display: "flex", justifyContent: "space-between", alignItems: "center",
+              }}>
+                <div>
+                  <p style={{ margin: 0, fontWeight: 700, fontSize: 15 }}>⭐ Destacar por 24h</p>
+                  <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,0.4)" }}>+$2 USD · Primero en el feed · Más visibilidad</p>
+                </div>
+                {destacado && <span style={{ color: "#F59E0B", fontSize: 20 }}>✓</span>}
+              </div>
+            </div>
+
+            {destacado && (
+              <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 12, padding: "12px 14px", marginBottom: 16 }}>
+                <p style={{ margin: 0, fontSize: 13, color: "#F59E0B" }}>
+                  ⭐ Tu propiedad aparecerá primera en el feed por 24 horas. Se agregarán $2 USD al momento de publicar.
+                </p>
+              </div>
+            )}
+
+            <button onClick={() => setStep(6)} style={btn}>Continuar →</button>
+          </div>
+        )}
+
+        {/* ── PASO 6: ARRYSE ── */}
+        {step === 6 && (
+          <div style={{ textAlign: "center" }}>
+            <div style={{ width: 80, height: 80, borderRadius: "50%", background: "rgba(37,99,235,0.12)", border: "2px solid rgba(37,99,235,0.3)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", fontSize: 36 }}>
+              📍
+            </div>
+            <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 8px" }}>Verificación ARRYSE</h1>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 8px", lineHeight: 1.6 }}>
+              Necesitamos confirmar que estás en la ubicación real de la propiedad.
+            </p>
+            <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 12, margin: "0 0 28px" }}>
+              Gratuito · Automático · Instantáneo
+            </p>
+
+            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: "16px", marginBottom: 24, textAlign: "left" }}>
+              {[
+                { icon: "🛰️", text: "GPS de alta precisión" },
+                { icon: "📐", text: "Altitud y acelerómetro" },
+                { icon: "🔒", text: "Metadatos del video verificados" },
+                { icon: "⚡", text: "Resultado instantáneo" },
+              ].map(f => (
+                <div key={f.text} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                  <span style={{ fontSize: 18 }}>{f.icon}</span>
+                  <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,0.5)" }}>{f.text}</p>
+                </div>
+              ))}
+            </div>
+
+            {arryseStatus === "verifying" && (
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ width: 48, height: 48, borderRadius: "50%", border: "3px solid rgba(37,99,235,0.3)", borderTop: "3px solid #2563EB", margin: "0 auto 12px", animation: "spin 1s linear infinite" }} />
+                <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14 }}>Verificando ubicación...</p>
+              </div>
+            )}
+
+            {arryseStatus === "ok" && (
+              <div style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.3)", borderRadius: 12, padding: "14px", marginBottom: 16 }}>
+                <p style={{ margin: 0, color: "#22C55E", fontWeight: 700 }}>✅ Ubicación verificada</p>
+                {location && <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>{location.lat.toFixed(4)}, {location.lng.toFixed(4)}</p>}
+              </div>
+            )}
+
+            {arryseStatus === "error" && (
+              <div style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 12, padding: "14px", marginBottom: 16 }}>
+                <p style={{ margin: "0 0 4px", color: "#FCA5A5", fontWeight: 700 }}>⚠️ No se pudo verificar</p>
+                <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.4)" }}>Activá el GPS y permitÍ el acceso a la ubicación</p>
+              </div>
+            )}
+
+            {arryseStatus === "pending" && (
+              <button onClick={handleARRYSE} style={btn}>
+                Verificar con ARRYSE →
               </button>
-            )
-          })}
-        </div>
+            )}
+
+            {arryseStatus === "error" && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <button onClick={handleARRYSE} style={btn}>Reintentar</button>
+                <button onClick={() => setStep(7)} style={{ ...btn, background: "rgba(255,255,255,0.06)", boxShadow: "none", color: "rgba(255,255,255,0.5)", fontSize: 14 }}>
+                  Publicar sin verificación
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── PASO 7: RESUMEN Y PUBLICAR ── */}
+        {step === 7 && (
+          <div>
+            <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 4px" }}>Resumen</h1>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 20px" }}>Revisá antes de publicar</p>
+
+            {/* Preview video */}
+            {videoPreview && (
+              <div style={{ borderRadius: 14, overflow: "hidden", marginBottom: 16, background: "#000", position: "relative" }}>
+                <video src={videoPreview} style={{ width: "100%", maxHeight: 200, objectFit: "cover" }} muted />
+                {arryseStatus === "ok" && (
+                  <div style={{ position: "absolute", top: 10, left: 10, background: "rgba(0,0,0,0.7)", borderRadius: 20, padding: "4px 10px", display: "flex", alignItems: "center", gap: 6 }}>
+                    <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#22C55E" }} />
+                    <span style={{ fontSize: 11, color: "#22C55E", fontWeight: 700 }}>ARRYSE ✓</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Datos */}
+            <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: "16px", marginBottom: 16 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                {[
+                  { label: "Operación", value: operacion.toUpperCase() },
+                  { label: "Tipo", value: tipoPropiedad },
+                  { label: "Precio", value: `${moneda} ${precio}` },
+                  { label: "Superficie", value: superficie ? `${superficie} m²` : "-" },
+                  { label: "Ambientes", value: ambientes || "-" },
+                  { label: "Ubicación", value: `${barrio}, ${ciudad}` },
+                ].map(d => (
+                  <div key={d.label}>
+                    <p style={{ margin: 0, fontSize: 11, color: "rgba(255,255,255,0.3)" }}>{d.label}</p>
+                    <p style={{ margin: "2px 0 0", fontSize: 13, fontWeight: 600 }}>{d.value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Costo total */}
+            {(duracionExtra || destacado) && (
+              <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 14, padding: "14px 16px", marginBottom: 16 }}>
+                <p style={{ margin: "0 0 8px", fontWeight: 700, fontSize: 14 }}>💳 Costo adicional</p>
+                {duracionExtra && <p style={{ margin: "0 0 4px", fontSize: 13, color: "rgba(255,255,255,0.5)" }}>Duración extra ({duracionExtra}s): +${duracionExtra === 120 ? "1.00" : "1.50"} USD</p>}
+                {destacado && <p style={{ margin: "0 0 4px", fontSize: 13, color: "rgba(255,255,255,0.5)" }}>Destacado 24h: +$2.00 USD</p>}
+                <p style={{ margin: "8px 0 0", fontWeight: 700, fontSize: 15, color: "#F59E0B" }}>
+                  Total: ${((duracionExtra === 120 ? 1 : duracionExtra === 180 ? 1.5 : 0) + (destacado ? 2 : 0)).toFixed(2)} USD
+                </p>
+              </div>
+            )}
+
+            {error && <p style={{ color: "#EF4444", fontSize: 13, margin: "0 0 12px" }}>{error}</p>}
+
+            <button onClick={handlePublicar} disabled={loading} style={{ ...btn, opacity: loading ? 0.6 : 1 }}>
+              {loading ? "Publicando..." : "🚀 Publicar ahora"}
+            </button>
+
+            <p style={{ textAlign: "center", fontSize: 12, color: "rgba(255,255,255,0.2)", marginTop: 12 }}>
+              Al publicar aceptás los Términos y Condiciones de Vivienda Ya
+            </p>
+          </div>
+        )}
       </div>
 
-      {/* Start button */}
-      {selectedMode && (
-        <div className="mt-6 px-4">
-          <button
-            onClick={() => handleProtectedAction('Grabar', () => {
-              const mode = arryseModes.find((m) => m.mode === selectedMode)
-              if (mode && mode.cost > 0) {
-                // check enough credits before spending
-                const balance = user?.credits || 0
-                if (balance < mode.cost) {
-                  const msg =
-                    lang === "es"
-                      ? "Saldo insuficiente. ¡Comprá un pack para publicar tu propiedad!"
-                      : "Saldo insuficiente. Compre um pacote para publicar sua propriedade!"
-                  alert(msg)
-                  return
-                }
-                const success = spendCredits(mode.cost, `ARRYSE Pro - Grabacion`)
-                if (!success) return
-              }
-              setIsRecording(true)
-            })}
-            className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary py-4 text-sm font-bold text-primary-foreground transition-all active:scale-[0.98]"
-          >
-            Iniciar grabacion ARRYSE
-            <ArrowRight className="h-4 w-4" />
-          </button>
-        </div>
-      )}
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   )
 }
