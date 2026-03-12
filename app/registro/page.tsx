@@ -311,60 +311,40 @@ export default function RegistroPage() {
             {/* Input oculto — sin capture para evitar rotación */}
             <input ref={fileRef} type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
 
-            {/* FRENTE */}
-            <div style={{ marginBottom: 12 }}>
-              <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13, margin: '0 0 6px', fontWeight: 600 }}>
-                Frente {dniFront && <span style={{ color: '#22C55E' }}>✓ Cargado</span>}
-              </p>
-              <div onClick={() => handleScanDNI('front')} style={{
-                height: 100, borderRadius: 12,
-                border: `2px dashed ${dniFront ? '#22C55E' : 'rgba(255,255,255,0.2)'}`,
-                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', overflow: 'hidden', background: 'rgba(255,255,255,0.03)',
-                position: 'relative',
-              }}>
-                {scanning && scanSide === 'front' ? (
-                  <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, margin: 0 }}>⏳ Procesando...</p>
-                ) : dniFront ? (
-                  <>
-                    <img src={dniFront} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    <div style={{ position: 'absolute', top: 6, right: 6, background: '#22C55E', borderRadius: '50%', width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>✓</div>
-                  </>
-                ) : (
-                  <>
-                    <span style={{ fontSize: 24 }}>📷</span>
-                    <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 12, margin: '6px 0 0' }}>Tocá para fotografiar el frente</p>
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* DORSO */}
-            <div style={{ marginBottom: 16 }}>
-              <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 13, margin: '0 0 6px', fontWeight: 600 }}>
-                Dorso {dniBack && <span style={{ color: '#22C55E' }}>✓ Cargado</span>}
-              </p>
-              <div onClick={() => handleScanDNI('back')} style={{
-                height: 100, borderRadius: 12,
-                border: `2px dashed ${dniBack ? '#22C55E' : 'rgba(255,255,255,0.2)'}`,
-                display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', overflow: 'hidden', background: 'rgba(255,255,255,0.03)',
-                position: 'relative',
-              }}>
-                {scanning && scanSide === 'back' ? (
-                  <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 13, margin: 0 }}>⏳ Procesando...</p>
-                ) : dniBack ? (
-                  <>
-                    <img src={dniBack} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    <div style={{ position: 'absolute', top: 6, right: 6, background: '#22C55E', borderRadius: '50%', width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12 }}>✓</div>
-                  </>
-                ) : (
-                  <>
-                    <span style={{ fontSize: 24 }}>📷</span>
-                    <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 12, margin: '6px 0 0' }}>Tocá para fotografiar el dorso</p>
-                  </>
-                )}
-              </div>
+            {/* FRENTE + DORSO lado a lado */}
+            <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
+              {(['front', 'back'] as const).map(side => {
+                const img = side === 'front' ? dniFront : dniBack
+                const label = side === 'front' ? 'Frente' : 'Dorso'
+                return (
+                  <div key={side} style={{ flex: 1 }}>
+                    <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: 12, margin: '0 0 6px', fontWeight: 600, textAlign: 'center' }}>
+                      {label} {img && <span style={{ color: '#22C55E' }}>✓</span>}
+                    </p>
+                    <div onClick={() => handleScanDNI(side)} style={{
+                      height: 110, borderRadius: 12,
+                      border: `2px dashed ${img ? '#22C55E' : 'rgba(255,255,255,0.2)'}`,
+                      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+                      cursor: 'pointer', overflow: 'hidden', background: 'rgba(255,255,255,0.03)',
+                      position: 'relative',
+                    }}>
+                      {scanning && scanSide === side ? (
+                        <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 12, margin: 0, textAlign: 'center', padding: '0 8px' }}>⏳ Procesando...</p>
+                      ) : img ? (
+                        <>
+                          <img src={img} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          <div style={{ position: 'absolute', top: 6, right: 6, background: '#22C55E', borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11 }}>✓</div>
+                        </>
+                      ) : (
+                        <>
+                          <span style={{ fontSize: 22 }}>📷</span>
+                          <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: 11, margin: '6px 0 0', textAlign: 'center', padding: '0 6px' }}>Tocá para fotografiar</p>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
             </div>
 
             {error && <p style={{ color: '#EF4444', fontSize: 13, marginTop: 4 }}>{error}</p>}
