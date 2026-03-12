@@ -335,9 +335,9 @@ export default function PublicarPage() {
 
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Tipo de propiedad</p>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
-              ['Departamento', 'Casa', 'PH', 'Local', 'Oficina', 'Terreno', 'Loft', 'Monoambiente', 'Cabaña', 'Duplex', 'Cochera', 'Galpón']
+             {['Departamento', 'Casa', 'PH', 'Local', 'Oficina', 'Terreno', 'Loft', 'Monoambiente', 'Cabaña', 'Duplex', 'Cochera', 'Galpón'].map(t => (
                 <button key={t} onClick={() => setTipoPropiedad(t)} style={chip(tipoPropiedad === t)}>
-                  {t.charAt(0).toUpperCase() + t.slice(1)}
+                  {t}
                 </button>
               ))}
             </div>
