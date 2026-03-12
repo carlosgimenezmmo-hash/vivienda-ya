@@ -320,7 +320,7 @@ export default function PublicarPage() {
         )}
 
         {step === 4 && (
-          <div>
+         <div style={{ paddingBottom: 100 }}>
             <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 4px" }}>Datos de la propiedad</h1>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 20px" }}>Se verán sobre el video en el feed</p>
 
@@ -335,7 +335,7 @@ export default function PublicarPage() {
 
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Tipo de propiedad</p>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
-              {["departamento", "casa", "ph", "local", "oficina", "terreno"].map(t => (
+              ['Departamento', 'Casa', 'PH', 'Local', 'Oficina', 'Terreno', 'Loft', 'Monoambiente', 'Cabaña', 'Duplex', 'Cochera', 'Galpón']
                 <button key={t} onClick={() => setTipoPropiedad(t)} style={chip(tipoPropiedad === t)}>
                   {t.charAt(0).toUpperCase() + t.slice(1)}
                 </button>
@@ -373,8 +373,9 @@ export default function PublicarPage() {
 
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>WhatsApp de contacto</p>
             <input value={whatsapp} onChange={e => setWhatsapp(e.target.value)} placeholder="Ej: 5491112345678" type="tel" style={{ ...inp, marginBottom: 20 }} />
+          
 
-            {error && <p style={{ color: "#EF4444", fontSize: 13, margin: "0 0 10px" }}>{error}</p>}
+         {error && <p style={{ color: "#EF4444", fontSize: 13, margin: "0 0 10px" }}>{error}</p>}
             <button onClick={() => {
               if (!precio || !barrio || !ciudad) return setError("Completá precio y ubicación")
               setError(""); setStep(5)
