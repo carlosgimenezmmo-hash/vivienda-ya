@@ -350,7 +350,7 @@ export default function RegistroPage() {
                     {side === 'front' ? 'Frente' : 'Dorso'} {(side === 'front' ? dniFront : dniBack) && <span style={{ color: '#22C55E' }}>✓</span>}
                   </p>
                   <div onClick={() => handleScanDNI(side)} style={{
-                    height: 150, borderRadius: 14,
+                    height: 110, borderRadius: 14,
                     border: `2px dashed ${(side === 'front' ? dniFront : dniBack) ? '#22C55E' : 'rgba(255,255,255,0.15)'}`,
                     display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
                     cursor: 'pointer', overflow: 'hidden', background: 'rgba(255,255,255,0.02)',
