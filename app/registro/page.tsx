@@ -157,7 +157,7 @@ export default function RegistroPage() {
       addCredits(1, "Recompensa por verificación")
       router.push('/')
     } catch (err: any) {
-      setError(err.message || 'Error al registrarse')
+      setError(err.message === 'User already registered' ? 'Este email ya tiene una cuenta. Iniciá sesión.' : err.message || 'Error al registrarse')
     } finally {
       setLoading(false)
     }
@@ -357,13 +357,13 @@ export default function RegistroPage() {
 
         {/* PASO 4 - CONFIRMACIÓN */}
         {step === 4 && (
-          <div style={{ textAlign: 'center', paddingTop: 8 }}>
-            <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'rgba(34,197,94,0.12)', border: '2px solid rgba(34,197,94,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px' }}>
+          <div style={{ textAlign: 'center', paddingTop: 0 }}>
+            <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'rgba(34,197,94,0.12)', border: '2px solid rgba(34,197,94,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="20 6 9 17 4 12"/>
               </svg>
             </div>
-            <h1 style={{ fontSize: 26, fontWeight: 800, margin: '0 0 10px', letterSpacing: -0.5 }}>¡Todo listo!</h1>
+            <h1 style={{ fontSize: 24, fontWeight: 800, margin: '0 0 6px', letterSpacing: -0.5 }}>¡Todo listo!</h1>
             <p style={{ color: 'rgba(255,255,255,0.45)', fontSize: 15, margin: '0 0 6px', lineHeight: 1.6 }}>
               Tu cuenta está siendo verificada.
             </p>
