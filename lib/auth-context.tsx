@@ -31,32 +31,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const isLoggedIn = user !== null && user.isLoggedIn
 
-  // Al arrancar, verificar si hay sesión activa en Supabase
+  const buildUser = (supabaseUser: any): User => {
+    const meta = supabaseUser.user_metadata
+    return {
+      ...mockUser,
+      id: supabaseUser.id,
+      name: `${meta.nombre || ''} ${meta.apellido || ''}`.trim() || supabaseUser.email || 'Usuario',
+      email: supabaseUser.email || '',
+      isLoggedIn: true,
+    }
+  }
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        const meta = session.user.user_metadata
-        setUser({
-          ...mockUser,
-          id: session.user.id,
-          name: `${meta.nombre || ''} ${meta.apellido || ''}`.trim() || session.user.email || 'Usuario',
-          email: session.user.email || '',
-          isLoggedIn: true,
-        })
-      }
+      if (session?.user) setUser(buildUser(session.user))
     })
 
-    // Escuchar cambios de sesión (login/logout)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
-        const meta = session.user.user_metadata
-        setUser({
-          ...mockUser,
-          id: session.user.id,
-          name: `${meta.nombre || ''} ${meta.apellido || ''}`.trim() || session.user.email || 'Usuario',
-          email: session.user.email || '',
-          isLoggedIn: true,
-        })
+        setUser(buildUser(session.user))
       } else {
         setUser(null)
       }
@@ -65,10 +58,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe()
   }, [])
 
-  const login = useCallback(() => {
-    // El login real lo maneja onAuthStateChange arriba
-    // Este método queda para compatibilidad
-  }, [])
+  const login = useCallback(() => {}, [])
 
   const logout = useCallback(async () => {
     await supabase.auth.signOut()
