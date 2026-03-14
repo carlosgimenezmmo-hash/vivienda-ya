@@ -1,5 +1,4 @@
-@"
-"use client"
+﻿"use client"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useAuth } from "@/lib/auth-context"
@@ -60,4 +59,3 @@ export function BottomNav() {
     </>
   )
 }
-"@ | Set-Content "C:\proyectos\vivienda-ya\components\bottom-nav.tsx" -Encoding UTF8
