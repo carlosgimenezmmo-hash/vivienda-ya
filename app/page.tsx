@@ -25,7 +25,8 @@ export default function ViviendaYaFull() {
         const { data, error } = await supabase
           .from('properties')
           .select('*')
-          .not('video_url', 'is', null);
+          .not('video_url', 'is', null)
+          .order('created_at', { ascending: false });
         if (error) throw error;
         setProperties(data || []);
       } catch (err) {
