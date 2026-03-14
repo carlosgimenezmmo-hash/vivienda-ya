@@ -28,4 +28,4 @@ export function BottomNav() {
     }
     const clean = activeProperty.whatsapp_number.replace(/\D/g, '')
     const msg = `Hola! Vi "${activeProperty.title}" en ViviendaYa y me interesa. Podes darme mas info?`
-```
+
