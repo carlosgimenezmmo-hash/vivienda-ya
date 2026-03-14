@@ -363,7 +363,9 @@ export default function PublicarPage() {
         )}
         {step === 3 && (
           <div style={{ paddingBottom: 120 }}>
-            <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 4px" }}>Grabá la propiedad</h1>
+           <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 4px" }}>Grabá la propiedad</h1>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 16px" }}>Tenés {duracionElegida} segundos · Grabá desde adentro y afuera</p>
+            <div style={{
       
               background: gpsStatus === "ok" ? "rgba(34,197,94,0.08)" : gpsStatus === "error" ? "rgba(239,68,68,0.08)" : "rgba(37,99,235,0.08)",
               border: `1px solid ${gpsStatus === "ok" ? "rgba(34,197,94,0.25)" : gpsStatus === "error" ? "rgba(239,68,68,0.25)" : "rgba(37,99,235,0.25)"}`,
