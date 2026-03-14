@@ -64,18 +64,25 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
   }
 };
 
-  const togglePause = (i: number, id: number) => {
+ const togglePause = (i: number, id: number) => {
     const video = videoRefs.current[i];
     if (!video) return;
     if (video.paused) {
       video.play();
       setPaused(prev => ({ ...prev, [id]: false }));
     } else {
-      video.pause();
-      setPaused(prev => ({ ...prev, [id]: true }));
+      // Primer toque activa sonido, segundo toque pausa
+      if (video.muted) {
+        video.muted = false;
+        videoRefs.current.forEach((v, idx) => {
+          if (idx !== i && v) v.muted = true;
+        });
+      } else {
+        video.pause();
+        setPaused(prev => ({ ...prev, [id]: true }));
+      }
     }
   };
-
   const handleWhatsApp = (number: string, title: string) => {
     const clean = number?.replace(/\D/g, '');
     const msg = `Hola! Vi "${title}" en ViviendaYa y me interesa. ¿Podés darme más info?`;
