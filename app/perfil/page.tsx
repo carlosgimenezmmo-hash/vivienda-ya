@@ -126,8 +126,7 @@ export default function PerfilPage() {
               <circle cx="12" cy="13" r="4"/>
             </svg>
           </label>
-          <input id="avatar-upload" type="file" accept="image/*" capture="user" style={{ display: "none" }}
-            onChange={async (e) => {
+          <input id="avatar-upload" type="file" accept="image/*" style={{ display: "none" }} onChange={async (e) => {
               const file = e.target.files?.[0]
               if (!file) return
               const { data: sessionData } = await supabase.auth.getSession()
