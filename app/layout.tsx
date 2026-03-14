@@ -1,12 +1,10 @@
 import type { Metadata, Viewport } from "next"
-import { Geist } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { AuthProvider } from "@/lib/auth-context"
+import { ActivePropertyProvider } from "@/lib/active-property-context"
 import { ProtectedActionProvider } from "@/lib/protected-action-context"
 import { BottomNav } from "@/components/bottom-nav"
 import "./globals.css"
-
-const geist = Geist({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "Vivienda Ya - Propiedades como nunca las viste",
@@ -39,12 +37,14 @@ export default function RootLayout({
     <html lang="es">
       <body style={{ margin: 0, padding: 0, background: '#000', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' }}>
         <AuthProvider>
-          <ProtectedActionProvider>
-            <div style={{ width: '100%', minHeight: '100dvh', position: 'relative' }}>
-              <main style={{ flex: 1 }}>{children}</main>
-              <BottomNav />
-            </div>
-          </ProtectedActionProvider>
+          <ActivePropertyProvider>
+            <ProtectedActionProvider>
+              <div style={{ width: '100%', minHeight: '100dvh', position: 'relative' }}>
+                <main style={{ flex: 1 }}>{children}</main>
+                <BottomNav />
+              </div>
+            </ProtectedActionProvider>
+          </ActivePropertyProvider>
         </AuthProvider>
         <Analytics />
       </body>

@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
+import { useActiveProperty } from '@/lib/active-property-context';
 import { AuthSheet } from '@/components/auth-sheet';
 
 export default function ViviendaYaFull() {
@@ -14,6 +15,7 @@ export default function ViviendaYaFull() {
   const videoRefs = useRef<HTMLVideoElement[]>([]);
   const { isLoggedIn, likedProperties, savedProperties, toggleLike, toggleSave } = useAuth();
   const router = useRouter();
+  const { setActiveProperty } = useActiveProperty();
   const [showAuthSheet, setShowAuthSheet] = useState(false);
   const [authAction, setAuthAction] = useState('');
 
@@ -44,6 +46,7 @@ export default function ViviendaYaFull() {
             video.play().catch(() => {});
             const index = videoRefs.current.indexOf(video);
             if (index !== -1) setActiveIndex(index);
+          setActiveProperty({ id: properties[index]?.id, title: properties[index]?.title, whatsapp_number: properties[index]?.whatsapp_number });
           } else {
             video.pause();
           }
