@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth-context"
-
+import { supabase } from "@/lib/supabaseClient"
 export default function PerfilPage() {
   const { user, isLoggedIn, logout } = useAuth()
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
@@ -103,14 +103,46 @@ export default function PerfilPage() {
 
       {/* AVATAR + DATOS */}
       <div style={{ padding: "24px 20px 20px", display: "flex", alignItems: "center", gap: 16 }}>
-        <div style={{
-          width: 72, height: 72, borderRadius: "50%",
-          background: "linear-gradient(135deg, #2563EB, #1d4ed8)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: 26, fontWeight: 800, color: "#fff", flexShrink: 0,
-          border: "3px solid rgba(37,99,235,0.4)",
-        }}>
-          {initials}
+       <div style={{ position: "relative", flexShrink: 0 }}>
+          <div style={{
+            width: 72, height: 72, borderRadius: "50%",
+            background: user.avatar_url ? "transparent" : "linear-gradient(135deg, #2563EB, #1d4ed8)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 26, fontWeight: 800, color: "#fff",
+            border: "3px solid rgba(37,99,235,0.4)",
+            overflow: "hidden",
+          }}>
+            {user.avatar_url ? <img src={user.avatar_url} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : initials}
+          </div>
+          <label htmlFor="avatar-upload" style={{
+            position: "absolute", bottom: 0, right: 0,
+            width: 24, height: 24, borderRadius: "50%",
+            background: "#2563EB", border: "2px solid #0a0a0a",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            cursor: "pointer",
+          }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+          </label>
+          <input id="avatar-upload" type="file" accept="image/*" capture="user" style={{ display: "none" }}
+            onChange={async (e) => {
+              const file = e.target.files?.[0]
+              if (!file) return
+              const { data: sessionData } = await supabase.auth.getSession()
+              const uid = sessionData?.session?.user?.id
+              if (!uid) return
+              const ext = file.name.split(".").pop()
+              const path = `avatars/${uid}.${ext}`
+              const { error } = await supabase.storage.from("videos-app").upload(path, file, { upsert: true, contentType: file.type })
+              if (!error) {
+                const { data } = supabase.storage.from("videos-app").getPublicUrl(path)
+                await supabase.from("users").update({ avatar_url: data.publicUrl }).eq("id", uid)
+                window.location.reload()
+              }
+            }}
+          />
         </div>
         <div style={{ flex: 1 }}>
           <h2 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 4px" }}>{user.name}</h2>
