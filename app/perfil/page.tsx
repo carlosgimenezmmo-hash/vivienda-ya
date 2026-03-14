@@ -139,7 +139,8 @@ export default function PerfilPage() {
               if (!error) {
                 const { data } = supabase.storage.from("videos-app").getPublicUrl(path)
                 await supabase.from("users").update({ avatar_url: data.publicUrl }).eq("id", uid)
-                window.location.reload()
+await supabase.auth.updateUser({ data: { avatar_url: data.publicUrl } })
+window.location.reload()
               }
             }}
           />

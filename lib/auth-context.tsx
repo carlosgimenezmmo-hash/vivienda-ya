@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const isLoggedIn = user !== null && user.isLoggedIn
 
-  const buildUser = (supabaseUser: any): User => {
+ const buildUser = (supabaseUser: any): User => {
     const meta = supabaseUser.user_metadata
     return {
       ...mockUser,
@@ -39,6 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       name: `${meta.nombre || ''} ${meta.apellido || ''}`.trim() || supabaseUser.email || 'Usuario',
       email: supabaseUser.email || '',
       isLoggedIn: true,
+      avatar_url: meta.avatar_url || null,
     }
   }
 
