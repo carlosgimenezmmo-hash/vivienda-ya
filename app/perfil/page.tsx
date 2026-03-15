@@ -114,8 +114,50 @@ export default function PerfilPage() {
           }}>
             {user.avatar_url ? <img src={user.avatar_url} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : initials}
           </div>
-          <label htmlFor="avatar-upload" style={{
-            position: "absolute", bottom: 0, right: 0,
+          <div 
+  onClick={() => document.getElementById('avatar-upload')?.click()}
+  style={{
+    position: "absolute", bottom: 0, right: 0,
+    width: 24, height: 24, borderRadius: "50%",
+    background: "#2563EB", border: "2px solid #0a0a0a",
+    display: "flex", alignItems: "center", justifyContent: "center",
+    cursor: "pointer",
+  }}>
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
+    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+    <circle cx="12" cy="13" r="4"/>
+  </svg>
+</div>
+<input
+  id="avatar-upload"
+  type="file"
+  accept="image/*"
+  style={{ display: "none" }}
+  onChange={async (e) => {
+    alert("Archivo seleccionado")
+    const file = e.target.files?.[0]
+    if (!file) return
+    const { data: sessionData } = await supabase.auth.getSession()
+    const uid = sessionData?.session?.user?.id || user?.id
+    if (!uid) {
+      alert("Sin sesión: " + JSON.stringify(sessionData))
+      return
+    }
+    alert("UID: " + uid)
+    const ext = file.name.split(".").pop()
+    const path = `avatars/${uid}.${ext}`
+    const { error } = await supabase.storage.from("videos-app").upload(path, file, { upsert: true, contentType: file.type })
+    if (error) {
+      alert("Error upload: " + error.message)
+      return
+    }
+    const { data } = supabase.storage.from("videos-app").getPublicUrl(path)
+    await supabase.from("users").update({ avatar_url: data.publicUrl }).eq("id", uid)
+    await supabase.auth.updateUser({ data: { avatar_url: data.publicUrl } })
+    alert("Foto subida! Recargando...")
+    window.location.reload()
+  }}
+       position: "absolute", bottom: 0, right: 0,
             width: 24, height: 24, borderRadius: "50%",
             background: "#2563EB", border: "2px solid #0a0a0a",
             display: "flex", alignItems: "center", justifyContent: "center",
