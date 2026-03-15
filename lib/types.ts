@@ -70,6 +70,7 @@ export interface User {
   name: string
   email: string
   avatar: string
+  avatar_url?: string
   level: UserLevel
   credits: number
   stats: {
@@ -78,29 +79,9 @@ export interface User {
     permutas: number
     likes: number
   }
-  properties: string[] // property IDs
+  properties: string[]
   isLoggedIn: boolean
 }
-
-export interface Chat {
-  id: string
-  contactName: string
-  contactAvatar: string
-  lastMessage: string
-  timestamp: string
-  unread: number
-  propertyId?: string
-}
-
-export interface Notification {
-  id: string
-  type: "like" | "message" | "match" | "credit" | "system" | "arryse"
-  title: string
-  description: string
-  timestamp: string
-  read: boolean
-}
-
 // ===== SISTEMA DE CREDITOS =====
 
 export interface CreditPack {
