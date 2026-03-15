@@ -129,9 +129,12 @@ export default function PerfilPage() {
           <input id="avatar-upload" type="file" accept="image/*" style={{ display: "none" }} onChange={async (e) => {
               const file = e.target.files?.[0]
               if (!file) return
-              const { data: sessionData } = await supabase.auth.getSession()
-              const uid = sessionData?.session?.user?.id
-              if (!uid) return
+             const { data: sessionData } = await supabase.auth.getSession()
+const uid = sessionData?.session?.user?.id || user?.id
+if (!uid) {
+  alert("Sin sesión: " + JSON.stringify(sessionData))
+  return
+}
               const ext = file.name.split(".").pop()
               const path = `avatars/${uid}.${ext}`
               const { error } = await supabase.storage.from("videos-app").upload(path, file, { upsert: true, contentType: file.type })
