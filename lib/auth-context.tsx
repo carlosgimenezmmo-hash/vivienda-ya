@@ -31,27 +31,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const isLoggedIn = user !== null && user.isLoggedIn
 
- const buildUser = (supabaseUser: any): User => {
+ const buildUser = async (supabaseUser: any): Promise<User> => {
     const meta = supabaseUser.user_metadata
+    const { data: userData } = await supabase.from('users').select('avatar_url, credits').eq('id', supabaseUser.id).single()
     return {
       ...mockUser,
       id: supabaseUser.id,
       name: `${meta.nombre || ''} ${meta.apellido || ''}`.trim() || supabaseUser.email || 'Usuario',
       email: supabaseUser.email || '',
       isLoggedIn: true,
-      avatar_url: meta.avatar_url || null,
+      avatar_url: userData?.avatar_url || meta.avatar_url || null,
+      credits: userData?.credits || mockUser.credits,
     }
   }
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) setUser(buildUser(session.user))
+ supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (session?.user) setUser(await buildUser(session.user))
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        setUser(buildUser(session.user))
-      } else {
+    if (session?.user) {
+        setUser(await buildUser(session.user))
+      }  else {
         setUser(null)
       }
     })
