@@ -134,7 +134,7 @@ export default function PerfilPage() {
   accept="image/*"
   style={{ display: "none" }}
   onChange={async (e) => {
-    alert("Archivo seleccionado")
+   
     const file = e.target.files?.[0]
     if (!file) return
     const { data: sessionData } = await supabase.auth.getSession()
@@ -143,7 +143,7 @@ export default function PerfilPage() {
       alert("Sin sesiÃ³n: " + JSON.stringify(sessionData))
       return
     }
-    alert("UID: " + uid)
+   
     const ext = file.name.split(".").pop()
     const path = `avatars/${uid}.${ext}`
     const { error } = await supabase.storage.from("videos-app").upload(path, file, { upsert: true, contentType: file.type })
