@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -14,7 +14,7 @@ export default function PerfilPage() {
     router.push("/")
   }
 
-  // ── PANTALLA SIN LOGIN ──────────────────────────────────────────────────────
+  // â”€â”€ PANTALLA SIN LOGIN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   if (!isLoggedIn || !user) {
     return (
       <div style={{
@@ -36,7 +36,7 @@ export default function PerfilPage() {
           Tu perfil te espera
         </h2>
         <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, textAlign: "center", margin: "0 0 36px", lineHeight: 1.6 }}>
-          Creá tu cuenta para gestionar tus propiedades,<br/>créditos y contactar propietarios.
+          CreÃ¡ tu cuenta para gestionar tus propiedades,<br/>crÃ©ditos y contactar propietarios.
         </p>
         <button onClick={() => router.push("/registro")} style={{
           width: "100%", maxWidth: 340, padding: "16px", borderRadius: 14, border: "none",
@@ -45,7 +45,7 @@ export default function PerfilPage() {
           fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
           boxShadow: "0 4px 20px rgba(37,99,235,0.35)",
         }}>
-          Registrarme gratis →
+          Registrarme gratis â†’
         </button>
         <button onClick={() => router.push("/login")} style={{
           width: "100%", maxWidth: 340, padding: "15px", borderRadius: 14,
@@ -61,17 +61,17 @@ export default function PerfilPage() {
     )
   }
 
-  // ── PANTALLA CON LOGIN ──────────────────────────────────────────────────────
+  // â”€â”€ PANTALLA CON LOGIN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const initials = user.name
     ? user.name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
     : "?"
 
   const menuItems = [
-    { emoji: "🏠", label: "Mis Publicaciones", sub: "0 propiedades activas", href: "/publicar" },
-    { emoji: "🔖", label: "Guardados", sub: "Propiedades que te gustaron", href: "#" },
-    { emoji: "🔁", label: "Mis Permutas", sub: "Intercambios activos", href: "#" },
-    { emoji: "💬", label: "Mensajes", sub: "Conversaciones con propietarios", href: "#" },
-  { emoji: "⚙️", label: "Configuración", sub: "Cuenta y privacidad", href: "/configuracion" },
+    { emoji: "ðŸ ", label: "Mis Publicaciones", sub: "0 propiedades activas", href: "/publicar" },
+    { emoji: "ðŸ”–", label: "Guardados", sub: "Propiedades que te gustaron", href: "#" },
+    { emoji: "ðŸ”", label: "Mis Permutas", sub: "Intercambios activos", href: "#" },
+    { emoji: "ðŸ’¬", label: "Mensajes", sub: "Conversaciones con propietarios", href: "#" },
+  { emoji: "âš™ï¸", label: "ConfiguraciÃ³n", sub: "Cuenta y privacidad", href: "/configuracion" },
   ]
 
   return (
@@ -140,7 +140,7 @@ export default function PerfilPage() {
     const { data: sessionData } = await supabase.auth.getSession()
     const uid = sessionData?.session?.user?.id || user?.id
     if (!uid) {
-      alert("Sin sesión: " + JSON.stringify(sessionData))
+      alert("Sin sesiÃ³n: " + JSON.stringify(sessionData))
       return
     }
     alert("UID: " + uid)
@@ -156,36 +156,6 @@ export default function PerfilPage() {
     await supabase.auth.updateUser({ data: { avatar_url: data.publicUrl } })
     alert("Foto subida! Recargando...")
     window.location.reload()
-  }}
-       position: "absolute", bottom: 0, right: 0,
-            width: 24, height: 24, borderRadius: "50%",
-            background: "#2563EB", border: "2px solid #0a0a0a",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            cursor: "pointer",
-          }}>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round">
-              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-              <circle cx="12" cy="13" r="4"/>
-            </svg>
-          </label>
-          <input id="avatar-upload" type="file" accept="image/*" style={{ display: "none" }} onChange={async (e) => {
-              const file = e.target.files?.[0]
-              if (!file) return
-             const { data: sessionData } = await supabase.auth.getSession()
-const uid = sessionData?.session?.user?.id || user?.id
-if (!uid) {
-  alert("Sin sesión: " + JSON.stringify(sessionData))
-  return
-}
-              const ext = file.name.split(".").pop()
-              const path = `avatars/${uid}.${ext}`
-              const { error } = await supabase.storage.from("videos-app").upload(path, file, { upsert: true, contentType: file.type })
-              if (!error) {
-                const { data } = supabase.storage.from("videos-app").getPublicUrl(path)
-                await supabase.from("users").update({ avatar_url: data.publicUrl }).eq("id", uid)
-await supabase.auth.updateUser({ data: { avatar_url: data.publicUrl } })
-window.location.reload()
-              }
             }}
           />
         </div>
@@ -203,12 +173,12 @@ window.location.reload()
         </div>
       </div>
 
-      {/* ESTADÍSTICAS */}
+      {/* ESTADÃSTICAS */}
       <div style={{ padding: "0 20px 20px", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
         {[
           { label: "Publicaciones", value: "0" },
           { label: "Guardados", value: "0" },
-          { label: "Créditos", value: String(user.credits || 0) },
+          { label: "CrÃ©ditos", value: String(user.credits || 0) },
         ].map((stat) => (
           <div key={stat.label} style={{
             background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)",
@@ -220,7 +190,7 @@ window.location.reload()
         ))}
       </div>
 
-      {/* CRÉDITOS BANNER */}
+      {/* CRÃ‰DITOS BANNER */}
       <div style={{ padding: "0 20px 20px" }}>
         <div style={{
           background: "linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.05))",
@@ -229,10 +199,10 @@ window.location.reload()
           display: "flex", alignItems: "center", justifyContent: "space-between",
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontSize: 22 }}>🪙</span>
+            <span style={{ fontSize: 22 }}>ðŸª™</span>
             <div>
-              <p style={{ margin: 0, fontWeight: 700, fontSize: 14 }}>Mis Créditos</p>
-              <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.4)" }}>Usá créditos para destacar propiedades</p>
+              <p style={{ margin: 0, fontWeight: 700, fontSize: 14 }}>Mis CrÃ©ditos</p>
+              <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.4)" }}>UsÃ¡ crÃ©ditos para destacar propiedades</p>
             </div>
           </div>
           <div style={{ textAlign: "right" }}>
@@ -241,7 +211,7 @@ window.location.reload()
         </div>
       </div>
 
-      {/* MENÚ */}
+      {/* MENÃš */}
       <div style={{ padding: "0 20px" }}>
         <div style={{
           background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
@@ -280,7 +250,7 @@ window.location.reload()
         }}>
           <div>
             <p style={{ margin: "0 0 2px", fontSize: 13, fontWeight: 700, color: "#60A5FA" }}>Plan actual: GRATIS</p>
-            <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.35)" }}>3 videos · 60 seg · Verificación ARRYSE</p>
+            <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.35)" }}>3 videos Â· 60 seg Â· VerificaciÃ³n ARRYSE</p>
           </div>
           <button style={{
             background: "linear-gradient(135deg, #2563EB, #1d4ed8)",
@@ -288,7 +258,7 @@ window.location.reload()
             color: "#fff", fontSize: 12, fontWeight: 700, cursor: "pointer",
             fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
           }}>
-            PRO →
+            PRO â†’
           </button>
         </div>
       </div>
@@ -306,9 +276,9 @@ window.location.reload()
             padding: "24px 20px 40px",
           }} onClick={e => e.stopPropagation()}>
             <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.2)", margin: "0 auto 20px" }} />
-            <h3 style={{ fontSize: 18, fontWeight: 800, margin: "0 0 8px", textAlign: "center" }}>¿Cerrar sesión?</h3>
+            <h3 style={{ fontSize: 18, fontWeight: 800, margin: "0 0 8px", textAlign: "center" }}>Â¿Cerrar sesiÃ³n?</h3>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, textAlign: "center", margin: "0 0 24px" }}>
-              Podés volver a entrar cuando quieras.
+              PodÃ©s volver a entrar cuando quieras.
             </p>
             <button onClick={handleLogout} style={{
               width: "100%", padding: "15px", borderRadius: 14,
@@ -316,7 +286,7 @@ window.location.reload()
               color: "#FCA5A5", fontSize: 15, fontWeight: 700, cursor: "pointer",
               marginBottom: 10, fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
             }}>
-              Sí, cerrar sesión
+              SÃ­, cerrar sesiÃ³n
             </button>
             <button onClick={() => setShowLogoutConfirm(false)} style={{
               width: "100%", padding: "15px", borderRadius: 14,
