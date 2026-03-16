@@ -309,11 +309,14 @@ export default function RegistroPage() {
             </div>
 
             {/* Input oculto — sin capture para evitar rotación */}
-            <input ref={fileRef} type="file" accept="image/*" capture="environment" onChange={handleFileChange} style={{ display: 'none' }} />
+            
             
 
             {/* FRENTE + DORSO lado a lado */}
-            <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
+       <input ref={fileRef} type="file" accept="image/*" onChange={handleFileChange} style={{ display: 'none' }} />
+```
+
+Sacamos el `capture="environment"` — así en todos los celulares aparece el menú para elegir entre cámara o galería.
               {(['front', 'back'] as const).map(side => {
                 const img = side === 'front' ? dniFront : dniBack
                 const label = side === 'front' ? 'Frente' : 'Dorso'
