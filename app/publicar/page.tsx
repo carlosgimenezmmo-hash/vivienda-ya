@@ -152,15 +152,15 @@ export default function PublicarPage() {
         lat: gpsLocation?.lat || null,
         lng: gpsLocation?.lng || null,
         highlighted: destacado,
-        likes: 0,
-      }
+      likes: 0,
+      }).select().single()
 
       // Solo agregar user_id si hay sesión real de Supabase
       if (session?.user?.id) {
         insertPayload.user_id = session.user.id
       }
 
-      const { error: insertError } = await supabase.from("properties").insert(insertPayload)
+     const { data: insertData, error: insertError } = await supabase.from("properties").insert({
 
       if (insertError) {
         if (insertError.message.includes("row-level") || insertError.message.includes("policy")) {
@@ -169,7 +169,14 @@ export default function PublicarPage() {
         throw insertError
       }
 
-      router.push("/")
+     // Moderación en background — no bloquea al usuario
+fetch('/api/moderar', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ propertyId: insertData?.id, videoUrl: videoUrl }),
+}).catch(() => {})
+
+router.push("/")
     } catch (err: any) {
       setError(err.message || "Error al publicar. Intentá de nuevo.")
     } finally {
