@@ -36,7 +36,7 @@ export default function PerfilPage() {
           Tu perfil te espera
         </h2>
           Crea tu cuenta para gestionar tus propiedades,<br/>creditos y contactar propietarios.
-          CreÃ¡ tu cuenta para gestionar tus propiedades,<br/>crÃ©ditos y contactar propietarios.
+          Crea tu cuenta para gestionar tus propiedades y contactar propietarios.
         </p>
         <button onClick={() => router.push("/registro")} style={{
           width: "100%", maxWidth: 340, padding: "16px", borderRadius: 14, border: "none",

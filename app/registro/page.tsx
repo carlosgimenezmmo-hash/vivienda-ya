@@ -354,7 +354,7 @@ export default function RegistroPage() {
             {error && <p style={{ color: '#EF4444', fontSize: 13, marginTop: 4 }}>{error}</p>}
 
             <button onClick={handlePaso3} disabled={scanning} style={{ ...btn, marginTop: 12, opacity: scanning ? 0.6 : 1 }}>
-              {scanning ? 'Procesando...' : 'Continuar â†’'}
+              {scanning ? 'Procesando...' : 'Continuar'}
             </button>
           </div>
         )}
