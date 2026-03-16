@@ -35,7 +35,7 @@ export default function PerfilPage() {
         <h2 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 10px", textAlign: "center" }}>
           Tu perfil te espera
         </h2>
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, textAlign: "center", margin: "0 0 36px", lineHeight: 1.6 }}>
+          Crea tu cuenta para gestionar tus propiedades,<br/>creditos y contactar propietarios.
           CreÃ¡ tu cuenta para gestionar tus propiedades,<br/>crÃ©ditos y contactar propietarios.
         </p>
         <button onClick={() => router.push("/registro")} style={{
@@ -44,7 +44,7 @@ export default function PerfilPage() {
           color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer", marginBottom: 12,
           fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
           boxShadow: "0 4px 20px rgba(37,99,235,0.35)",
-        }}>
+          Registrarme gratis →
           Registrarme gratis â†’
         </button>
         <button onClick={() => router.push("/login")} style={{
@@ -66,12 +66,12 @@ export default function PerfilPage() {
     ? user.name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
     : "?"
 
-  const menuItems = [
-    { emoji: "ðŸ ", label: "Mis Publicaciones", sub: "0 propiedades activas", href: "/publicar" },
-    { emoji: "ðŸ”–", label: "Guardados", sub: "Propiedades que te gustaron", href: "#" },
-    { emoji: "ðŸ”", label: "Mis Permutas", sub: "Intercambios activos", href: "#" },
-    { emoji: "ðŸ’¬", label: "Mensajes", sub: "Conversaciones con propietarios", href: "#" },
-  { emoji: "âš™ï¸", label: "ConfiguraciÃ³n", sub: "Cuenta y privacidad", href: "/configuracion" },
+    { emoji: "🏠", label: "Mis Publicaciones", sub: "0 propiedades activas", href: "/mis-publicaciones" },
+    { emoji: "🔖", label: "Guardados", sub: "Propiedades que te gustaron", href: "#" },
+    { emoji: "🔄", label: "Mis Permutas", sub: "Intercambios activos", href: "#" },
+    { emoji: "💬", label: "Mensajes", sub: "Conversaciones con propietarios", href: "#" },
+    { emoji: "⚙️", label: "Configuracion", sub: "Cuenta y privacidad", href: "/configuracion" },
+
   ]
 
   return (
@@ -177,7 +177,7 @@ export default function PerfilPage() {
       <div style={{ padding: "0 20px 20px", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
         {[
           { label: "Publicaciones", value: "0" },
-          { label: "Guardados", value: "0" },
+          { label: "Creditos", value: String(user.credits || 0) },
           { label: "CrÃ©ditos", value: String(user.credits || 0) },
         ].map((stat) => (
           <div key={stat.label} style={{
@@ -200,8 +200,8 @@ export default function PerfilPage() {
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{ fontSize: 22 }}>ðŸª™</span>
-            <div>
-              <p style={{ margin: 0, fontWeight: 700, fontSize: 14 }}>Mis CrÃ©ditos</p>
+              <p style={{ margin: 0, fontWeight: 700, fontSize: 14 }}>Mis Creditos</p>
+              <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.4)" }}>Usa creditos para destacar propiedades</p>
               <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.4)" }}>UsÃ¡ crÃ©ditos para destacar propiedades</p>
             </div>
           </div>
@@ -249,7 +249,7 @@ export default function PerfilPage() {
           display: "flex", alignItems: "center", justifyContent: "space-between",
         }}>
           <div>
-            <p style={{ margin: "0 0 2px", fontSize: 13, fontWeight: 700, color: "#60A5FA" }}>Plan actual: GRATIS</p>
+            <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.35)" }}>3 videos · 60 seg · Verificacion ARRYSE</p>
             <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.35)" }}>3 videos Â· 60 seg Â· VerificaciÃ³n ARRYSE</p>
           </div>
           <button style={{
@@ -275,9 +275,9 @@ export default function PerfilPage() {
             background: "#1a1a1a", borderRadius: "20px 20px 0 0",
             padding: "24px 20px 40px",
           }} onClick={e => e.stopPropagation()}>
-            <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.2)", margin: "0 auto 20px" }} />
+            <h3 style={{ fontSize: 18, fontWeight: 800, margin: "0 0 8px", textAlign: "center" }}>Cerrar sesion?</h3>
             <h3 style={{ fontSize: 18, fontWeight: 800, margin: "0 0 8px", textAlign: "center" }}>Â¿Cerrar sesiÃ³n?</h3>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, textAlign: "center", margin: "0 0 24px" }}>
+              Podes volver a entrar cuando quieras.
               PodÃ©s volver a entrar cuando quieras.
             </p>
             <button onClick={handleLogout} style={{
@@ -285,7 +285,7 @@ export default function PerfilPage() {
               background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)",
               color: "#FCA5A5", fontSize: 15, fontWeight: 700, cursor: "pointer",
               marginBottom: 10, fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
-            }}>
+              Si, cerrar sesion
               SÃ­, cerrar sesiÃ³n
             </button>
             <button onClick={() => setShowLogoutConfirm(false)} style={{
