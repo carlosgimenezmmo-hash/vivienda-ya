@@ -218,7 +218,18 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
                 </button>
 
                 {/* GUARDAR */}
-                <button onClick={() => requireLogin(() => toggleSave(String(p.id)), 'guardar propiedades')}
+                <button onClick={() => requireLogin(async () => {
+  const { data: sessionData } = await supabase.auth.getSession()
+  const uid = sessionData?.session?.user?.id || user?.id
+  if (!uid) return
+  const isSaved = savedProperties.has(String(p.id))
+  if (isSaved) {
+    await supabase.from("saved_properties").delete().eq("user_id", uid).eq("property_id", p.id)
+  } else {
+    await supabase.from("saved_properties").insert({ user_id: uid, property_id: p.id })
+  }
+  toggleSave(String(p.id))
+}, 'guardar propiedades')}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: 0 }}>
                   <svg width="28" height="28" viewBox="0 0 24 24" fill={savedProperties.has(String(p.id)) ? 'white' : 'none'} stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>

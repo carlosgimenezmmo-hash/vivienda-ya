@@ -36,7 +36,7 @@ export default function PerfilPage() {
 
   const menuItems = [
     { emoji: "🏠", label: "Mis Publicaciones", sub: "0 propiedades activas", href: "/mis-publicaciones" },
-    { emoji: "🔖", label: "Guardados", sub: "Propiedades que te gustaron", href: "#" },
+    { emoji: "🔖", label: "Guardados", sub: "Propiedades que te gustaron", href: "/guardados" },
     { emoji: "🔄", label: "Mis Permutas", sub: "Intercambios activos", href: "#" },
     { emoji: "💬", label: "Mensajes", sub: "Conversaciones con propietarios", href: "#" },
     { emoji: "⚙️", label: "Configuracion", sub: "Cuenta y privacidad", href: "/configuracion" },
