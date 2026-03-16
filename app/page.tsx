@@ -9,7 +9,39 @@ import { AuthSheet } from '@/components/auth-sheet';
 export default function ViviendaYaFull() {
   const [properties, setProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showComments, setShowComments] = useState<number | null>(null);
+ const [showComments, setShowComments] = useState<number | null>(null);
+const [comments, setComments] = useState<{ [key: number]: any[] }>({});
+const [commentText, setCommentText] = useState("");
+const [sendingComment, setSendingComment] = useState(false);
+
+const fetchComments = async (propertyId: number) => {
+  const { data } = await supabase
+    .from("comments")
+    .select("*")
+    .eq("property_id", propertyId)
+    .order("created_at", { ascending: true })
+  if (data) setComments(prev => ({ ...prev, [propertyId]: data }))
+}
+
+const sendComment = async (propertyId: number) => {
+  if (!commentText.trim()) return
+  setSendingComment(true)
+  const { data: sessionData } = await supabase.auth.getSession()
+  const uid = sessionData?.session?.user?.id || user?.id
+  if (!uid) { setSendingComment(false); return }
+  const { data, error } = await supabase.from("comments").insert({
+    property_id: propertyId,
+    user_id: uid,
+    user_name: user?.name || "Usuario",
+    user_avatar: user?.avatar_url || null,
+    content: commentText.trim(),
+  }).select().single()
+  if (!error && data) {
+    setComments(prev => ({ ...prev, [propertyId]: [...(prev[propertyId] || []), data] }))
+    setCommentText("")
+  }
+  setSendingComment(false)
+}
   const [paused, setPaused] = useState<{ [key: number]: boolean }>({});
   const [activeIndex, setActiveIndex] = useState(0);
   const videoRefs = useRef<HTMLVideoElement[]>([]);
@@ -209,7 +241,11 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
                 </button>
 
                 {/* CHAT */}
-                <button onClick={() => requireLogin(() => setShowComments(showComments === p.id ? null : p.id), 'chatear')}
+                <button onClick={() => requireLogin(() => {
+  const newId = showComments === p.id ? null : p.id
+  setShowComments(newId)
+  if (newId && !comments[newId]) fetchComments(newId)
+}, 'chatear')}
                   style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: 0 }}>
                   <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
@@ -310,7 +346,57 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
               </div>
 
               {/* PANEL COMENTARIOS */}
-              {showComments === p.id && (
+             {showComments === p.id && (
+  <div style={{
+    position: 'absolute', bottom: 80, right: 0, width: '80%', maxHeight: '55vh',
+    background: 'rgba(10,10,10,0.95)', borderRadius: '20px 0 0 20px',
+    padding: 18, zIndex: 30, overflowY: 'auto', boxSizing: 'border-box',
+    backdropFilter: 'blur(20px)', display: 'flex', flexDirection: 'column',
+  }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14 }}>
+      <span style={{ color: '#fff', fontWeight: 700, fontSize: 15 }}>Comentarios</span>
+      <button onClick={() => setShowComments(null)} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', fontSize: 20 }}>✕</button>
+    </div>
+
+    <div style={{ flex: 1, overflowY: 'auto', marginBottom: 12 }}>
+      {!comments[p.id] || comments[p.id].length === 0 ? (
+        <p style={{ color: '#555', fontSize: 13, textAlign: 'center', marginTop: 24 }}>
+          No hay comentarios. Se el primero!
+        </p>
+      ) : (
+        comments[p.id].map((c) => (
+          <div key={c.id} style={{ marginBottom: 12 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+              <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: '#fff', overflow: 'hidden', flexShrink: 0 }}>
+                {c.user_avatar ? <img src={c.user_avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : (c.user_name?.[0] || 'U')}
+              </div>
+              <span style={{ color: '#fff', fontSize: 12, fontWeight: 600 }}>{c.user_name || 'Usuario'}</span>
+              <span style={{ color: '#444', fontSize: 11 }}>{new Date(c.created_at).toLocaleDateString('es-AR')}</span>
+            </div>
+            <p style={{ margin: '0 0 0 36px', color: 'rgba(255,255,255,0.8)', fontSize: 13, lineHeight: 1.4 }}>{c.content}</p>
+          </div>
+        ))
+      )}
+    </div>
+
+    <div style={{ display: 'flex', gap: 8 }}>
+      <input
+        value={commentText}
+        onChange={e => setCommentText(e.target.value)}
+        onKeyDown={e => e.key === 'Enter' && sendComment(p.id)}
+        placeholder="Escribi un comentario..."
+        style={{ flex: 1, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 24, padding: '10px 14px', color: '#fff', fontSize: 13, outline: 'none', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' }}
+      />
+      <button
+        onClick={() => sendComment(p.id)}
+        disabled={sendingComment}
+        style={{ background: '#2563EB', border: 'none', borderRadius: 24, padding: '10px 16px', color: '#fff', cursor: 'pointer', fontSize: 16, opacity: sendingComment ? 0.5 : 1 }}
+      >
+        ↗
+      </button>
+    </div>
+  </div>
+)}
                 <div style={{
                   position: 'absolute', bottom: 80, right: 0, width: '80%', maxHeight: '55vh',
                   background: 'rgba(10,10,10,0.95)', borderRadius: '20px 0 0 20px',
