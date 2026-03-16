@@ -25,6 +25,26 @@ const fetchComments = async (propertyId: number) => {
 
 const sendComment = async (propertyId: number) => {
   if (!commentText.trim()) return
+  if (!isLoggedIn) { requireLogin(() => {}, 'comentar'); return }
+  setSendingComment(true)
+  const { data: sessionData } = await supabase.auth.getSession()
+  const uid = sessionData?.session?.user?.id
+  if (!uid) { setSendingComment(false); return }
+  const { data, error } = await supabase.from("comments").insert({
+    property_id: propertyId,
+    user_id: uid,
+    user_name: sessionData?.session?.user?.user_metadata?.nombre || "Usuario",
+    content: commentText.trim(),
+  }).select().single()
+  if (!error && data) {
+    setComments(prev => ({ ...prev, [propertyId]: [...(prev[propertyId] || []), data] }))
+    setCommentText("")
+  } else if (error) {
+    alert("Error: " + error.message)
+  }
+  setSendingComment(false)
+}
+  if (!commentText.trim()) return
   setSendingComment(true)
   const { data: sessionData } = await supabase.auth.getSession()
   const uid = sessionData?.session?.user?.id || user?.id
