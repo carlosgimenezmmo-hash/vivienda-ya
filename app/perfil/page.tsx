@@ -60,12 +60,12 @@ export default function PerfilPage() {
       </div>
     )
   }
-
-  // â”€â”€ PANTALLA CON LOGIN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // PANTALLA CON LOGIN
   const initials = user.name
     ? user.name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
     : "?"
 
+  const menuItems = [
     { emoji: "🏠", label: "Mis Publicaciones", sub: "0 propiedades activas", href: "/mis-publicaciones" },
     { emoji: "🔖", label: "Guardados", sub: "Propiedades que te gustaron", href: "#" },
     { emoji: "🔄", label: "Mis Permutas", sub: "Intercambios activos", href: "#" },
