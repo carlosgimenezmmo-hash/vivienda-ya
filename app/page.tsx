@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/lib/auth-context';
@@ -122,7 +122,7 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
   };
   const handleWhatsApp = (number: string, title: string) => {
     const clean = number?.replace(/\D/g, '');
-    const msg = `Hola! Vi "${title}" en ViviendaYa y me interesa. ¿Podés darme más info?`;
+    const msg = `Hola! Vi "${title}" en ViviendaYa y me interesa. Â¿PodÃ©s darme mÃ¡s info?`;
     window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
@@ -131,7 +131,7 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
       navigator.share({ title, url: window.location.href });
     } else {
       navigator.clipboard.writeText(window.location.href);
-      alert('¡Link copiado!');
+      alert('Â¡Link copiado!');
     }
   };
 
@@ -216,7 +216,7 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
                     background: 'rgba(245,158,11,0.9)', color: '#fff',
                     padding: '5px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700,
                     backdropFilter: 'blur(8px)',
-                  }}>⭐ DESTACADO</span>
+                  }}>â­ DESTACADO</span>
                   <span style={{
                     background: 'rgba(34,197,94,0.9)', color: '#fff',
                     padding: '5px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700,
@@ -295,11 +295,11 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
                     display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20,
                     overflow: 'hidden', flexShrink: 0,
                   }}>
-                    {p.owner_avatar ? <img src={p.owner_avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : '👤'}
+                    {p.owner_avatar ? <img src={p.owner_avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 'ðŸ‘¤'}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                     <span style={{ fontWeight: 700, fontSize: 15 }}>{p.owner_name || 'Propietario'}</span>
-                    <span style={{ background: '#1d4ed8', borderRadius: 4, padding: '2px 6px', fontSize: 10, fontWeight: 700 }}>☆</span>
+                    <span style={{ background: '#1d4ed8', borderRadius: 4, padding: '2px 6px', fontSize: 10, fontWeight: 700 }}>â˜†</span>
                   </div>
                 </div>
 
@@ -326,13 +326,13 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
                 <h3 style={{ margin: '0 0 5px 0', fontSize: 22, fontWeight: 800, lineHeight: 1.2, letterSpacing: -0.3 }}>{p.title}</h3>
                 <p style={{ margin: '0 0 6px 0', fontSize: 13, color: 'rgba(255,255,255,0.8)', display: 'flex', alignItems: 'center', gap: 4 }}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                  {[p.neighborhood, p.city].filter(Boolean).join(', ') || p.location || 'Ubicación no disponible'}
+                  {[p.neighborhood, p.city].filter(Boolean).join(', ') || p.location || 'UbicaciÃ³n no disponible'}
                 </p>
                 <p style={{ margin: '0 0 6px 0', fontSize: 28, fontWeight: 800, letterSpacing: -0.5 }}>
                   USD {Number(p.price)?.toLocaleString() || 'Consultar'}
                 </p>
                 <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.7)', display: 'flex', gap: 8 }}>
-                  {[p.rooms ? `${p.rooms} amb.` : null, p.surface ? `${p.surface} m²` : null, p.bedrooms ? `${p.bedrooms} dorm.` : null].filter(Boolean).map((item, idx, arr) => (
+                  {[p.rooms ? `${p.rooms} amb.` : null, p.surface ? `${p.surface} mÂ²` : null, p.bedrooms ? `${p.bedrooms} dorm.` : null].filter(Boolean).map((item, idx, arr) => (
                     <React.Fragment key={idx}>
                       <span>{item}</span>
                       {idx < arr.length - 1 && <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>}
@@ -345,78 +345,36 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
                 </p>
               </div>
 
-              {/* PANEL COMENTARIOS */}
-             {showComments === p.id && (
-  <div style={{
-    position: 'absolute', bottom: 80, right: 0, width: '80%', maxHeight: '55vh',
-    background: 'rgba(10,10,10,0.95)', borderRadius: '20px 0 0 20px',
-    padding: 18, zIndex: 30, overflowY: 'auto', boxSizing: 'border-box',
-    backdropFilter: 'blur(20px)', display: 'flex', flexDirection: 'column',
-  }}>
-    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14 }}>
-      <span style={{ color: '#fff', fontWeight: 700, fontSize: 15 }}>Comentarios</span>
-      <button onClick={() => setShowComments(null)} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', fontSize: 20 }}>✕</button>
-    </div>
-
-    <div style={{ flex: 1, overflowY: 'auto', marginBottom: 12 }}>
-      {!comments[p.id] || comments[p.id].length === 0 ? (
-        <p style={{ color: '#555', fontSize: 13, textAlign: 'center', marginTop: 24 }}>
-          No hay comentarios. Se el primero!
-        </p>
-      ) : (
-        comments[p.id].map((c) => (
-          <div key={c.id} style={{ marginBottom: 12 }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-              <div style={{ width: 28, height: 28, borderRadius: '50%', background: '#2563EB', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: '#fff', overflow: 'hidden', flexShrink: 0 }}>
-                {c.user_avatar ? <img src={c.user_avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : (c.user_name?.[0] || 'U')}
-              </div>
-              <span style={{ color: '#fff', fontSize: 12, fontWeight: 600 }}>{c.user_name || 'Usuario'}</span>
-              <span style={{ color: '#444', fontSize: 11 }}>{new Date(c.created_at).toLocaleDateString('es-AR')}</span>
-            </div>
-            <p style={{ margin: '0 0 0 36px', color: 'rgba(255,255,255,0.8)', fontSize: 13, lineHeight: 1.4 }}>{c.content}</p>
-          </div>
-        ))
-      )}
-    </div>
-
-    <div style={{ display: 'flex', gap: 8 }}>
-      <input
-        value={commentText}
-        onChange={e => setCommentText(e.target.value)}
-        onKeyDown={e => e.key === 'Enter' && sendComment(p.id)}
-        placeholder="Escribi un comentario..."
-        style={{ flex: 1, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 24, padding: '10px 14px', color: '#fff', fontSize: 13, outline: 'none', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' }}
-      />
-      <button
-        onClick={() => sendComment(p.id)}
-        disabled={sendingComment}
-        style={{ background: '#2563EB', border: 'none', borderRadius: 24, padding: '10px 16px', color: '#fff', cursor: 'pointer', fontSize: 16, opacity: sendingComment ? 0.5 : 1 }}
-      >
-        ↗
-      </button>
-    </div>
-  </div>
-)}
-                <div style={{
-                  position: 'absolute', bottom: 80, right: 0, width: '80%', maxHeight: '55vh',
-                  background: 'rgba(10,10,10,0.95)', borderRadius: '20px 0 0 20px',
-                  padding: 18, zIndex: 30, overflowY: 'auto', boxSizing: 'border-box',
-                  backdropFilter: 'blur(20px)',
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14 }}>
-                    <span style={{ color: '#fff', fontWeight: 700, fontSize: 15 }}>Comentarios</span>
-                    <button onClick={() => setShowComments(null)} style={{ background: 'none', border: 'none', color: '#666', cursor: 'pointer', fontSize: 20, lineHeight: 1 }}>✕</button>
+              {showComments === p.id && (
+                <div style={{ position: "absolute", bottom: 80, right: 0, width: "80%", maxHeight: "55vh", background: "rgba(10,10,10,0.95)", borderRadius: "20px 0 0 20px", padding: 18, zIndex: 30, overflowY: "auto", boxSizing: "border-box", backdropFilter: "blur(20px)", display: "flex", flexDirection: "column" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 14 }}>
+                    <span style={{ color: "#fff", fontWeight: 700, fontSize: 15 }}>Comentarios</span>
+                    <button onClick={() => setShowComments(null)} style={{ background: "none", border: "none", color: "#666", cursor: "pointer", fontSize: 20 }}>X</button>
                   </div>
-                  <p style={{ color: '#555', fontSize: 13, textAlign: 'center', marginTop: 24 }}>
-                    Todavía no hay comentarios. ¡Sé el primero!
-                  </p>
-                  <div style={{ marginTop: 16, display: 'flex', gap: 8 }}>
-                    <input placeholder="Escribí un comentario..."
-                      style={{ flex: 1, background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 24, padding: '10px 14px', color: '#fff', fontSize: 13, outline: 'none' }}
-                    />
-                    <button style={{ background: '#2563EB', border: 'none', borderRadius: 24, padding: '10px 16px', color: '#fff', cursor: 'pointer', fontSize: 16 }}>↗</button>
+                  <div style={{ flex: 1, overflowY: "auto", marginBottom: 12 }}>
+                    {!comments[p.id] || comments[p.id].length === 0 ? (
+                      <p style={{ color: "#555", fontSize: 13, textAlign: "center", marginTop: 24 }}>No hay comentarios. Se el primero!</p>
+                    ) : (
+                      comments[p.id].map((c) => (
+                        <div key={c.id} style={{ marginBottom: 12 }}>
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                            <div style={{ width: 28, height: 28, borderRadius: "50%", background: "#2563EB", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#fff", overflow: "hidden", flexShrink: 0 }}>
+                              {c.user_avatar ? <img src={c.user_avatar} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : (c.user_name?.[0] || "U")}
+                            </div>
+                            <span style={{ color: "#fff", fontSize: 12, fontWeight: 600 }}>{c.user_name || "Usuario"}</span>
+                            <span style={{ color: "#444", fontSize: 11 }}>{new Date(c.created_at).toLocaleDateString("es-AR")}</span>
+                          </div>
+                          <p style={{ margin: "0 0 0 36px", color: "rgba(255,255,255,0.8)", fontSize: 13, lineHeight: 1.4 }}>{c.content}</p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <input value={commentText} onChange={e => setCommentText(e.target.value)} onKeyDown={e => e.key === "Enter" && sendComment(p.id)} placeholder="Escribi un comentario..." style={{ flex: 1, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 24, padding: "10px 14px", color: "#fff", fontSize: 13, outline: "none", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }} />
+                    <button onClick={() => sendComment(p.id)} disabled={sendingComment} style={{ background: "#2563EB", border: "none", borderRadius: 24, padding: "10px 16px", color: "#fff", cursor: "pointer", fontSize: 16, opacity: sendingComment ? 0.5 : 1 }}>send</button>
                   </div>
                 </div>
+
               )}
 
             </section>
