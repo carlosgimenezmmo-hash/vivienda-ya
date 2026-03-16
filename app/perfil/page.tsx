@@ -32,21 +32,21 @@ export default function PerfilPage() {
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
           </svg>
         </div>
-        <h2 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 10px", textAlign: "center" }}>
-          Tu perfil te espera
-        </h2>
-          Crea tu cuenta para gestionar tus propiedades,<br/>creditos y contactar propietarios.
+        <h2 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 10px", textAlign: "center" }}>Tu perfil te espera</h2>
+        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, textAlign: "center", margin: "0 0 32px", lineHeight: 1.5 }}>
           Crea tu cuenta para gestionar tus propiedades y contactar propietarios.
         </p>
+
+
         <button onClick={() => router.push("/registro")} style={{
           width: "100%", maxWidth: 340, padding: "16px", borderRadius: 14, border: "none",
           background: "linear-gradient(135deg, #2563EB, #1d4ed8)",
           color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer", marginBottom: 12,
           fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
-          boxShadow: "0 4px 20px rgba(37,99,235,0.35)",
-          Registrarme gratis →
-          Registrarme gratis â†’
-        </button>
+        }}>Registrarme gratis</button>
+
+
+
         <button onClick={() => router.push("/login")} style={{
           width: "100%", maxWidth: 340, padding: "15px", borderRadius: 14,
           border: "1px solid rgba(255,255,255,0.12)",
