@@ -212,7 +212,7 @@ export default function RegistroPage() {
         )}
 
         {step === 2 && (
-          <div>
+          <div style={{ paddingBottom: 120 }}>
             <h1 style={{ fontSize: 26, fontWeight: 800, margin: "0 0 6px" }}>Tus datos</h1>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 28px" }}>Verificamos que sos mayor de 18 anos</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
