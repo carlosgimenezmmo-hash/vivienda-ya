@@ -295,8 +295,8 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
                     <span style={{ fontWeight: "bold", fontSize: 15, color: "#fff" }}>{p.owner_name || "Propietario"}</span>
                     <span style={{ background: "#1d4ed8", borderRadius: 4, padding: "2px 6px", fontSize: 10, fontWeight: 700, color: "#fff" }}>VY</span>
                   </div>
-                  </div>
                 </div>
+
 
                 {/* BADGES */}
                 <div style={{ display: 'flex', gap: 8, marginBottom: 10, flexWrap: 'wrap' }}>
