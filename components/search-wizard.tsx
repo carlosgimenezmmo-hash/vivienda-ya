@@ -226,7 +226,7 @@ export function SearchWizard() {
             <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", margin: "0 0 10px", fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: 1 }}>Provincia</p>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 20 }}>
               {provinces.map((prov) => (
-                <button key={prov} onClick={() => {<button key={prov} onClick={() => setFilters({ ...filters, province: prov, city: undefined })} setFilters({ ...filters, province: prov, city: undefined }) }}
+                <button key={prov} onClick={() => setFilters({ ...filters, province: prov, city: undefined })}
                   style={chip(filters.province === prov)}>
                   {prov}
                 </button>
