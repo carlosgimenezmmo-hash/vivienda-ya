@@ -44,8 +44,35 @@ const priceRangesAlquiler = [
   { label: "Mas de USD 2.000/mes", min: 2000, max: 999999 },
 ]
 
-const provinces = ["Buenos Aires", "CABA", "Cordoba", "Santa Fe", "Mendoza", "Tucuman", "Rio Negro", "Neuquen", "Salta", "Misiones", "Entre Rios", "Chubut"]
+const provinces = ["Buenos Aires", "CABA", "Cordoba", "Santa Fe", "Mendoza", "Tucuman", "Salta", "Misiones", "Entre Rios", "Chubut", "Rio Negro", "Neuquen", "San Juan", "San Luis", "La Rioja", "Catamarca", "Jujuy", "Formosa", "Chaco", "Santiago del Estero", "La Pampa", "Santa Cruz", "Tierra del Fuego", "Corrientes"]
 
+
+const citiesByProvince: Record<string, string[]> = {
+  "Buenos Aires": ["La Plata", "Mar del Plata", "Bahi­a Blanca", "Quilmes", "Lomas de Zamora", "San Isidro", "Vicente Lopez", "Tigre", "Pilar", "Campana", "Zarate", "Tandil", "Necochea", "Tres Arroyos", "Azul", "Olavarria", "Pergamino", "San Nicolas", "Junin", "Mercedes", "Lujan", "Moron", "Merlo", "Moreno", "San Martin", "Avellaneda", "Lanus", "Almirante Brown"],
+  "CABA": ["Palermo", "Belgrano", "Recoleta", "San Telmo", "Puerto Madero", "Caballito", "Villa Crespo", "Almagro", "Balvanera", "Flores", "Floresta", "Villa del Parque", "Devoto", "Colegiales", "Nunez", "Saavedra", "Barracas", "La Boca", "Mataderos", "Liniers"],
+  "Cordoba": ["Cordoba Capital", "Villa Carlos Paz", "Rio Cuarto", "Villa Maria", "San Francisco", "Alta Gracia", "La Falda", "Cosquin", "Villa General Belgrano", "Cruz del Eje", "Dean Funes", "Rio Tercero"],
+  "Santa Fe": ["Rosario", "Santa Fe Capital", "Rafaela", "Venado Tuerto", "Reconquista", "Sunchales", "Esperanza", "Santo Tome", "Coronda", "Casilda"],
+  "Mendoza": ["Mendoza Capital", "San Rafael", "Godoy Cruz", "Lujan de Cuyo", "Maipu", "Las Heras", "Guaymallen", "Tunuyan", "Rivadavia", "La Paz"],
+  "Tucuman": ["San Miguel de Tucuman", "Yerba Buena", "Tafi Viejo", "Concepcion", "Banda del Rio Sali", "Famailla"],
+  "Salta": ["Salta Capital", "San Ramon de la Nueva Oran", "Tartagal", "Cafayate", "Rosario de la Frontera"],
+  "Neuquen": ["Neuquen Capital", "San Martin de los Andes", "Villa La Angostura", "Zapala", "Cutral Co"],
+  "Rio Negro": ["Bariloche", "Viedma", "General Roca", "Cipolletti", "El Bolson", "Villa Regina"],
+  "Misiones": ["Posadas", "Oberá", "Eldorado", "Puerto Iguazu", "Apostoles"],
+  "Entre Rios": ["Parana", "Concordia", "Gualeguaychu", "Colon", "Federacion"],
+  "Chubut": ["Comodoro Rivadavia", "Rawson", "Trelew", "Puerto Madryn", "Esquel"],
+  "San Juan": ["San Juan Capital", "Caucete", "Rivadavia", "Chimbas", "Rawson"],
+  "San Luis": ["San Luis Capital", "Villa Mercedes", "Merlo", "Potrero de los Funes"],
+  "Jujuy": ["San Salvador de Jujuy", "Palpal­a", "Libertador General San Martin", "Humahuaca"],
+  "Corrientes": ["Corrientes Capital", "Goya", "Paso de los Libres", "Mercedes", "Curuzú Cuatiá"],
+  "Chaco": ["Resistencia", "Presidencia Roque Saenz Pena", "Villa Angela", "Charata"],
+  "Formosa": ["Formosa Capital", "Clorinda", "Pirané", "El Colorado"],
+  "La Pampa": ["Santa Rosa", "General Pico", "Toay", "Eduardo Castex"],
+  "Santa Cruz": ["Rio Gallegos", "Caleta Olivia", "El Calafate", "Puerto Madryn"],
+  "La Rioja": ["La Rioja Capital", "Chilecito", "Aimogasta"],
+  "Catamarca": ["Catamarca Capital", "San Fernando del Valle", "Belen"],
+  "Santiago del Estero": ["Santiago del Estero Capital", "La Banda", "Termas de Rio Hondo"],
+  "Tierra del Fuego": ["Ushuaia", "Rio Grande", "Tolhuin"],
+}
 const featureOptions = ["Garage", "Patio", "Pileta", "Parrilla", "Balcon", "Terraza", "Luminoso", "Seguridad", "Amenities", "Gym", "Cochera", "Quincho", "Jardin", "Chimenea", "Deck"]
 
 const conditionOptions = [
@@ -205,11 +232,20 @@ export function SearchWizard() {
                 </button>
               ))}
             </div>
-            {selectedProvince && (
-              <div>
+            {filters.province && citiesByProvince[filters.province] && (
+              <div style={{ marginTop: 16 }}>
+                <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", margin: "0 0 10px", fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: 1 }}>Ciudad</p>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                  {citiesByProvince[filters.province].map((city) => (
+                    <button key={city} onClick={() => setFilters({ ...filters, city })} style={chip(filters.city === city)}>{city}</button>
+                  ))}
+                </div>
+              </div>
+            )}
+            {filters.province && !citiesByProvince[filters.province] && (
+              <div style={{ marginTop: 16 }}>
                 <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", margin: "0 0 10px", fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: 1 }}>Ciudad (opcional)</p>
-                <input placeholder="Escribi la ciudad..." value={filters.city || ""} onChange={e => setFilters({ ...filters, city: e.target.value })}
-                  style={{ width: "100%", padding: "14px 16px", borderRadius: 12, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontSize: 15, outline: "none", boxSizing: "border-box" as const, fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }} />
+                <input placeholder="Escribi la ciudad..." value={filters.city || ""} onChange={e => setFilters({ ...filters, city: e.target.value })} style={{ width: "100%", padding: "14px 16px", borderRadius: 12, background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", fontSize: 15, outline: "none", boxSizing: "border-box" as const }} />
               </div>
             )}
           </div>
