@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server"
+﻿import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -11,9 +11,9 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(
   supabaseUrl || "",
   supabaseKey || ""
-)
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
+
+
+
 )
 
 export async function POST(req: NextRequest) {
@@ -32,18 +32,18 @@ export async function POST(req: NextRequest) {
           contents: [{
             parts: [{
               text: `Sos un moderador de contenido para una app inmobiliaria argentina.
-Analizá esta URL de video de una propiedad: ${videoUrl}
+AnalizÃ¡ esta URL de video de una propiedad: ${videoUrl}
 
-Respondé SOLO con un JSON sin markdown:
+RespondÃ© SOLO con un JSON sin markdown:
 {"status": "approved", "reason": "Video de propiedad normal"}
 o
-{"status": "pending", "reason": "Motivo de revisión"}
+{"status": "pending", "reason": "Motivo de revisiÃ³n"}
 o
 {"status": "rejected", "reason": "Motivo de rechazo"}
 
-Rechazá solo si hay contenido sexual, violento u ofensivo obvio.
-Marcá como pending si no podés analizar o hay algo dudoso.
-Aprobá si parece un video normal de propiedad inmobiliaria.`
+RechazÃ¡ solo si hay contenido sexual, violento u ofensivo obvio.
+MarcÃ¡ como pending si no podÃ©s analizar o hay algo dudoso.
+AprobÃ¡ si parece un video normal de propiedad inmobiliaria.`
             }]
           }]
         }),
