@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useRef, ChangeEvent } from "react"
 import { createWorker } from "tesseract.js"
@@ -67,7 +67,7 @@ export default function RegistroPage() {
     const fecha = getFechaNacimiento()
     if (!nombre || !apellido || !telefono || !fecha) return setError("Completa todos los campos")
     if (calcularEdad(fecha) < 18) return setError("Debes ser mayor de 18 anos para registrarte")
-    if (!provincia || !ciudad) return setError("Selecciona tu provincia e ingresa tu ciudad")
+    if (!provincia || !ciudad) return setError("Selecciona tu provincia de residencia e ingresa tu ciudad")
     setStep(3)
   }
 
@@ -230,7 +230,7 @@ export default function RegistroPage() {
                 </div>
               </div>
               <div>
-                <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, margin: "0 0 6px" }}>Provincia</p>
+                <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, margin: "0 0 6px" }}>Provincia de residencia</p>
                 <select
                   value={provincia}
                   onChange={e => { setProvincia(e.target.value); setCiudad("") }}
@@ -244,11 +244,11 @@ export default function RegistroPage() {
               </div>
               {provincia && (
                 <div>
-                  <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, margin: "0 0 6px" }}>Ciudad</p>
+                  <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 12, margin: "0 0 6px" }}>Ciudad de residencia</p>
                   <input
                     value={ciudad}
                     onChange={e => setCiudad(e.target.value)}
-                    placeholder="Escribi tu ciudad"
+                    placeholder="Escribi tu ciudad de residencia"
                     style={inp}
                   />
                 </div>
