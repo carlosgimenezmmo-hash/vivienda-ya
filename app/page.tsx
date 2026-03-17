@@ -9,59 +9,10 @@ import { AuthSheet } from '@/components/auth-sheet';
 export default function ViviendaYaFull() {
   const [properties, setProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
- const [showComments, setShowComments] = useState<number | null>(null);
-const [comments, setComments] = useState<{ [key: number]: any[] }>({});
-const [commentText, setCommentText] = useState("");
-const [sendingComment, setSendingComment] = useState(false);
-
-const fetchComments = async (propertyId: number) => {
-  const { data } = await supabase
-    .from("comments")
-    .select("*")
-    .eq("property_id", propertyId)
-    .order("created_at", { ascending: true })
-  if (data) setComments(prev => ({ ...prev, [propertyId]: data }))
-}
-
-const sendComment = async (propertyId: number) => {
-  if (!commentText.trim()) return
-  if (!isLoggedIn) { requireLogin(() => {}, 'comentar'); return }
-  setSendingComment(true)
-  const { data: sessionData } = await supabase.auth.getSession()
-  const uid = sessionData?.session?.user?.id
-  if (!uid) { setSendingComment(false); return }
-  const { data, error } = await supabase.from("comments").insert({
-    property_id: propertyId,
-    user_id: uid,
-    user_name: sessionData?.session?.user?.user_metadata?.nombre || "Usuario",
-    content: commentText.trim(),
-  }).select().single()
-  if (!error && data) {
-    setComments(prev => ({ ...prev, [propertyId]: [...(prev[propertyId] || []), data] }))
-    setCommentText("")
-  } else if (error) {
-    alert("Error: " + error.message)
-  }
-  setSendingComment(false)
-}
-  if (!commentText.trim()) return
-  setSendingComment(true)
-  const { data: sessionData } = await supabase.auth.getSession()
-  const uid = sessionData?.session?.user?.id || user?.id
-  if (!uid) { setSendingComment(false); return }
-  const { data, error } = await supabase.from("comments").insert({
-    property_id: propertyId,
-    user_id: uid,
-    user_name: user?.name || "Usuario",
-    user_avatar: user?.avatar_url || null,
-    content: commentText.trim(),
-  }).select().single()
-  if (!error && data) {
-    setComments(prev => ({ ...prev, [propertyId]: [...(prev[propertyId] || []), data] }))
-    setCommentText("")
-  }
-  setSendingComment(false)
-}
+  const [showComments, setShowComments] = useState<number | null>(null);
+  const [comments, setComments] = useState<{ [key: number]: any[] }>({});
+  const [commentText, setCommentText] = useState("");
+  const [sendingComment, setSendingComment] = useState(false);
   const [paused, setPaused] = useState<{ [key: number]: boolean }>({});
   const [activeIndex, setActiveIndex] = useState(0);
   const videoRefs = useRef<HTMLVideoElement[]>([]);
@@ -120,6 +71,30 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
     action();
   }
 };
+
+  const fetchComments = async (propertyId: number) => {
+    const { data } = await supabase.from("comments").select("*").eq("property_id", propertyId).order("created_at", { ascending: true })
+    if (data) setComments(prev => ({ ...prev, [propertyId]: data }))
+  }
+
+  const sendComment = async (propertyId: number) => {
+    if (!commentText.trim()) return
+    setSendingComment(true)
+    const { data: sessionData } = await supabase.auth.getSession()
+    const uid = sessionData?.session?.user?.id
+    if (!uid) { setSendingComment(false); return }
+    const { data, error } = await supabase.from("comments").insert({
+      property_id: propertyId,
+      user_id: uid,
+      user_name: sessionData?.session?.user?.user_metadata?.nombre || "Usuario",
+      content: commentText.trim(),
+    }).select().single()
+    if (!error && data) {
+      setComments(prev => ({ ...prev, [propertyId]: [...(prev[propertyId] || []), data] }))
+      setCommentText("")
+    } else if (error) { alert("Error: " + error.message) }
+    setSendingComment(false)
+  }
 
  const togglePause = (i: number, id: number) => {
     const video = videoRefs.current[i];
