@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -7,25 +7,25 @@ import { supabase } from "@/lib/supabaseClient"
 const TOTAL_STEPS = 7
 
 const operationOptions = [
-  { value: "venta", label: "Comprar", emoji: "🏠" },
-  { value: "alquiler", label: "Alquilar", emoji: "🔑" },
-  { value: "permuta", label: "Permuta", emoji: "🔄" },
-  { value: "temporario", label: "Temporario", emoji: "📅" },
+  { value: "venta", label: "Comprar", emoji: "ðŸ " },
+  { value: "alquiler", label: "Alquilar", emoji: "ðŸ”‘" },
+  { value: "permuta", label: "Permuta", emoji: "ðŸ”„" },
+  { value: "temporario", label: "Temporario", emoji: "ðŸ“…" },
 ]
 
 const propertyTypes = [
-  { value: "departamento", label: "Depto", emoji: "🏢" },
-  { value: "casa", label: "Casa", emoji: "🏡" },
-  { value: "ph", label: "PH", emoji: "🏛️" },
-  { value: "loft", label: "Loft", emoji: "🏙️" },
-  { value: "monoambiente", label: "Mono", emoji: "🛏️" },
-  { value: "cabana", label: "Cabaña", emoji: "🌲" },
-  { value: "quinta", label: "Quinta", emoji: "🌿" },
-  { value: "terreno", label: "Terreno", emoji: "📍" },
-  { value: "local", label: "Local", emoji: "🏪" },
-  { value: "oficina", label: "Oficina", emoji: "💼" },
-  { value: "galpon", label: "Galpón", emoji: "🏭" },
-  { value: "campo", label: "Campo", emoji: "🚜" },
+  { value: "departamento", label: "Depto", emoji: "ðŸ¢" },
+  { value: "casa", label: "Casa", emoji: "ðŸ¡" },
+  { value: "ph", label: "PH", emoji: "ðŸ›ï¸" },
+  { value: "loft", label: "Loft", emoji: "ðŸ™ï¸" },
+  { value: "monoambiente", label: "Mono", emoji: "ðŸ›ï¸" },
+  { value: "cabana", label: "CabaÃ±a", emoji: "ðŸŒ²" },
+  { value: "quinta", label: "Quinta", emoji: "ðŸŒ¿" },
+  { value: "terreno", label: "Terreno", emoji: "ðŸ“" },
+  { value: "local", label: "Local", emoji: "ðŸª" },
+  { value: "oficina", label: "Oficina", emoji: "ðŸ’¼" },
+  { value: "galpon", label: "GalpÃ³n", emoji: "ðŸ­" },
+  { value: "campo", label: "Campo", emoji: "ðŸšœ" },
 ]
 
 const priceRangesVenta = [
@@ -53,10 +53,10 @@ const featureOptions = [
 ]
 
 const conditionOptions = [
-  { value: "a-estrenar", label: "A estrenar", emoji: "✨" },
-  { value: "muy-bueno", label: "Muy bueno", emoji: "⭐" },
-  { value: "bueno", label: "Bueno", emoji: "👍" },
-  { value: "a-reciclar", label: "A reciclar", emoji: "🔨" },
+  { value: "a-estrenar", label: "A estrenar", emoji: "âœ¨" },
+  { value: "muy-bueno", label: "Muy bueno", emoji: "â­" },
+  { value: "bueno", label: "Bueno", emoji: "ðŸ‘" },
+  { value: "a-reciclar", label: "A reciclar", emoji: "ðŸ”¨" },
 ]
 
 export function SearchWizard() {
@@ -105,7 +105,7 @@ export function SearchWizard() {
     setLoading(false)
   }
 
-  const next = () => { if (step < TOTAL_STEPS) setStep(step + 1) else handleSearch() }
+  const next = () => { if (step < TOTAL_STEPS) { setStep(step + 1) } else { handleSearch() } }
   const prev = () => { if (step > 1) setStep(step - 1) }
 
   const title = { fontSize: 24, fontWeight: 800, color: "#fff", margin: "0 0 6px" } as React.CSSProperties
@@ -125,14 +125,14 @@ export function SearchWizard() {
             </h1>
             <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
               {filters.operation ? filters.operation.charAt(0).toUpperCase() + filters.operation.slice(1) : "Todas"}
-              {filters.city ? ` · ${filters.city}` : filters.province ? ` · ${filters.province}` : ""}
+              {filters.city ? ` Â· ${filters.city}` : filters.province ? ` Â· ${filters.province}` : ""}
             </p>
           </div>
         </div>
 
         {results.length === 0 ? (
           <div style={{ textAlign: "center", padding: "60px 20px" }}>
-            <span style={{ fontSize: 48 }}>🔍</span>
+            <span style={{ fontSize: 48 }}>ðŸ”</span>
             <h2 style={{ fontSize: 20, fontWeight: 700, margin: "16px 0 8px" }}>Sin resultados</h2>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 24px" }}>Proba con otros filtros</p>
             <button onClick={() => { setShowResults(false); setStep(1); setFilters({}) }} style={{ ...btn, width: "auto", padding: "14px 28px" }}>
@@ -154,19 +154,19 @@ export function SearchWizard() {
                     </span>
                     {p.verified && (
                       <span style={{ background: "rgba(34,197,94,0.15)", color: "#22C55E", border: "1px solid rgba(34,197,94,0.3)", borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 700 }}>
-                        GPS ✓
+                        GPS âœ“
                       </span>
                     )}
                   </div>
                   <h3 style={{ margin: "0 0 4px", fontSize: 16, fontWeight: 700 }}>{p.title || "Sin titulo"}</h3>
                   <p style={{ margin: "0 0 4px", fontSize: 13, color: "rgba(255,255,255,0.5)" }}>
-                    📍 {[p.neighborhood, p.city].filter(Boolean).join(", ") || p.location}
+                    ðŸ“ {[p.neighborhood, p.city].filter(Boolean).join(", ") || p.location}
                   </p>
                   <p style={{ margin: "0 0 8px", fontSize: 20, fontWeight: 800 }}>
                     USD {Number(p.price)?.toLocaleString()}
                   </p>
                   <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
-                    {[p.rooms ? `${p.rooms} amb.` : null, p.surface ? `${p.surface} m²` : null, p.bedrooms ? `${p.bedrooms} dorm.` : null].filter(Boolean).join(" · ")}
+                    {[p.rooms ? `${p.rooms} amb.` : null, p.surface ? `${p.surface} mÂ²` : null, p.bedrooms ? `${p.bedrooms} dorm.` : null].filter(Boolean).join(" Â· ")}
                   </p>
                 </div>
               </div>
@@ -268,7 +268,7 @@ export function SearchWizard() {
                   <button key={range.label} onClick={() => setFilters({ ...filters, priceMin: range.min, priceMax: range.max })}
                     style={{ ...chip(active), justifyContent: "space-between" }}>
                     <span>{range.label}</span>
-                    {active && <span>✓</span>}
+                    {active && <span>âœ“</span>}
                   </button>
                 )
               })}
@@ -290,7 +290,7 @@ export function SearchWizard() {
                   <span style={{ fontSize: 15, fontWeight: 600 }}>{label}</span>
                   <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
                     <button onClick={() => setFilters({ ...filters, [key]: Math.max(0, (filters[key] || 0) - 1) })}
-                      style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(255,255,255,0.1)", border: "none", color: "#fff", fontSize: 20, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>−</button>
+                      style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(255,255,255,0.1)", border: "none", color: "#fff", fontSize: 20, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>âˆ’</button>
                     <span style={{ fontSize: 20, fontWeight: 800, minWidth: 24, textAlign: "center" }}>{filters[key] || 0}</span>
                     <button onClick={() => setFilters({ ...filters, [key]: (filters[key] || 0) + 1 })}
                       style={{ width: 36, height: 36, borderRadius: "50%", background: "#2563EB", border: "none", color: "#fff", fontSize: 20, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
@@ -313,7 +313,7 @@ export function SearchWizard() {
                     const current = filters.features || []
                     setFilters({ ...filters, features: active ? current.filter((f: string) => f !== feat) : [...current, feat] })
                   }} style={chip(active)}>
-                    {feat} {active && "✓"}
+                    {feat} {active && "âœ“"}
                   </button>
                 )
               })}
@@ -331,7 +331,7 @@ export function SearchWizard() {
                   style={{ ...chip(filters.condition === cond.value), justifyContent: "flex-start", padding: "16px 20px" }}>
                   <span style={{ fontSize: 24 }}>{cond.emoji}</span>
                   <span style={{ fontSize: 15 }}>{cond.label}</span>
-                  {filters.condition === cond.value && <span style={{ marginLeft: "auto" }}>✓</span>}
+                  {filters.condition === cond.value && <span style={{ marginLeft: "auto" }}>âœ“</span>}
                 </button>
               ))}
             </div>
@@ -343,11 +343,11 @@ export function SearchWizard() {
       <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, padding: "16px 20px calc(16px + env(safe-area-inset-bottom))", background: "rgba(10,10,10,0.95)", borderTop: "1px solid rgba(255,255,255,0.08)", display: "flex", gap: 10, zIndex: 20 }}>
         {step > 1 && (
           <button onClick={prev} style={{ padding: "14px 20px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.12)", background: "transparent", color: "rgba(255,255,255,0.7)", fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", display: "flex", alignItems: "center", gap: 6 }}>
-            ← Atras
+            â† Atras
           </button>
         )}
         <button onClick={next} disabled={loading} style={{ ...btn, flex: 1, opacity: loading ? 0.7 : 1 }}>
-          {loading ? "Buscando..." : step === TOTAL_STEPS ? "🔍 Buscar" : "Siguiente →"}
+          {loading ? "Buscando..." : step === TOTAL_STEPS ? "ðŸ” Buscar" : "Siguiente â†’"}
         </button>
       </div>
     </div>
