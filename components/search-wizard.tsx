@@ -187,7 +187,7 @@ export function SearchWizard() {
         </div>
       </div>
 
-      <div style={{ flex: 1, padding: "24px 20px 120px", overflowY: "auto" }}>
+      <div style={{ flex: 1, padding: "24px 20px 160px", overflowY: "scroll"}}>
 
         {step === 1 && (
           <div>
