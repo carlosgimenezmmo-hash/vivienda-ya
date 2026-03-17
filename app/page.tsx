@@ -327,7 +327,7 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
                   USD {Number(p.price)?.toLocaleString() || 'Consultar'}
                 </p>
                   {[p.rooms ? `${p.rooms} amb.` : null, p.surface ? `${p.surface} m2` : null, p.bedrooms ? `${p.bedrooms} dorm.` : null].filter(Boolean).map((item, idx, arr) => (
-                  {[p.rooms ? `${p.rooms} amb.` : null, p.surface ? `${p.surface} m2` : null, p.bedrooms ? `${p.bedrooms} dorm.` : null].filter(Boolean).map((item, idx, arr) => (
+
                     <React.Fragment key={idx}>
                       <span>{item}</span>
                       {idx < arr.length - 1 && <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>}
