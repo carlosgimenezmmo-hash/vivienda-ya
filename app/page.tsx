@@ -29,7 +29,6 @@ export default function ViviendaYaFull() {
           .from('properties')
           .select('*')
           .not('video_url', 'is', null)
-            .eq('city', user?.city || '')
 .eq('status', 'approved')
           .order('created_at', { ascending: false });
         if (error) throw error;
