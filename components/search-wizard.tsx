@@ -295,7 +295,7 @@ export function SearchWizard() {
 
       </div>
 
-      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, padding: "16px 20px 32px", background: "rgba(10,10,10,0.95)", borderTop: "1px solid rgba(255,255,255,0.08)", display: "flex", gap: 10, zIndex: 20 }}>
+      <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, padding: "16px 20px 90px", background: "rgba(10,10,10,0.95)", borderTop: "1px solid rgba(255,255,255,0.08)", display: "flex", gap: 10, zIndex: 20 }}>
         {step > 1 && (
           <button onClick={prev} style={{ padding: "14px 20px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.12)", background: "transparent", color: "rgba(255,255,255,0.7)", fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
             Atras
