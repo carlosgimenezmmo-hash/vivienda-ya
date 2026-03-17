@@ -289,11 +289,11 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
                     background: '#333', border: '2px solid rgba(255,255,255,0.8)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20,
                     overflow: 'hidden', flexShrink: 0,
-                  }}>
+                    {p.owner_avatar ? <img src={p.owner_avatar} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <span style={{ fontSize: 18 }}>U</span>}
                     {p.owner_avatar ? <img src={p.owner_avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 'ðŸ‘¤'}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ fontWeight: 700, fontSize: 15 }}>{p.owner_name || 'Propietario'}</span>
+                    <span style={{ background: "#1d4ed8", borderRadius: 4, padding: "2px 6px", fontSize: 10, fontWeight: 700, color: "#fff" }}>+</span>
                     <span style={{ background: '#1d4ed8', borderRadius: 4, padding: '2px 6px', fontSize: 10, fontWeight: 700 }}>â˜†</span>
                   </div>
                 </div>
@@ -326,7 +326,7 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
                 <p style={{ margin: '0 0 6px 0', fontSize: 28, fontWeight: 800, letterSpacing: -0.5 }}>
                   USD {Number(p.price)?.toLocaleString() || 'Consultar'}
                 </p>
-                <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.7)', display: 'flex', gap: 8 }}>
+                  {[p.rooms ? `${p.rooms} amb.` : null, p.surface ? `${p.surface} m2` : null, p.bedrooms ? `${p.bedrooms} dorm.` : null].filter(Boolean).map((item, idx, arr) => (
                   {[p.rooms ? `${p.rooms} amb.` : null, p.surface ? `${p.surface} mÂ²` : null, p.bedrooms ? `${p.bedrooms} dorm.` : null].filter(Boolean).map((item, idx, arr) => (
                     <React.Fragment key={idx}>
                       <span>{item}</span>
