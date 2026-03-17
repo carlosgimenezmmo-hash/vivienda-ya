@@ -197,7 +197,7 @@ export function SearchWizard() {
 
       {/* CONTENT */}
       <div style={{ flex: 1, padding: "24px 20px 120px", overflowY: "auto" }}>
-
+      <span style={{ fontSize: 32, lineHeight: 1 }}>{op.label[0]}</span>
         {step === 1 && (
           <div>
             <h2 style={title}>Que estas buscando?</h2>
@@ -206,7 +206,7 @@ export function SearchWizard() {
               {operationOptions.map((op) => (
                 <button key={op.value} onClick={() => { setFilters({ ...filters, operation: op.value }); next() }}
                   style={{ ...chip(filters.operation === op.value), flexDirection: "column", padding: "20px 16px", gap: 10, justifyContent: "center" }}>
-                  <span style={{ fontSize: 32 }}>{op.emoji}</span>
+                  <span style={{ fontSize: 32 }}></span>
                   <span style={{ fontSize: 14, fontWeight: 700 }}>{op.label}</span>
                 </button>
               ))}
@@ -353,3 +353,4 @@ export function SearchWizard() {
     </div>
   )
 }
+
