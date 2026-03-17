@@ -267,7 +267,7 @@ export function SearchWizard() {
                 return (
                   <button key={range.label} onClick={() => setFilters({ ...filters, priceMin: range.min, priceMax: range.max })}
                     style={{ ...chip(active), justifyContent: "space-between" }}>
-                    <span>{range.label}</span>
+                    {active && <span>OK</span>}
                     {active && <span>âœ“</span>}
                   </button>
                 )
@@ -289,7 +289,7 @@ export function SearchWizard() {
                 <div key={key} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <span style={{ fontSize: 15, fontWeight: 600 }}>{label}</span>
                   <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                    <button onClick={() => setFilters({ ...filters, [key]: Math.max(0, (filters[key] || 0) - 1) })}
+                      style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(255,255,255,0.1)", border: "none", color: "#fff", fontSize: 20, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>-</button>
                       style={{ width: 36, height: 36, borderRadius: "50%", background: "rgba(255,255,255,0.1)", border: "none", color: "#fff", fontSize: 20, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}>âˆ’</button>
                     <span style={{ fontSize: 20, fontWeight: 800, minWidth: 24, textAlign: "center" }}>{filters[key] || 0}</span>
                     <button onClick={() => setFilters({ ...filters, [key]: (filters[key] || 0) + 1 })}
@@ -312,8 +312,8 @@ export function SearchWizard() {
                   <button key={feat} onClick={() => {
                     const current = filters.features || []
                     setFilters({ ...filters, features: active ? current.filter((f: string) => f !== feat) : [...current, feat] })
-                  }} style={chip(active)}>
-                    {feat} {active && "âœ“"}
+                   }} style={chip(active)}>
+                    {feat} {active && <span>OK</span>}
                   </button>
                 )
               })}
