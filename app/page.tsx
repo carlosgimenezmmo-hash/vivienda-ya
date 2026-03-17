@@ -320,20 +320,20 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
 
                 <h3 style={{ margin: '0 0 5px 0', fontSize: 22, fontWeight: 800, lineHeight: 1.2, letterSpacing: -0.3 }}>{p.title}</h3>
                 <p style={{ margin: '0 0 6px 0', fontSize: 13, color: 'rgba(255,255,255,0.8)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  {[p.neighborhood, p.city].filter(Boolean).join(", ") || p.location || "Sin ubicacion"}
                   {[p.neighborhood, p.city].filter(Boolean).join(', ') || p.location || 'UbicaciÃ³n no disponible'}
                 </p>
                 <p style={{ margin: '0 0 6px 0', fontSize: 28, fontWeight: 800, letterSpacing: -0.5 }}>
-                  USD {Number(p.price)?.toLocaleString() || 'Consultar'}
+                  USD {Number(p.price)?.toLocaleString() || "Consultar"}
                 </p>
-                  {[p.rooms ? `${p.rooms} amb.` : null, p.surface ? `${p.surface} m2` : null, p.bedrooms ? `${p.bedrooms} dorm.` : null].filter(Boolean).map((item, idx, arr) => (
+                <p style={{ margin: 0, fontSize: 13, color: "#ccc" }}>
+                  {[p.rooms ? `${p.rooms} amb.` : null, p.surface ? `${p.surface} m2` : null, p.bedrooms ? `${p.bedrooms} dorm.` : null].filter(Boolean).join(" | ")}
+                </p>
 
-                    <React.Fragment key={idx}>
-                      <span>{item}</span>
-                      {idx < arr.length - 1 && <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>}
-                    </React.Fragment>
-                  ))}
-                </p>
+
+
+
+
                 <p style={{ margin: '8px 0 0 0', fontSize: 13, color: '#22C55E', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
                   Ver detalles
