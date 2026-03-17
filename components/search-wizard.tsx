@@ -329,9 +329,9 @@ export function SearchWizard() {
               {conditionOptions.map((cond) => (
                 <button key={cond.value} onClick={() => setFilters({ ...filters, condition: cond.value })}
                   style={{ ...chip(filters.condition === cond.value), justifyContent: "flex-start", padding: "16px 20px" }}>
-                  <span style={{ fontSize: 24 }}>{cond.emoji}</span>
+
                   <span style={{ fontSize: 15 }}>{cond.label}</span>
-                  {filters.condition === cond.value && <span style={{ marginLeft: "auto" }}>âœ“</span>}
+                  {filters.condition === cond.value && <span style={{ marginLeft: "auto", color: "#22C55E" }}>OK</span>}
                 </button>
               ))}
             </div>
