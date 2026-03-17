@@ -321,14 +321,14 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
                 <h3 style={{ margin: '0 0 5px 0', fontSize: 22, fontWeight: 800, lineHeight: 1.2, letterSpacing: -0.3 }}>{p.title}</h3>
                 <p style={{ margin: '0 0 6px 0', fontSize: 13, color: 'rgba(255,255,255,0.8)', display: 'flex', alignItems: 'center', gap: 4 }}>
                   {[p.neighborhood, p.city].filter(Boolean).join(", ") || p.location || "Sin ubicacion"}
-                  {[p.neighborhood, p.city].filter(Boolean).join(', ') || p.location || 'UbicaciÃ³n no disponible'}
                 </p>
-                <p style={{ margin: '0 0 6px 0', fontSize: 28, fontWeight: 800, letterSpacing: -0.5 }}>
+                <p style={{ margin: "0 0 6px 0", fontSize: 28, fontWeight: 800, letterSpacing: -0.5 }}>
                   USD {Number(p.price)?.toLocaleString() || "Consultar"}
                 </p>
                 <p style={{ margin: 0, fontSize: 13, color: "#ccc" }}>
                   {[p.rooms ? `${p.rooms} amb.` : null, p.surface ? `${p.surface} m2` : null, p.bedrooms ? `${p.bedrooms} dorm.` : null].filter(Boolean).join(" | ")}
                 </p>
+
 
 
 
