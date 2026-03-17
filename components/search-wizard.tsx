@@ -196,7 +196,7 @@ export function SearchWizard() {
       </div>
 
       {/* CONTENT */}
-      <div style={{ flex: 1, padding: "24px 20px 120px", overflowY: "auto" }}>
+
       <span style={{ fontSize: 32, lineHeight: 1 }}>{op.label[0]}</span>
         {step === 1 && (
           <div>
@@ -206,7 +206,7 @@ export function SearchWizard() {
               {operationOptions.map((op) => (
                 <button key={op.value} onClick={() => { setFilters({ ...filters, operation: op.value }); next() }}
                   style={{ ...chip(filters.operation === op.value), flexDirection: "column", padding: "20px 16px", gap: 10, justifyContent: "center" }}>
-                  <span style={{ fontSize: 32 }}></span>
+                  <span style={{ fontSize: 28, fontWeight: 900, color: "#60A5FA" }}>{op.label.slice(0,2).toUpperCase()}</span>
                   <span style={{ fontSize: 14, fontWeight: 700 }}>{op.label}</span>
                 </button>
               ))}
