@@ -16,7 +16,7 @@ export default function ViviendaYaFull() {
   const [paused, setPaused] = useState<{ [key: number]: boolean }>({});
   const [activeIndex, setActiveIndex] = useState(0);
   const videoRefs = useRef<HTMLVideoElement[]>([]);
-  const { isLoggedIn, likedProperties, savedProperties, toggleLike, toggleSave } = useAuth();
+  const { isLoggedIn, user, likedProperties, savedProperties, toggleLike, toggleSave } = useAuth();
   const router = useRouter();
   const { setActiveProperty } = useActiveProperty();
   const [showAuthSheet, setShowAuthSheet] = useState(false);
@@ -29,6 +29,7 @@ export default function ViviendaYaFull() {
           .from('properties')
           .select('*')
           .not('video_url', 'is', null)
+            .eq('city', user?.city || '')
 .eq('status', 'approved')
           .order('created_at', { ascending: false });
         if (error) throw error;
