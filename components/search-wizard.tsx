@@ -15,10 +15,10 @@ const operationOptions = [
 
 const propertyTypes = [
   { value: "departamento", label: "Depto", emoji: "ðŸ¢" },
-  { value: "casa", label: "Casa", emoji: "ðŸ¡" },
-  { value: "ph", label: "PH", emoji: "ðŸ›ï¸" },
-  { value: "loft", label: "Loft", emoji: "ðŸ™ï¸" },
-  { value: "monoambiente", label: "Mono", emoji: "ðŸ›ï¸" },
+  { value: "venta", label: "Comprar", emoji: "Casa" },
+  { value: "alquiler", label: "Alquilar", emoji: "Llave" },
+  { value: "permuta", label: "Permuta", emoji: "Cambio" },
+  { value: "temporario", label: "Temporario", emoji: "Fecha" },
   { value: "cabana", label: "CabaÃ±a", emoji: "ðŸŒ²" },
   { value: "quinta", label: "Quinta", emoji: "ðŸŒ¿" },
   { value: "terreno", label: "Terreno", emoji: "ðŸ“" },
