@@ -288,13 +288,13 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
                     width: 42, height: 42, borderRadius: '50%',
                     background: '#333', border: '2px solid rgba(255,255,255,0.8)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20,
-                    overflow: 'hidden', flexShrink: 0,
+                  }}>
                     {p.owner_avatar ? <img src={p.owner_avatar} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <span style={{ fontSize: 18 }}>U</span>}
-                    {p.owner_avatar ? <img src={p.owner_avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : 'ðŸ‘¤'}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ background: "#1d4ed8", borderRadius: 4, padding: "2px 6px", fontSize: 10, fontWeight: 700, color: "#fff" }}>+</span>
-                    <span style={{ background: '#1d4ed8', borderRadius: 4, padding: '2px 6px', fontSize: 10, fontWeight: 700 }}>â˜†</span>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{ fontWeight: "bold", fontSize: 15, color: "#fff" }}>{p.owner_name || "Propietario"}</span>
+                    <span style={{ background: "#1d4ed8", borderRadius: 4, padding: "2px 6px", fontSize: 10, fontWeight: 700, color: "#fff" }}>VY</span>
+                  </div>
                   </div>
                 </div>
 
@@ -327,7 +327,7 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
                   USD {Number(p.price)?.toLocaleString() || 'Consultar'}
                 </p>
                   {[p.rooms ? `${p.rooms} amb.` : null, p.surface ? `${p.surface} m2` : null, p.bedrooms ? `${p.bedrooms} dorm.` : null].filter(Boolean).map((item, idx, arr) => (
-                  {[p.rooms ? `${p.rooms} amb.` : null, p.surface ? `${p.surface} mÂ²` : null, p.bedrooms ? `${p.bedrooms} dorm.` : null].filter(Boolean).map((item, idx, arr) => (
+                  {[p.rooms ? `${p.rooms} amb.` : null, p.surface ? `${p.surface} m2` : null, p.bedrooms ? `${p.bedrooms} dorm.` : null].filter(Boolean).map((item, idx, arr) => (
                     <React.Fragment key={idx}>
                       <span>{item}</span>
                       {idx < arr.length - 1 && <span style={{ color: 'rgba(255,255,255,0.3)' }}>|</span>}
