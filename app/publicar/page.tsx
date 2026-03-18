@@ -77,7 +77,8 @@ export default function PublicarPage() {
 
       const { error: insertError } = await supabase.from("properties").insert({
         user_id: user?.id || null,
-        owner_name: user?.name || "Propietario",
+       owner_name: user?.name || "Propietario",
+owner_avatar: user?.avatar_url || null,
         operation_type: operacion,
         property_type: tipoPropiedad,
         price: parseFloat(precio) || 0,
