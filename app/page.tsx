@@ -340,11 +340,9 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
   Ver detalles
 </p>
-                </p>
               </div>
 
-              {showComments === p.id && (
-                <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 40, background: "rgba(10,10,10,0.97)", borderRadius: "24px 24px 0 0", padding: "20px 20px 100px", maxHeight: "70vh", overflowY: "auto", backdropFilter: "blur(20px)" }}>
+              {showDetails === p.id && (
     <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.2)", margin: "0 auto 20px" }} />
     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
       <div>
@@ -370,6 +368,13 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
       </div>
     )}
     <button onClick={() => requireLogin(() => { const clean = p.whatsapp_number?.replace(/\D/g, ''); const msg = `Hola! Vi tu propiedad en ViviendaYa y me interesa. Podes darme mas info?`; window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`, '_blank'); }, 'contactar')}
+      style={{ width: "100%", padding: "16px", borderRadius: 14, border: "none", background: "#25D366", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+      Contactar por WhatsApp
+    </button>
+  </div>
+)}
+              {showDetails === p.id && (
+            <button onClick={() => requireLogin(() => { const clean = p.whatsapp_number?.replace(/\D/g, ''); const msg = `Hola! Vi tu propiedad en ViviendaYa y me interesa. Podes darme mas info?`; window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`, '_blank'); }, 'contactar')}
       style={{ width: "100%", padding: "16px", borderRadius: 14, border: "none", background: "#25D366", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
       Contactar por WhatsApp
     </button>
