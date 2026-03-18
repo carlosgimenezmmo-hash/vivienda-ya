@@ -334,13 +334,13 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
 
 
 
-                <p style={{ margin: '8px 0 0 0', fontSize: 13, color: '#22C55E', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+                <p onClick={() => setShowDetails(showDetails === p.id ? null : p.id)} style={{ margin: "8px 0 0 0", fontSize: 13, color: "#22C55E", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
-                 <p onClick={() => setShowDetails(showDetails === p.id ? null : p.id)} style={{ margin: '8px 0 0 0', fontSize: 13, color: '#22C55E', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
-  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
-  Ver detalles
-</p>
+                  Ver detalles
+                </p>
               </div>
+
+
 
               {showDetails === p.id && (
     <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.2)", margin: "0 auto 20px" }} />
