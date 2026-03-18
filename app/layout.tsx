@@ -1,4 +1,4 @@
-import type { Metadata, Viewport } from "next"
+﻿import type { Metadata, Viewport } from "next"
 import { Analytics } from "@vercel/analytics/next"
 import { AuthProvider } from "@/lib/auth-context"
 import { ActivePropertyProvider } from "@/lib/active-property-context"
@@ -39,8 +39,8 @@ export default function RootLayout({
         <AuthProvider>
           <ActivePropertyProvider>
             <ProtectedActionProvider>
-              <div style={{ width: '100%', minHeight: '100dvh', position: 'relative' }}>
-                <main style={{ flex: 1 }}>{children}</main>
+              <div style={{ width: "100%", height: "100dvh", overflow: "hidden", position: "relative" }}>
+                <main style={{ height: "100dvh", overflow: "hidden" }}>{children}</main>
                 <BottomNav />
               </div>
             </ProtectedActionProvider>
