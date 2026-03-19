@@ -149,7 +149,7 @@ owner_avatar: user?.avatar_url || null,
   }
 
   return (
-    <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", display: "flex", flexDirection: "column", paddingBottom: 80 }}>
+    <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", display: "flex", flexDirection: "column" }}>
 
       {/* HEADER */}
       <div style={{ padding: "52px 20px 16px", display: "flex", alignItems: "center", gap: 14 }}>
@@ -170,7 +170,7 @@ owner_avatar: user?.avatar_url || null,
         ))}
       </div>
 
-      <div style={{ flex: 1, padding: "0 20px", overflowY: "auto", paddingBottom: 180 }}>
+      <div style={{ flex: 1, padding: "0 20px 200px", overflowY: "auto" }}>
 {/* PASO 1 - PLAN */}
         {step === 1 && (
           <div style={{ paddingBottom: 100 }}>
