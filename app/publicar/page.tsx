@@ -244,12 +244,12 @@ owner_avatar: user?.avatar_url || null,
 
 
 
-            <div style={{ height: 120 }} />
-          </div>
-        )}
 
-        {/* PASO 2 - VIDEO */}
-        {step === 2 && (
+          <div style={{ position: "sticky", bottom: 80, left: 0, right: 0, paddingTop: 16 }}>
+            <button onClick={() => setStep(2)} style={btn}>Continuar</button>
+          </div>
+        </div>
+        )}
           <div style={{ paddingBottom: 100 }}>
             <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Graba la propiedad</h1>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 16px" }}>
@@ -465,11 +465,11 @@ owner_avatar: user?.avatar_url || null,
         )}
 
       </div>
-      {step === 1 && (
-        <div style={{ position: "fixed", bottom: 80, left: 0, right: 0, padding: "16px 20px", background: "rgba(10,10,10,0.95)", borderTop: "1px solid rgba(255,255,255,0.08)", zIndex: 50 }}>
-          <button onClick={() => setStep(2)} style={btn}>Continuar</button>
-        </div>
-      )}
+
+
+
+
+
     </div>
   )
 }
