@@ -170,7 +170,7 @@ owner_avatar: user?.avatar_url || null,
         ))}
       </div>
 
-      <div style={{ flex: 1, padding: "0 20px 200px", overflowY: "auto" }}>
+      <div style={{ flex: 1, paddingLeft: "20px", paddingRight: "20px", paddingBottom: "200px", overflowY: "auto" }}>
 {/* PASO 1 - PLAN */}
         {step === 1 && (
           <div style={{ paddingBottom: 100 }}>
