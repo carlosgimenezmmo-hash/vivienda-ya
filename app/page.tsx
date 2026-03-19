@@ -342,44 +342,35 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
 
 
 
-              {showDetails === p.id && (
-    <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.2)", margin: "0 auto 20px" }} />
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-      <div>
-        <h2 style={{ margin: "0 0 4px", fontSize: 20, fontWeight: 800, color: "#fff" }}>{p.title || "Propiedad"}</h2>
-        <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,0.5)" }}>{[p.neighborhood, p.city].filter(Boolean).join(", ")}</p>
-      </div>
-      <button onClick={() => setShowDetails(null)} style={{ background: "rgba(255,255,255,0.1)", border: "none", borderRadius: "50%", width: 32, height: 32, color: "#fff", cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>x</button>
-    </div>
-    <p style={{ margin: "0 0 16px", fontSize: 28, fontWeight: 800, color: "#fff" }}>USD {Number(p.price)?.toLocaleString()}</p>
-    <div style={{ display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap" as const }}>
-      {p.rooms && <span style={{ background: "rgba(255,255,255,0.08)", borderRadius: 10, padding: "8px 14px", color: "#fff", fontSize: 13 }}>{p.rooms} ambientes</span>}
-      {p.bedrooms && <span style={{ background: "rgba(255,255,255,0.08)", borderRadius: 10, padding: "8px 14px", color: "#fff", fontSize: 13 }}>{p.bedrooms} dorm.</span>}
-      {p.bathrooms && <span style={{ background: "rgba(255,255,255,0.08)", borderRadius: 10, padding: "8px 14px", color: "#fff", fontSize: 13 }}>{p.bathrooms} banos</span>}
-      {p.surface && <span style={{ background: "rgba(255,255,255,0.08)", borderRadius: 10, padding: "8px 14px", color: "#fff", fontSize: 13 }}>{p.surface} m2</span>}
-    </div>
-    {p.description && <p style={{ margin: "0 0 16px", fontSize: 14, color: "rgba(255,255,255,0.6)", lineHeight: 1.5 }}>{p.description}</p>}
-    {p.lat && p.lng && (
-      <div style={{ marginBottom: 16, borderRadius: 14, overflow: "hidden" }}>
-        <iframe
-          src={`https://www.openstreetmap.org/export/embed.html?bbox=${p.lng - 0.005},${p.lat - 0.005},${p.lng + 0.005},${p.lat + 0.005}&layer=mapnik&marker=${p.lat},${p.lng}`}
-          style={{ width: "100%", height: 180, border: "none" }}
-        />
-      </div>
-    )}
-    <button onClick={() => requireLogin(() => { const clean = p.whatsapp_number?.replace(/\D/g, ''); const msg = `Hola! Vi tu propiedad en ViviendaYa y me interesa. Podes darme mas info?`; window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`, '_blank'); }, 'contactar')}
-      style={{ width: "100%", padding: "16px", borderRadius: 14, border: "none", background: "#25D366", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-      Contactar por WhatsApp
-    </button>
-  </div>
-)}
-              {showDetails === p.id && (
-            <button onClick={() => requireLogin(() => { const clean = p.whatsapp_number?.replace(/\D/g, ''); const msg = `Hola! Vi tu propiedad en ViviendaYa y me interesa. Podes darme mas info?`; window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`, '_blank'); }, 'contactar')}
-      style={{ width: "100%", padding: "16px", borderRadius: 14, border: "none", background: "#25D366", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-      Contactar por WhatsApp
-    </button>
-  </div>
-)}
+                <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 40, background: "rgba(10,10,10,0.97)", borderRadius: "24px 24px 0 0", padding: "20px 20px 100px", maxHeight: "70vh", overflowY: "auto", backdropFilter: "blur(20px)" }}>
+                  <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.2)", margin: "0 auto 20px" }} />
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+                    <div>
+                      <h2 style={{ margin: "0 0 4px", fontSize: 20, fontWeight: 800, color: "#fff" }}>{p.title || "Propiedad"}</h2>
+                      <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,0.5)" }}>{[p.neighborhood, p.city].filter(Boolean).join(", ")}</p>
+                    </div>
+                    <button onClick={() => setShowDetails(null)} style={{ background: "rgba(255,255,255,0.1)", border: "none", borderRadius: "50%", width: 32, height: 32, color: "#fff", cursor: "pointer", fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center" }}>x</button>
+                  </div>
+                  <p style={{ margin: "0 0 16px", fontSize: 28, fontWeight: 800, color: "#fff" }}>USD {Number(p.price)?.toLocaleString()}</p>
+                  <div style={{ display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap" as const }}>
+                    {p.rooms && <span style={{ background: "rgba(255,255,255,0.08)", borderRadius: 10, padding: "8px 14px", color: "#fff", fontSize: 13 }}>{p.rooms} ambientes</span>}
+                    {p.bedrooms && <span style={{ background: "rgba(255,255,255,0.08)", borderRadius: 10, padding: "8px 14px", color: "#fff", fontSize: 13 }}>{p.bedrooms} dorm.</span>}
+                    {p.bathrooms && <span style={{ background: "rgba(255,255,255,0.08)", borderRadius: 10, padding: "8px 14px", color: "#fff", fontSize: 13 }}>{p.bathrooms} banos</span>}
+                    {p.surface && <span style={{ background: "rgba(255,255,255,0.08)", borderRadius: 10, padding: "8px 14px", color: "#fff", fontSize: 13 }}>{p.surface} m2</span>}
+                  </div>
+                  {p.description && <p style={{ margin: "0 0 16px", fontSize: 14, color: "rgba(255,255,255,0.6)", lineHeight: 1.5 }}>{p.description}</p>}
+                  {p.lat && p.lng && (
+                    <div style={{ marginBottom: 16, borderRadius: 14, overflow: "hidden" }}>
+                      <iframe src={`https://www.openstreetmap.org/export/embed.html?bbox=${p.lng - 0.005},${p.lat - 0.005},${p.lng + 0.005},${p.lat + 0.005}&layer=mapnik&marker=${p.lat},${p.lng}`} style={{ width: "100%", height: 180, border: "none" }} />
+                    </div>
+                  )}
+                  <button onClick={() => requireLogin(() => { const clean = p.whatsapp_number?.replace(/\D/g, ""); const msg = "Hola! Vi tu propiedad en ViviendaYa y me interesa. Podes darme mas info?"; window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`, "_blank"); }, "contactar")} style={{ width: "100%", padding: "16px", borderRadius: 14, border: "none", background: "#25D366", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+                    Contactar por WhatsApp
+                  </button>
+                </div>
+              )}
+
+              {showComments === p.id && (
                 <div style={{ position: "absolute", bottom: 80, right: 0, width: "80%", maxHeight: "55vh", background: "rgba(10,10,10,0.95)", borderRadius: "20px 0 0 20px", padding: 18, zIndex: 30, overflowY: "auto", boxSizing: "border-box", backdropFilter: "blur(20px)", display: "flex", flexDirection: "column" }}>
                   <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 14 }}>
                     <span style={{ color: "#fff", fontWeight: 700, fontSize: 15 }}>Comentarios</span>
@@ -408,18 +399,13 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
                     <button onClick={() => sendComment(p.id)} disabled={sendingComment} style={{ background: "#2563EB", border: "none", borderRadius: 24, padding: "10px 16px", color: "#fff", cursor: "pointer", fontSize: 16, opacity: sendingComment ? 0.5 : 1 }}>send</button>
                   </div>
                 </div>
-
               )}
 
             </section>
           ))
         )}
-</div>
-      <AuthSheet
-        visible={showAuthSheet}
-        onClose={() => setShowAuthSheet(false)}
-        action={authAction}
-      />
+      </div>
+      <AuthSheet visible={showAuthSheet} onClose={() => setShowAuthSheet(false)} action={authAction} />
     </div>
   );
 }

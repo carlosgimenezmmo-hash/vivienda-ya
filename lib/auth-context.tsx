@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react"
 import type { User, Transaction } from "./types"
@@ -25,25 +25,31 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
-  const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions)
-  const [likedProperties, setLikedProperties] = useState<Set<string>>(new Set())
+   const [transactions, setTransactions] = useState<Transaction[]>([])
+    const [likedProperties, setLikedProperties] = useState<Set<string>>(new Set())
   const [savedProperties, setSavedProperties] = useState<Set<string>>(new Set())
 
   const isLoggedIn = user !== null && user.isLoggedIn
 
- const buildUser = async (supabaseUser: any): Promise<User> => {
-    const meta = supabaseUser.user_metadata
-    const { data: userData } = await supabase.from('users').select('avatar_url, credits').eq('id', supabaseUser.id).single()
-    return {
-      ...mockUser,
-      id: supabaseUser.id,
-      name: `${meta.nombre || ''} ${meta.apellido || ''}`.trim() || supabaseUser.email || 'Usuario',
-      email: supabaseUser.email || '',
-      isLoggedIn: true,
-      avatar_url: userData?.avatar_url || meta.avatar_url || null,
-      credits: userData?.credits || mockUser.credits,
-    }
+const buildUser = async (supabaseUser: any): Promise<User> => {
+  const meta = supabaseUser.user_metadata
+  const { data: userData } = await supabase
+    .from('users')
+    .select('avatar_url, credits, full_name, phone')
+    .eq('id', supabaseUser.id)
+    .single()
+  return {
+    id: supabaseUser.id,
+    name: userData?.full_name || `${meta.nombre || ''} ${meta.apellido || ''}`.trim() || supabaseUser.email || 'Usuario',
+    email: supabaseUser.email || '',
+    isLoggedIn: true,
+    avatar_url: userData?.avatar_url || meta.avatar_url || null,
+    credits: userData?.credits ?? 0,
+    phone: userData?.phone || meta.telefono || '',
+    level: 'basico',
+    verified: false,
   }
+}
 
   useEffect(() => {
  supabase.auth.getSession().then(async ({ data: { session } }) => {
