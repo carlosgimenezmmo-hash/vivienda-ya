@@ -10,7 +10,8 @@ export default function ViviendaYaFull() {
   const [properties, setProperties] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showComments, setShowComments] = useState<number | null>(null);
-  const [comments, setComments] = useState<{ [key: number]: any[] }>({});
+  const [showComments, setShowComments] = useState<number | null>(null);
+  const [showDetails, setShowDetails] = useState<number | null>(null);
   const [commentText, setCommentText] = useState("");
   const [sendingComment, setSendingComment] = useState(false);
   const [paused, setPaused] = useState<{ [key: number]: boolean }>({});
