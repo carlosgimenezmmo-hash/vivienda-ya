@@ -239,12 +239,12 @@ owner_avatar: user?.avatar_url || null,
               ))}
             </div>
 
-           {/* BOTON FIJO */}
-      {step === 1 && (
-        <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, padding: "16px 20px 32px", background: "rgba(10,10,10,0.95)", borderTop: "1px solid rgba(255,255,255,0.08)", zIndex: 20 }}>
-          <button onClick={() => setStep(2)} style={btn}>Continuar</button>
-        </div>
-      )}
+
+
+
+
+
+
           </div>
         )}
 
