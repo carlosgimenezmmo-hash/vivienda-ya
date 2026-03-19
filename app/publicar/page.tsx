@@ -170,7 +170,7 @@ owner_avatar: user?.avatar_url || null,
         ))}
       </div>
 
-      <div style={{ flex: 1, padding: "0 20px", overflowY: "auto" }}>
+      <div style={{ flex: 1, padding: "0 20px", overflowY: "auto", paddingBottom: 100 }}>
 {/* PASO 1 - PLAN */}
         {step === 1 && (
           <div style={{ paddingBottom: 100 }}>
@@ -466,7 +466,7 @@ owner_avatar: user?.avatar_url || null,
 
       </div>
       {step === 1 && (
-        <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, padding: "16px 20px 32px", background: "rgba(10,10,10,0.95)", borderTop: "1px solid rgba(255,255,255,0.08)", zIndex: 20 }}>
+        <div style={{ position: "fixed", bottom: 80, left: 0, right: 0, padding: "16px 20px", background: "rgba(10,10,10,0.95)", borderTop: "1px solid rgba(255,255,255,0.08)", zIndex: 50 }}>
           <button onClick={() => setStep(2)} style={btn}>Continuar</button>
         </div>
       )}
