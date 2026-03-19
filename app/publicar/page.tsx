@@ -367,8 +367,8 @@ owner_avatar: user?.avatar_url || null,
 
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>WhatsApp de contacto</p>
             <input value={whatsapp} onChange={e => setWhatsapp(e.target.value)} placeholder="Ej: 5491112345678" type="tel" style={{ ...inp, marginBottom: 20 }} />
-
-            <button onClick={() => setStep(4)} style={btn}>                                                                   
+            <button onClick={() => setStep(4)} style={btn}>Continuar</button>
+          </div>
           </div>
         )}
 
