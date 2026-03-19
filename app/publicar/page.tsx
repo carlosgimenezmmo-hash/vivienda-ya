@@ -244,7 +244,7 @@ owner_avatar: user?.avatar_url || null,
 
 
 
-
+            <div style={{ height: 120 }} />
           </div>
         )}
 
