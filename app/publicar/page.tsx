@@ -215,7 +215,7 @@ export default function PublicarPage() {
               ))}
             </div>
 
-            <button onClick={() => setStep(2)} style={btn}>Continuar</button>
+
           </div>
         )}
 
@@ -385,6 +385,11 @@ export default function PublicarPage() {
         )}
 
       </div>
+      {step === 1 && (
+        <div style={{ position: "fixed", bottom: 80, left: 0, right: 0, padding: "12px 20px", background: "#0a0a0a", zIndex: 99 }}>
+          <button onClick={() => setStep(2)} style={btn}>Continuar</button>
+        </div>
+      )}
     </div>
   )
 }
