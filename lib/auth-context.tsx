@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react"
 import type { User, Transaction } from "./types"
-import { mockUser, mockTransactions } from "./mock-data"
+
 import { addRevenue } from "./revenue"
 import { supabase } from "./supabaseClient"
 
