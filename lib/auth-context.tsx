@@ -79,7 +79,7 @@ const buildUser = async (supabaseUser: any): Promise<User> => {
       await supabase.auth.signOut()
       setUser(null)
     } else {
-      setUser({ ...mockUser, isLoggedIn: true })
+      setUser(null)
     }
   }, [isLoggedIn])
 
