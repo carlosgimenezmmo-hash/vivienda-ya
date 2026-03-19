@@ -171,103 +171,75 @@ owner_avatar: user?.avatar_url || null,
       </div>
 
       <div style={{ flex: 1, padding: "0 20px", overflowY: "auto" }}>
-
-        {/* PASO 1 - PLAN */}
+{/* PASO 1 - PLAN */}
         {step === 1 && (
           <div style={{ paddingBottom: 100 }}>
             <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Tu plan</h1>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 24px" }}>Videos disponibles este mes</p>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 20px" }}>Videos disponibles este mes</p>
 
-            {/* PLAN GRATIS */}
             <button onClick={() => setPlanElegido("gratis")} style={card(planElegido === "gratis")}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
                   <p style={{ margin: 0, fontWeight: 700, fontSize: 16, color: "#fff" }}>Plan GRATIS</p>
-                  <p style={{ margin: "4px 0 0", fontSize: 13, color: "rgba(255,255,255,0.5)" }}>3 videos/mes incluidos</p>
+                  <p style={{ margin: "4px 0 0", fontSize: 13, color: "rgba(255,255,255,0.5)" }}>3 videos/mes · 60 seg · Chat incluido</p>
                 </div>
-                <div style={{ textAlign: "right" }}>
-                  <p style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "#22C55E" }}>3</p>
-                  <p style={{ margin: 0, fontSize: 11, color: "rgba(255,255,255,0.4)" }}>disponibles</p>
-                </div>
-              </div>
-              <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(255,255,255,0.08)" }}>
-                <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.5)" }}>Videos de hasta 60 segundos</p>
-                <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(255,255,255,0.5)" }}>Verificacion ARRYSE gratuita</p>
-                <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(255,255,255,0.5)" }}>Chat con interesados</p>
+                <p style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "#22C55E" }}>$0</p>
               </div>
             </button>
 
-            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", margin: "4px 0 16px", fontWeight: 600 }}>AGREGAR MAS VIDEOS</p>
+            <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", margin: "16px 0 10px", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" }}>Videos extra</p>
 
-            {/* VIDEO EXTRA */}
             <button onClick={() => setPlanElegido("extra1")} style={card(planElegido === "extra1")}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
                   <p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#fff" }}>1 video extra</p>
-                  <p style={{ margin: "4px 0 0", fontSize: 13, color: "rgba(255,255,255,0.5)" }}>Pago unico este mes</p>
+                  <p style={{ margin: "2px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>Pago unico</p>
                 </div>
                 <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#60A5FA" }}>USD 1</p>
               </div>
             </button>
 
-            {/* PACK 5 */}
             <button onClick={() => setPlanElegido("pack5")} style={card(planElegido === "pack5")}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
-                  <p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#fff" }}>Pack 5 videos extra</p>
-                  <p style={{ margin: "4px 0 0", fontSize: 13, color: "rgba(255,255,255,0.5)" }}>Ahorro 20%</p>
+                  <p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#fff" }}>Pack 5 videos</p>
+                  <p style={{ margin: "2px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>Ahorro 20%</p>
                 </div>
                 <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#60A5FA" }}>USD 4</p>
               </div>
             </button>
 
-            {/* PACK 10 */}
             <button onClick={() => setPlanElegido("pack10")} style={card(planElegido === "pack10")}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
-                  <p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#fff" }}>Pack 10 videos extra</p>
-                  <p style={{ margin: "4px 0 0", fontSize: 13, color: "rgba(255,255,255,0.5)" }}>Ahorro 30%</p>
+                  <p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#fff" }}>Pack 10 videos</p>
+                  <p style={{ margin: "2px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>Ahorro 30%</p>
                 </div>
                 <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#60A5FA" }}>USD 7</p>
               </div>
             </button>
 
-            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", margin: "4px 0 16px", fontWeight: 600 }}>DURACION DEL VIDEO</p>
+            <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", margin: "16px 0 10px", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" }}>Duracion del video</p>
 
-            {/* VIDEO 120 SEG */}
-            <button onClick={() => setPlanElegido("v120")} style={card(planElegido === "v120")}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#fff" }}>Video extendido 120 seg</p>
-                  <p style={{ margin: "4px 0 0", fontSize: 13, color: "rgba(255,255,255,0.5)" }}>Hasta 2 minutos</p>
-                </div>
-                <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#60A5FA" }}>USD 1</p>
-              </div>
-            </button>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 8 }}>
+              {[
+                { id: "gratis", label: "60 seg", precio: "Incluido", color: "#22C55E" },
+                { id: "v120", label: "120 seg", precio: "USD 1", color: "#60A5FA" },
+                { id: "v180", label: "180 seg", precio: "USD 2", color: "#60A5FA" },
+                { id: "v300", label: "300 seg", precio: "USD 4", color: "#60A5FA" },
+              ].map((v) => (
+                <button key={v.id + "-dur"} onClick={() => setPlanElegido(v.id)} style={{
+                  ...card(planElegido === v.id),
+                  padding: "14px",
+                  textAlign: "center" as const,
+                }}>
+                  <p style={{ margin: 0, fontWeight: 800, fontSize: 18, color: "#fff" }}>{v.label}</p>
+                  <p style={{ margin: "4px 0 0", fontSize: 12, color: v.color, fontWeight: 700 }}>{v.precio}</p>
+                </button>
+              ))}
+            </div>
 
-            {/* VIDEO 180 SEG */}
-            <button onClick={() => setPlanElegido("v180")} style={card(planElegido === "v180")}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#fff" }}>Video extendido 180 seg</p>
-                  <p style={{ margin: "4px 0 0", fontSize: 13, color: "rgba(255,255,255,0.5)" }}>Hasta 3 minutos</p>
-                </div>
-                <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#60A5FA" }}>USD 2</p>
-              </div>
-            </button>
-
-            {/* VIDEO 300 SEG */}
-            <button onClick={() => setPlanElegido("v300")} style={card(planElegido === "v300")}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#fff" }}>Video extendido 300 seg</p>
-                  <p style={{ margin: "4px 0 0", fontSize: 13, color: "rgba(255,255,255,0.5)" }}>Hasta 5 minutos · Solo PRO</p>
-                </div>
-                <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#60A5FA" }}>USD 4</p>
-              </div>
-            </button>
-
-            <button onClick={() => setStep(2)} style={{ ...btn, marginTop: 8 }}>Continuar</button>
+            <button onClick={() => setStep(2)} style={{ ...btn, marginTop: 16 }}>Continuar</button>
           </div>
         )}
 
