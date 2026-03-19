@@ -339,7 +339,7 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
                   Ver detalles
                 </p>
               </div>
-
+              {showDetails === p.id && (
 
 
                 <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 40, background: "rgba(10,10,10,0.97)", borderRadius: "24px 24px 0 0", padding: "20px 20px 100px", maxHeight: "70vh", overflowY: "auto", backdropFilter: "blur(20px)" }}>
