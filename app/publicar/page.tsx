@@ -150,7 +150,7 @@ export default function PublicarPage() {
         ))}
       </div>
 
-      <div style={{ flex: 1, padding: "0 20px", overflowY: "auto", paddingBottom: 160 }}>
+      <div style={{ flex: 1, paddingLeft: "20px", paddingRight: "20px", paddingTop: 0, paddingBottom: 160, overflowY: "auto" }}>
 
         {step === 1 && (
           <div>
