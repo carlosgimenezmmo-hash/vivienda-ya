@@ -10,19 +10,13 @@ export default function PublicarPage() {
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
-
-  // Paso 1 - Plan
   const [planElegido, setPlanElegido] = useState("gratis")
-
-  // Paso 2 - Video
   const [video, setVideo] = useState<File | null>(null)
   const [videoPreview, setVideoPreview] = useState<string | null>(null)
   const [gpsLat, setGpsLat] = useState<number | null>(null)
   const [gpsLng, setGpsLng] = useState<number | null>(null)
   const [gpsOk, setGpsOk] = useState(false)
   const videoRef = useRef<HTMLInputElement>(null)
-
-  // Paso 3 - Datos
   const [operacion, setOperacion] = useState("venta")
   const [tipoPropiedad, setTipoPropiedad] = useState("")
   const [precio, setPrecio] = useState("")
@@ -33,20 +27,13 @@ export default function PublicarPage() {
   const [ciudad, setCiudad] = useState("")
   const [descripcion, setDescripcion] = useState("")
   const [whatsapp, setWhatsapp] = useState("")
-
-  // Paso 4 - Destacar
   const [destacar, setDestacar] = useState("sin")
-
   const totalSteps = 5
 
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          setGpsLat(pos.coords.latitude)
-          setGpsLng(pos.coords.longitude)
-          setGpsOk(true)
-        },
+        (pos) => { setGpsLat(pos.coords.latitude); setGpsLng(pos.coords.longitude); setGpsOk(true) },
         () => setGpsOk(false)
       )
     }
@@ -67,18 +54,15 @@ export default function PublicarPage() {
       if (video) {
         const ext = video.name.split(".").pop()
         const path = `${Date.now()}.${ext}`
-        const { error: uploadError } = await supabase.storage
-          .from("videos-app")
-          .upload(path, video, { contentType: video.type })
+        const { error: uploadError } = await supabase.storage.from("videos-app").upload(path, video, { contentType: video.type })
         if (uploadError) throw uploadError
         const { data } = supabase.storage.from("videos-app").getPublicUrl(path)
         videoUrl = data.publicUrl
       }
-
       const { error: insertError } = await supabase.from("properties").insert({
         user_id: user?.id || null,
-       owner_name: user?.name || "Propietario",
-owner_avatar: user?.avatar_url || null,
+        owner_name: user?.name || "Propietario",
+        owner_avatar: user?.avatar_url || null,
         operation_type: operacion,
         property_type: tipoPropiedad,
         price: parseFloat(precio) || 0,
@@ -117,7 +101,6 @@ owner_avatar: user?.avatar_url || null,
     background: "linear-gradient(135deg, #2563EB, #1d4ed8)",
     color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer",
     fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
-    boxShadow: "0 4px 20px rgba(37,99,235,0.3)",
   }
 
   const card = (active: boolean): React.CSSProperties => ({
@@ -140,7 +123,6 @@ owner_avatar: user?.avatar_url || null,
   if (!isLoggedIn) {
     return (
       <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 24px", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
-        <span style={{ fontSize: 48, marginBottom: 16 }}>🔒</span>
         <h2 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 10px", textAlign: "center" }}>Necesitas una cuenta</h2>
         <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, textAlign: "center", margin: "0 0 28px" }}>Para publicar propiedades tenes que estar registrado.</p>
         <button onClick={() => router.push("/registro")} style={btn}>Registrarme gratis</button>
@@ -151,7 +133,6 @@ owner_avatar: user?.avatar_url || null,
   return (
     <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", display: "flex", flexDirection: "column" }}>
 
-      {/* HEADER */}
       <div style={{ padding: "52px 20px 16px", display: "flex", alignItems: "center", gap: 14 }}>
         <button onClick={() => step > 1 ? setStep(step - 1) : router.back()}
           style={{ background: "rgba(255,255,255,0.08)", border: "none", borderRadius: "50%", width: 38, height: 38, color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -163,17 +144,16 @@ owner_avatar: user?.avatar_url || null,
         </div>
       </div>
 
-      {/* PROGRESS */}
       <div style={{ padding: "0 20px 24px", display: "flex", gap: 6 }}>
         {Array.from({ length: totalSteps }).map((_, i) => (
-          <div key={i} style={{ flex: 1, height: 3, borderRadius: 2, background: i < step ? "#2563EB" : "rgba(255,255,255,0.1)", transition: "background 0.3s" }} />
+          <div key={i} style={{ flex: 1, height: 3, borderRadius: 2, background: i < step ? "#2563EB" : "rgba(255,255,255,0.1)" }} />
         ))}
       </div>
 
-      <div style={{ flex: 1, paddingLeft: "20px", paddingRight: "20px", paddingBottom: "200px", overflowY: "auto" }}>
-{/* PASO 1 - PLAN */}
+      <div style={{ flex: 1, padding: "0 20px", overflowY: "auto", paddingBottom: 160 }}>
+
         {step === 1 && (
-          <div style={{ paddingBottom: 100 }}>
+          <div>
             <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Tu plan</h1>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 20px" }}>Videos disponibles este mes</p>
 
@@ -221,53 +201,34 @@ owner_avatar: user?.avatar_url || null,
 
             <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", margin: "16px 0 10px", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" }}>Duracion del video</p>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 8 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 24 }}>
               {[
                 { id: "gratis", label: "60 seg", precio: "Incluido", color: "#22C55E" },
                 { id: "v120", label: "120 seg", precio: "USD 1", color: "#60A5FA" },
                 { id: "v180", label: "180 seg", precio: "USD 2", color: "#60A5FA" },
                 { id: "v300", label: "300 seg", precio: "USD 4", color: "#60A5FA" },
               ].map((v) => (
-                <button key={v.id + "-dur"} onClick={() => setPlanElegido(v.id)} style={{
-                  ...card(planElegido === v.id),
-                  padding: "14px",
-                  textAlign: "center" as const,
-                }}>
+                <button key={v.id + "-dur"} onClick={() => setPlanElegido(v.id)} style={{ ...card(planElegido === v.id), padding: "14px", textAlign: "center" as const, marginBottom: 0 }}>
                   <p style={{ margin: 0, fontWeight: 800, fontSize: 18, color: "#fff" }}>{v.label}</p>
                   <p style={{ margin: "4px 0 0", fontSize: 12, color: v.color, fontWeight: 700 }}>{v.precio}</p>
                 </button>
               ))}
             </div>
 
-
-
-
-
-
-
-          <div style={{ position: "sticky", bottom: 80, left: 0, right: 0, paddingTop: 16 }}>
             <button onClick={() => setStep(2)} style={btn}>Continuar</button>
           </div>
         )}
 
-        {/* PASO 2 - VIDEO */}
         {step === 2 && (
-          <div style={{ paddingBottom: 100 }}>
+          <div>
             <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Graba la propiedad</h1>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 16px" }}>
               Tenes {planElegido === "v120" ? "120" : planElegido === "v180" ? "180" : planElegido === "v300" ? "300" : "60"} segundos
             </p>
-            <div style={{
-              padding: "12px 16px", borderRadius: 12, marginBottom: 16,
-              background: gpsOk ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)",
-              border: `1px solid ${gpsOk ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.3)"}`,
-              display: "flex", alignItems: "center", gap: 10,
-            }}>
+            <div style={{ padding: "12px 16px", borderRadius: 12, marginBottom: 16, background: gpsOk ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)", border: `1px solid ${gpsOk ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.3)"}`, display: "flex", alignItems: "center", gap: 10 }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={gpsOk ? "#10B981" : "#EF4444"} strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               <div>
-                <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: gpsOk ? "#10B981" : "#EF4444" }}>
-                  ARRYSE: {gpsOk ? "Ubicacion capturada" : "Capturando ubicacion..."}
-                </p>
+                <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: gpsOk ? "#10B981" : "#EF4444" }}>ARRYSE: {gpsOk ? "Ubicacion capturada" : "Capturando ubicacion..."}</p>
                 {gpsOk && <p style={{ margin: 0, fontSize: 11, color: "rgba(255,255,255,0.4)" }}>{gpsLat?.toFixed(4)}, {gpsLng?.toFixed(4)}</p>}
               </div>
             </div>
@@ -275,50 +236,24 @@ owner_avatar: user?.avatar_url || null,
             <input ref={videoRef} type="file" accept="video/*" capture="environment" onChange={handleVideo} style={{ display: "none" }} />
 
             {!videoPreview ? (
-              <div onClick={() => videoRef.current?.click()} style={{
-                height: 260, borderRadius: 16,
-                border: "2px dashed rgba(37,99,235,0.4)",
-                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-                cursor: "pointer", background: "rgba(37,99,235,0.05)",
-              }}>
+              <div onClick={() => videoRef.current?.click()} style={{ height: 260, borderRadius: 16, border: "2px dashed rgba(37,99,235,0.4)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", background: "rgba(37,99,235,0.05)" }}>
                 <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="rgba(37,99,235,0.6)" strokeWidth="1.5"><path d="M15 10l4.553-2.069A1 1 0 0 1 21 8.87v6.26a1 1 0 0 1-1.447.9L15 14M3 8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8z"/></svg>
                 <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 15, marginTop: 12 }}>Toca para grabar</p>
-                <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 12, marginTop: 4 }}>Se abre la camara</p>
               </div>
             ) : (
               <div>
-                <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", marginBottom: 12 }}>
-                  {gpsOk && (
-                    <div style={{ position: "absolute", top: 10, left: 10, zIndex: 10, background: "rgba(16,185,129,0.9)", borderRadius: 20, padding: "4px 10px", display: "flex", alignItems: "center", gap: 6 }}>
-                      <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff" }} />
-                      <span style={{ color: "#fff", fontSize: 11, fontWeight: 700 }}>ARRYSE</span>
-                    </div>
-                  )}
-                  <video src={videoPreview} style={{ width: "100%", borderRadius: 16, maxHeight: 300, objectFit: "cover" }} controls />
-                </div>
-                <button onClick={() => { setVideo(null); setVideoPreview(null); }} style={{
-                  width: "100%", padding: "14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.12)",
-                  background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.7)", fontSize: 15,
-                  cursor: "pointer", marginBottom: 12, fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
-                }}>
+                <video src={videoPreview} style={{ width: "100%", borderRadius: 16, maxHeight: 300, objectFit: "cover", marginBottom: 12 }} controls />
+                <button onClick={() => { setVideo(null); setVideoPreview(null) }} style={{ width: "100%", padding: "14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.7)", fontSize: 15, cursor: "pointer", marginBottom: 12, fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
                   Volver a grabar
                 </button>
                 <button onClick={() => setStep(3)} style={btn}>Usar este video</button>
               </div>
             )}
-
-            <div style={{ marginTop: 20, background: "rgba(255,255,255,0.04)", borderRadius: 12, padding: 16 }}>
-              <p style={{ margin: "0 0 8px", fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: 1 }}>CONSEJOS PARA UN BUEN VIDEO</p>
-              {["Graba con buena luz natural", "Recorre todos los ambientes", "Mostra espacios y medidas", "Graba tambien el exterior"].map((tip, i) => (
-                <p key={i} style={{ margin: "6px 0 0", fontSize: 13, color: "rgba(255,255,255,0.4)" }}>• {tip}</p>
-              ))}
-            </div>
           </div>
         )}
 
-        {/* PASO 3 - DATOS */}
         {step === 3 && (
-          <div style={{ paddingBottom: 100 }}>
+          <div>
             <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 4px" }}>Datos de la propiedad</h1>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 20px" }}>Se veran sobre el video en el feed</p>
 
@@ -361,20 +296,17 @@ owner_avatar: user?.avatar_url || null,
             </div>
 
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Descripcion corta</p>
-            <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} placeholder="Describe brevemente la propiedad..." maxLength={150}
-              style={{ ...inp, height: 80, resize: "none", marginBottom: 4 }} />
+            <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} placeholder="Describe brevemente la propiedad..." maxLength={150} style={{ ...inp, height: 80, resize: "none", marginBottom: 4 }} />
             <p style={{ textAlign: "right", color: "rgba(255,255,255,0.3)", fontSize: 12, margin: "0 0 16px" }}>{descripcion.length}/150</p>
 
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>WhatsApp de contacto</p>
             <input value={whatsapp} onChange={e => setWhatsapp(e.target.value)} placeholder="Ej: 5491112345678" type="tel" style={{ ...inp, marginBottom: 20 }} />
             <button onClick={() => setStep(4)} style={btn}>Continuar</button>
           </div>
-
         )}
 
-        {/* PASO 4 - DESTACAR */}
         {step === 4 && (
-          <div style={{ paddingBottom: 100 }}>
+          <div>
             <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Destacar tu propiedad?</h1>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 24px" }}>Aparece primero en el feed</p>
 
@@ -412,9 +344,8 @@ owner_avatar: user?.avatar_url || null,
           </div>
         )}
 
-        {/* PASO 5 - RESUMEN Y PUBLICAR */}
         {step === 5 && (
-          <div style={{ paddingBottom: 100 }}>
+          <div>
             <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Todo listo!</h1>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 24px" }}>Revisa los datos antes de publicar</p>
 
@@ -423,30 +354,19 @@ owner_avatar: user?.avatar_url || null,
             )}
 
             <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: 16, marginBottom: 16 }}>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
-                <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>Operacion</span>
-                <span style={{ color: "#fff", fontSize: 13, fontWeight: 600, textTransform: "capitalize" }}>{operacion}</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
-                <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>Tipo</span>
-                <span style={{ color: "#fff", fontSize: 13, fontWeight: 600 }}>{tipoPropiedad || "No especificado"}</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
-                <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>Precio</span>
-                <span style={{ color: "#fff", fontSize: 13, fontWeight: 600 }}>{moneda} {parseInt(precio).toLocaleString()}</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
-                <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>Ubicacion</span>
-                <span style={{ color: "#fff", fontSize: 13, fontWeight: 600 }}>{barrio}, {ciudad}</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
-                <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>Destacar</span>
-                <span style={{ color: "#fff", fontSize: 13, fontWeight: 600 }}>{destacar === "sin" ? "No" : destacar === "24h" ? "24 horas" : "7 dias"}</span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>ARRYSE GPS</span>
-                <span style={{ color: gpsOk ? "#22C55E" : "#EF4444", fontSize: 13, fontWeight: 600 }}>{gpsOk ? "Verificado" : "No verificado"}</span>
-              </div>
+              {[
+                ["Operacion", operacion],
+                ["Tipo", tipoPropiedad || "No especificado"],
+                ["Precio", `${moneda} ${parseInt(precio).toLocaleString()}`],
+                ["Ubicacion", `${barrio}, ${ciudad}`],
+                ["Destacar", destacar === "sin" ? "No" : destacar === "24h" ? "24 horas" : "7 dias"],
+                ["ARRYSE GPS", gpsOk ? "Verificado" : "No verificado"],
+              ].map(([label, value], i, arr) => (
+                <div key={label} style={{ display: "flex", justifyContent: "space-between", marginBottom: i < arr.length - 1 ? 10 : 0 }}>
+                  <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>{label}</span>
+                  <span style={{ color: label === "ARRYSE GPS" ? (gpsOk ? "#22C55E" : "#EF4444") : "#fff", fontSize: 13, fontWeight: 600 }}>{value}</span>
+                </div>
+              ))}
             </div>
 
             {error && (
@@ -465,12 +385,6 @@ owner_avatar: user?.avatar_url || null,
         )}
 
       </div>
-
-
-
-
-
     </div>
   )
 }
-
