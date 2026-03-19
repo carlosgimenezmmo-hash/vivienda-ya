@@ -369,7 +369,7 @@ owner_avatar: user?.avatar_url || null,
             <input value={whatsapp} onChange={e => setWhatsapp(e.target.value)} placeholder="Ej: 5491112345678" type="tel" style={{ ...inp, marginBottom: 20 }} />
             <button onClick={() => setStep(4)} style={btn}>Continuar</button>
           </div>
-          </div>
+
         )}
 
         {/* PASO 4 - DESTACAR */}
