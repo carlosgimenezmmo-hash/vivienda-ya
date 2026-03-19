@@ -249,8 +249,8 @@ owner_avatar: user?.avatar_url || null,
             <button onClick={() => setStep(2)} style={btn}>Continuar</button>
           </div>
         </div>
-        )}
-          <div style={{ paddingBottom: 100 }}>
+        {/* PASO 2 - VIDEO */}
+        {step === 2 && (
             <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Graba la propiedad</h1>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 16px" }}>
               Tenes {planElegido === "v120" ? "120" : planElegido === "v180" ? "180" : planElegido === "v300" ? "300" : "60"} segundos
