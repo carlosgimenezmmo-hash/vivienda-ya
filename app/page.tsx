@@ -212,7 +212,7 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
                     background: 'rgba(245,158,11,0.9)', color: '#fff',
                     padding: '5px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700,
                     backdropFilter: 'blur(8px)',
-                  }}>â­ DESTACADO</span>
+                  }}>DESTACADO</span>
                   <span style={{
                     background: 'rgba(34,197,94,0.9)', color: '#fff',
                     padding: '5px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700,
