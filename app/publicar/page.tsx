@@ -239,7 +239,12 @@ owner_avatar: user?.avatar_url || null,
               ))}
             </div>
 
-            <button onClick={() => setStep(2)} style={{ ...btn, marginTop: 16 }}>Continuar</button>
+           {/* BOTON FIJO */}
+      {step === 1 && (
+        <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, padding: "16px 20px 32px", background: "rgba(10,10,10,0.95)", borderTop: "1px solid rgba(255,255,255,0.08)", zIndex: 20 }}>
+          <button onClick={() => setStep(2)} style={btn}>Continuar</button>
+        </div>
+      )}
           </div>
         )}
 
@@ -363,7 +368,7 @@ owner_avatar: user?.avatar_url || null,
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>WhatsApp de contacto</p>
             <input value={whatsapp} onChange={e => setWhatsapp(e.target.value)} placeholder="Ej: 5491112345678" type="tel" style={{ ...inp, marginBottom: 20 }} />
 
-            <button onClick={() => setStep(4)} style={btn}>Continuar</button>
+            <button onClick={() => setStep(4)} style={btn}>                                                                   
           </div>
         )}
 
@@ -460,6 +465,12 @@ owner_avatar: user?.avatar_url || null,
         )}
 
       </div>
+    {step === 1 && (
+        <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, padding: "16px 20px 32px", background: "rgba(10,10,10,0.95)", borderTop: "1px solid rgba(255,255,255,0.08)", zIndex: 20 }}>
+          <button onClick={() => setStep(2)} style={btn}>Continuar</button>
+        </div>
+      )}
+        
     </div>
   )
 }
