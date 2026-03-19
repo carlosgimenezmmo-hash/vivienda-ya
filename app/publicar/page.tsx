@@ -248,15 +248,15 @@ owner_avatar: user?.avatar_url || null,
           <div style={{ position: "sticky", bottom: 80, left: 0, right: 0, paddingTop: 16 }}>
             <button onClick={() => setStep(2)} style={btn}>Continuar</button>
           </div>
-        </div>
+        )}
+
         {/* PASO 2 - VIDEO */}
         {step === 2 && (
-        {step === 2 && (
           <div style={{ paddingBottom: 100 }}>
+            <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Graba la propiedad</h1>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 16px" }}>
               Tenes {planElegido === "v120" ? "120" : planElegido === "v180" ? "180" : planElegido === "v300" ? "300" : "60"} segundos
             </p>
-
-            {/* GPS ARRYSE */}
             <div style={{
               padding: "12px 16px", borderRadius: 12, marginBottom: 16,
               background: gpsOk ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)",
