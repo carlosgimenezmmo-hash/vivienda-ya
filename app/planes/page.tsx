@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -104,7 +104,7 @@ export default function PlanesPage() {
   }
 
   return (
-    <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", paddingBottom: 100 }}>
+    <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", paddingBottom: 160 }}>
 
       {/* HEADER */}
       <div style={{ padding: "52px 20px 24px" }}>
@@ -112,7 +112,7 @@ export default function PlanesPage() {
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
         </button>
         <h1 style={{ fontSize: 28, fontWeight: 900, margin: "0 0 8px" }}>
-          Elegí tu plan
+          ElegÃ­ tu plan
         </h1>
         <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", margin: 0 }}>
           Simple, justo y sin sorpresas
