@@ -58,12 +58,12 @@ export default function PlanesPage() {
   } catch {
     alert("Error al conectar con Mercado Pago.")
   }
-}
-    if (!isLoggedIn) { router.push("/registro"); return }
-    if (planId === "gratis") { router.push("/publicar"); return }
-    setPlanSeleccionado(planId)
-    alert("Mercado Pago proximamente")
-  }
+
+
+
+
+
+
 
   return (
     <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", overflowY: "scroll", WebkitOverflowScrolling: "touch" } as React.CSSProperties}>
