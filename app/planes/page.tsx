@@ -56,10 +56,10 @@ export default function PlanesPage() {
       alert("Error al procesar el pago. Intenta de nuevo.")
     }
   } catch {
+  } catch {
     alert("Error al conectar con Mercado Pago.")
+  }
 }
-
-
 
 
 
