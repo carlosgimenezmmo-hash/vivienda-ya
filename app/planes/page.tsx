@@ -5,72 +5,10 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth-context"
 
 const planes = [
-  {
-    id: "gratis",
-    nombre: "Gratis",
-    precio: 0,
-    periodo: "",
-    color: "#888",
-    features: [
-      "3 videos por mes",
-      "60 segundos por video",
-      "Estadisticas basicas",
-      "Verificacion ARRYSE gratis",
-      "Chat con interesados",
-    ],
-  },
-  {
-    id: "pro",
-    nombre: "PRO",
-    precio: 1.5,
-    periodo: "por semana",
-    color: "#2563EB",
-    features: [
-      "15 videos por mes",
-      "60 segundos por video",
-      "Estadisticas avanzadas",
-      "Ver quien vio tus propiedades",
-      "Badge PRO visible",
-      "1 destacado por semana (24h)",
-      "Soporte prioritario",
-    ],
-  },
-  {
-    id: "premium",
-    nombre: "PREMIUM",
-    precio: 25,
-    periodo: "por mes",
-    color: "#7C3AED",
-    features: [
-      "50 videos por mes",
-      "Videos de hasta 5 minutos",
-      "Hasta 5 agentes incluidos",
-      "Dashboard profesional",
-      "5 destacados por mes",
-      "2 lives por mes",
-      "API de integracion",
-      "Carga masiva Excel/CSV",
-      "Informes de mercado mensuales",
-      "Badge INMOBILIARIA VERIFICADA",
-      "Soporte VIP menos de 1 hora",
-    ],
-  },
-  {
-    id: "plus",
-    nombre: "PLUS",
-    precio: 40,
-    periodo: "por mes",
-    color: "#D97706",
-    features: [
-      "100 videos por mes",
-      "Videos de hasta 5 minutos",
-      "Hasta 10 agentes incluidos",
-      "10 destacados por mes",
-      "4 lives por mes",
-      "Prioridad absoluta en busquedas",
-      "Todo lo del plan PREMIUM incluido",
-    ],
-  },
+  { id: "gratis", nombre: "Gratis", precio: 0, periodo: "", color: "#888", features: ["3 videos por mes", "60 segundos por video", "Estadisticas basicas", "Verificacion ARRYSE gratis", "Chat con interesados"] },
+  { id: "pro", nombre: "PRO", precio: 1.5, periodo: "por semana", color: "#2563EB", features: ["15 videos por mes", "60 segundos por video", "Estadisticas avanzadas", "Ver quien vio tus propiedades", "Badge PRO visible", "1 destacado por semana (24h)", "Soporte prioritario"] },
+  { id: "premium", nombre: "PREMIUM", precio: 25, periodo: "por mes", color: "#7C3AED", features: ["50 videos por mes", "Videos de hasta 5 minutos", "Hasta 5 agentes incluidos", "Dashboard profesional", "5 destacados por mes", "2 lives por mes", "API de integracion", "Carga masiva Excel/CSV", "Informes de mercado mensuales", "Badge INMOBILIARIA VERIFICADA", "Soporte VIP menos de 1 hora"] },
+  { id: "plus", nombre: "PLUS", precio: 40, periodo: "por mes", color: "#D97706", features: ["100 videos por mes", "Videos de hasta 5 minutos", "Hasta 10 agentes incluidos", "10 destacados por mes", "4 lives por mes", "Prioridad absoluta en busquedas", "Todo lo del plan PREMIUM incluido"] },
 ]
 
 const servicios = [
@@ -91,64 +29,39 @@ export default function PlanesPage() {
   const [planSeleccionado, setPlanSeleccionado] = useState<string | null>(null)
 
   const handleContratar = (planId: string) => {
-    if (!isLoggedIn) {
-      router.push("/registro")
-      return
-    }
-    if (planId === "gratis") {
-      router.push("/publicar")
-      return
-    }
+    if (!isLoggedIn) { router.push("/registro"); return }
+    if (planId === "gratis") { router.push("/publicar"); return }
     setPlanSeleccionado(planId)
     alert("Mercado Pago proximamente")
   }
 
   return (
-    <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", paddingBottom: 160, overflowY: "auto" }}>
+    <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", overflowY: "scroll", WebkitOverflowScrolling: "touch" } as React.CSSProperties}>
 
-      {/* HEADER */}
       <div style={{ padding: "52px 20px 24px" }}>
         <button onClick={() => router.back()} style={{ background: "rgba(255,255,255,0.08)", border: "none", borderRadius: "50%", width: 38, height: 38, color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
         </button>
-        <h1 style={{ fontSize: 28, fontWeight: 900, margin: "0 0 8px" }}>
-          ElegÃ­ tu plan
-        </h1>
-        <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", margin: 0 }}>
-          Simple, justo y sin sorpresas
-        </p>
+        <h1 style={{ fontSize: 28, fontWeight: 900, margin: "0 0 8px" }}>Elegi tu plan</h1>
+        <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", margin: 0 }}>Simple, justo y sin sorpresas</p>
       </div>
 
-      {/* PLANES */}
       <div style={{ padding: "0 20px", display: "flex", flexDirection: "column", gap: 16, marginBottom: 40 }}>
         {planes.map((plan) => (
-          <div key={plan.id} style={{
-            background: "rgba(255,255,255,0.04)",
-            border: `2px solid ${planSeleccionado === plan.id ? plan.color : "rgba(255,255,255,0.08)"}`,
-            borderRadius: 20, overflow: "hidden",
-          }}>
-            {/* Header del plan */}
+          <div key={plan.id} style={{ background: "rgba(255,255,255,0.04)", border: `2px solid ${planSeleccionado === plan.id ? plan.color : "rgba(255,255,255,0.08)"}`, borderRadius: 20, overflow: "hidden" }}>
             <div style={{ padding: "20px 20px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                <div>
-                  <span style={{ background: plan.color, borderRadius: 20, padding: "3px 12px", fontSize: 12, fontWeight: 800, color: "#fff" }}>
-                    {plan.nombre}
-                  </span>
-                  <div style={{ marginTop: 12 }}>
-                    {plan.precio === 0 ? (
-                      <span style={{ fontSize: 32, fontWeight: 900 }}>Gratis</span>
-                    ) : (
-                      <>
-                        <span style={{ fontSize: 32, fontWeight: 900 }}>USD {plan.precio}</span>
-                        <span style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", marginLeft: 6 }}>{plan.periodo}</span>
-                      </>
-                    )}
-                  </div>
-                </div>
+              <span style={{ background: plan.color, borderRadius: 20, padding: "3px 12px", fontSize: 12, fontWeight: 800, color: "#fff" }}>{plan.nombre}</span>
+              <div style={{ marginTop: 12 }}>
+                {plan.precio === 0 ? (
+                  <span style={{ fontSize: 32, fontWeight: 900 }}>Gratis</span>
+                ) : (
+                  <>
+                    <span style={{ fontSize: 32, fontWeight: 900 }}>USD {plan.precio}</span>
+                    <span style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", marginLeft: 6 }}>{plan.periodo}</span>
+                  </>
+                )}
               </div>
             </div>
-
-            {/* Features */}
             <div style={{ padding: "16px 20px" }}>
               {plan.features.map((f, i) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
@@ -159,15 +72,8 @@ export default function PlanesPage() {
                 </div>
               ))}
             </div>
-
-            {/* Boton */}
             <div style={{ padding: "0 20px 20px" }}>
-              <button onClick={() => handleContratar(plan.id)} style={{
-                width: "100%", padding: "14px", borderRadius: 14, border: "none",
-                background: plan.precio === 0 ? "rgba(255,255,255,0.1)" : plan.color,
-                color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer",
-                fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
-              }}>
+              <button onClick={() => handleContratar(plan.id)} style={{ width: "100%", padding: "14px", borderRadius: 14, border: "none", background: plan.precio === 0 ? "rgba(255,255,255,0.1)" : plan.color, color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
                 {plan.precio === 0 ? "Empezar gratis" : `Contratar ${plan.nombre}`}
               </button>
             </div>
@@ -175,8 +81,7 @@ export default function PlanesPage() {
         ))}
       </div>
 
-      {/* SERVICIOS PUNTUALES */}
-      <div style={{ padding: "0 20px" }}>
+      <div style={{ padding: "0 20px 160px" }}>
         <h2 style={{ fontSize: 20, fontWeight: 800, margin: "0 0 6px" }}>Servicios puntuales</h2>
         <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", margin: "0 0 20px" }}>Paga solo lo que necesitas</p>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
