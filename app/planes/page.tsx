@@ -23,50 +23,38 @@ const servicios = [
   { nombre: "Informe de mercado", precio: 2, desc: "Reporte de precios por zona" },
 ]
 
+const pagarMP = async (titulo: string, precio: number, planId: string) => {
+  const res = await fetch("/api/pago", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ titulo, precio, planId }),
+  })
+  const data = await res.json()
+  if (data.url) window.location.href = data.url
+  else alert("Error al procesar el pago.")
+}
+
 export default function PlanesPage() {
   const router = useRouter()
   const { isLoggedIn } = useAuth()
   const [planSeleccionado, setPlanSeleccionado] = useState<string | null>(null)
 
- const handleContratar = async (planId: string) => {
-  if (!isLoggedIn) { router.push("/registro"); return }
-  if (planId === "gratis") { router.push("/publicar"); return }
-
-  const planInfo: Record<string, { titulo: string; precio: number }> = {
-    pro: { titulo: "Plan PRO - ViviendaYa", precio: 1.5 },
-    premium: { titulo: "Plan PREMIUM - ViviendaYa", precio: 25 },
-    plus: { titulo: "Plan PLUS - ViviendaYa", precio: 40 },
-  }
-
-  const plan = planInfo[planId]
-  if (!plan) return
-
-  setPlanSeleccionado(planId)
-
-  try {
-    const res = await fetch("/api/pago", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ titulo: plan.titulo, precio: plan.precio, planId }),
-    })
-    const data = await res.json()
-    if (data.url) {
-      window.location.href = data.url
-    } else {
-      alert("Error al procesar el pago. Intenta de nuevo.")
+  const handleContratar = async (planId: string) => {
+    if (!isLoggedIn) { router.push("/registro"); return }
+    if (planId === "gratis") { router.push("/publicar"); return }
+    const planInfo: Record<string, { titulo: string; precio: number }> = {
+      pro: { titulo: "Plan PRO - ViviendaYa", precio: 1.5 },
+      premium: { titulo: "Plan PREMIUM - ViviendaYa", precio: 25 },
+      plus: { titulo: "Plan PLUS - ViviendaYa", precio: 40 },
     }
-  } catch {
-
-    alert("Error al conectar con Mercado Pago.")
+    const plan = planInfo[planId]
+    if (!plan) return
+    setPlanSeleccionado(planId)
+    await pagarMP(plan.titulo, plan.precio, planId)
   }
-}
-
-
-
-
 
   return (
-    <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", overflowY: "scroll", WebkitOverflowScrolling: "touch" } as React.CSSProperties}>
+    <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", overflowY: "scroll" } as React.CSSProperties}>
 
       <div style={{ padding: "52px 20px 24px" }}>
         <button onClick={() => router.back()} style={{ background: "rgba(255,255,255,0.08)", border: "none", borderRadius: "50%", width: 38, height: 38, color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
@@ -122,20 +110,11 @@ export default function PlanesPage() {
                 <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.4)" }}>{s.desc}</p>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <button onClick={async () => { const res = await fetch("/api/pago", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ titulo: s.nombre, precio: s.precio, planId: "servicio" }) }); const data = await res.json(); if (data.url) window.location.href = data.url; else alert("Error al procesar el pago.") }} style={{ background: "#2563EB", border: "none", borderRadius: 10, padding: "8px 14px", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
+                <span style={{ fontSize: 16, fontWeight: 800 }}>USD {s.precio}</span>
+                <button onClick={() => pagarMP(s.nombre, s.precio, "servicio")} style={{ background: "#2563EB", border: "none", borderRadius: 10, padding: "8px 14px", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
                   Comprar
                 </button>
-
-
-
-
-
-
-
-
-
-
-
+              </div>
             </div>
           ))}
         </div>
@@ -144,4 +123,3 @@ export default function PlanesPage() {
     </div>
   )
 }
-
