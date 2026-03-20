@@ -104,7 +104,7 @@ export default function PlanesPage() {
   }
 
   return (
-    <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", paddingBottom: 160 }}>
+    <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", paddingBottom: 160, overflowY: "auto" }}>
 
       {/* HEADER */}
       <div style={{ padding: "52px 20px 24px" }}>
