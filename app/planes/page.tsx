@@ -122,8 +122,17 @@ export default function PlanesPage() {
                 <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.4)" }}>{s.desc}</p>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{ fontSize: 16, fontWeight: 800 }}>USD {s.precio}</span>
-                <button onClick={() => alert("Mercado Pago proximamente")} style={{ background: "#2563EB", border: "none", borderRadius: 10, padding: "8px 14px", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
+                <button onClick={async () => { const res = await fetch("/api/pago", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ titulo: s.nombre, precio: s.precio, planId: "servicio" }) }); const data = await res.json(); if (data.url) window.location.href = data.url; else alert("Error al procesar el pago.") }} style={{ background: "#2563EB", border: "none", borderRadius: 10, padding: "8px 14px", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
+                  Comprar
+                </button>
+
+
+
+
+
+
+
+
                   Comprar
                 </button>
               </div>
