@@ -28,7 +28,37 @@ export default function PlanesPage() {
   const { isLoggedIn } = useAuth()
   const [planSeleccionado, setPlanSeleccionado] = useState<string | null>(null)
 
-  const handleContratar = (planId: string) => {
+ const handleContratar = async (planId: string) => {
+  if (!isLoggedIn) { router.push("/registro"); return }
+  if (planId === "gratis") { router.push("/publicar"); return }
+
+  const planInfo: Record<string, { titulo: string; precio: number }> = {
+    pro: { titulo: "Plan PRO - ViviendaYa", precio: 1.5 },
+    premium: { titulo: "Plan PREMIUM - ViviendaYa", precio: 25 },
+    plus: { titulo: "Plan PLUS - ViviendaYa", precio: 40 },
+  }
+
+  const plan = planInfo[planId]
+  if (!plan) return
+
+  setPlanSeleccionado(planId)
+
+  try {
+    const res = await fetch("/api/pago", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ titulo: plan.titulo, precio: plan.precio, planId }),
+    })
+    const data = await res.json()
+    if (data.url) {
+      window.location.href = data.url
+    } else {
+      alert("Error al procesar el pago. Intenta de nuevo.")
+    }
+  } catch {
+    alert("Error al conectar con Mercado Pago.")
+  }
+}
     if (!isLoggedIn) { router.push("/registro"); return }
     if (planId === "gratis") { router.push("/publicar"); return }
     setPlanSeleccionado(planId)
