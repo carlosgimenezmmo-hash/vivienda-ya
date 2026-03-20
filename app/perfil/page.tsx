@@ -117,6 +117,18 @@ export default function PerfilPage() {
           </div>
         </div>
       </div>
+      {/* PLANES BANNER */}
+      <div style={{ padding: "0 20px 20px" }}>
+        <div onClick={() => router.push("/planes")} style={{ background: "linear-gradient(135deg, rgba(37,99,235,0.3), rgba(124,58,237,0.3))", border: "1px solid rgba(37,99,235,0.4)", borderRadius: 16, padding: "16px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div>
+            <p style={{ margin: 0, fontWeight: 800, fontSize: 15, color: "#fff" }}>Mejora tu plan</p>
+            <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(255,255,255,0.6)" }}>PRO desde USD 1.50/semana</p>
+          </div>
+          <div style={{ background: "linear-gradient(135deg, #2563EB, #7C3AED)", borderRadius: 20, padding: "8px 16px" }}>
+            <span style={{ color: "#fff", fontSize: 13, fontWeight: 700 }}>Ver planes</span>
+          </div>
+        </div>
+      </div>
 
       {/* MENU */}
       <div style={{ padding: "0 20px" }}>
