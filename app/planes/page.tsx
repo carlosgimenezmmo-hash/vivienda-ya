@@ -57,7 +57,7 @@ export default function PlanesPage() {
     }
   } catch {
     alert("Error al conectar con Mercado Pago.")
-  }
+}
 
 
 
