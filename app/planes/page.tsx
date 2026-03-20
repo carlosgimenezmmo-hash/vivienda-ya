@@ -133,9 +133,9 @@ export default function PlanesPage() {
 
 
 
-                  Comprar
-                </button>
-              </div>
+
+
+
             </div>
           ))}
         </div>
