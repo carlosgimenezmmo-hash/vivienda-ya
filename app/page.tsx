@@ -56,6 +56,26 @@ export default function ViviendaYaFull() {
     fetchChannels()
   }, [])
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const video = entry.target as HTMLVideoElement;
+          if (entry.isIntersecting) {
+            video.play().catch(() => {});
+            const index = videoRefs.current.indexOf(video);
+            if (index !== -1) setActiveIndex(index);
+          } else {
+            video.pause();
+          }
+        });
+      },
+      { threshold: 0.7 }
+    );
+    videoRefs.current.forEach((v) => { if (v) observer.observe(v); });
+    return () => observer.disconnect();
+  }, [properties]);
+
 
 
 
