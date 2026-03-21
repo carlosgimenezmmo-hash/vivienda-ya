@@ -41,21 +41,21 @@ export default function ViviendaYaFull() {
       }
     }
     fetchProperties();
-  }, []);
+
+  const [channels, setChannels] = useState<{ [key: string]: string }>({})
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const video = entry.target as HTMLVideoElement;
-          if (entry.isIntersecting) {
-            video.play().catch(() => {});
-            const index = videoRefs.current.indexOf(video);
-            if (index !== -1) setActiveIndex(index);
-          setActiveProperty({ id: properties[index]?.id, title: properties[index]?.title, whatsapp_number: properties[index]?.whatsapp_number });
-          } else {
-            video.pause();
-          }
+    async function fetchChannels() {
+      const { data } = await supabase.from("channels").select("user_id, slug")
+      if (data) {
+        const map: { [key: string]: string } = {}
+        data.forEach((c: any) => { map[c.user_id] = c.slug })
+        setChannels(map)
+      }
+    }
+    fetchChannels()
+  }, [])
+
         });
       },
       { threshold: 0.7 }
@@ -292,10 +292,10 @@ const requireLogin = (action: () => void, actionLabel?: string) => {
                   }}>
                     {p.owner_avatar ? <img src={p.owner_avatar} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <span style={{ fontSize: 18 }}>U</span>}
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                    <span style={{ fontWeight: "bold", fontSize: 15, color: "#fff" }}>{p.owner_name || "Propietario"}</span>
-                    <span style={{ background: "#1d4ed8", borderRadius: 4, padding: "2px 6px", fontSize: 10, fontWeight: 700, color: "#fff" }}>VY</span>
-                  </div>
+                   <div onClick={() => { const slug = channels[p.user_id]; if (slug) router.push(`/canal/${slug}`) }} style={{ display: "flex", alignItems: "center", gap: 6, cursor: channels[p.user_id] ? "pointer" : "default" }}>
+                     <span style={{ fontWeight: "bold", fontSize: 15, color: "#fff" }}>{p.owner_name || "Propietario"}</span>
+                     {channels[p.user_id] && <span style={{ background: "#2563EB", borderRadius: 4, padding: "2px 6px", fontSize: 10, fontWeight: 700, color: "#fff" }}>CANAL</span>}
+                   </div>
                 </div>
 
 
