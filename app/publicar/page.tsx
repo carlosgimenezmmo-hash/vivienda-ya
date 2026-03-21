@@ -25,7 +25,8 @@ export default function PublicarPage() {
   const [superficie, setSuperficie] = useState("")
   const [barrio, setBarrio] = useState("")
   const [ciudad, setCiudad] = useState("")
-  const [descripcion, setDescripcion] = useState("")
+ const [titulo, setTitulo] = useState("")
+const [descripcion, setDescripcion] = useState("")
   const [whatsapp, setWhatsapp] = useState("")
   const [destacar, setDestacar] = useState("sin")
   const totalSteps = 5
@@ -71,7 +72,9 @@ export default function PublicarPage() {
         neighborhood: barrio,
         city: ciudad,
         location: `${barrio}, ${ciudad}`,
-        description: descripcion,
+       title: titulo,
+       title: titulo,
+description: descripcion,
         whatsapp_number: whatsapp,
         video_url: videoUrl,
         verified: gpsOk,
@@ -256,6 +259,8 @@ export default function PublicarPage() {
           <div>
             <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 4px" }}>Datos de la propiedad</h1>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 20px" }}>Se veran sobre el video en el feed</p>
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Titulo de la propiedad</p>
+<input value={titulo} onChange={e => setTitulo(e.target.value)} placeholder="Ej: Hermoso depto en Palermo" style={{ ...inp, marginBottom: 16 }} />
 
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Tipo de operacion</p>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
