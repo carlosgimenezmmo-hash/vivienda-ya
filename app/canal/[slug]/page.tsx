@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect, useRef } from "react"
 import { useRouter, useParams } from "next/navigation"
@@ -79,7 +79,7 @@ export default function CanalPage() {
                 <video src={p.video_url} style={{ width: "100%", height: "100%", objectFit: "cover" }} muted playsInline />
               )}
               <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "linear-gradient(transparent, rgba(0,0,0,0.8))", padding: "20px 8px 8px" }}>
-                <p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: "#fff" }}>USD {Number(p.price)?.toLocaleString()}</p>
+                <p style={{ margin: "0 0 2px", fontSize: 12, fontWeight: 700, color: "#fff" }}>{p.title || p.operation_type?.toUpperCase()}</p>
                 <p style={{ margin: 0, fontSize: 11, color: "rgba(255,255,255,0.6)" }}>{p.neighborhood || p.city || ""}</p>
               </div>
               <div style={{ position: "absolute", top: 8, right: 8, background: "rgba(0,0,0,0.6)", borderRadius: 20, padding: "2px 8px" }}>
