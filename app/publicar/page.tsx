@@ -131,11 +131,11 @@ description: descripcion,
         <button onClick={() => router.push("/registro")} style={btn}>Registrarme gratis</button>
       </div>
     )
-    <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", display: "flex", flexDirection: "column", height: "100dvh" }}>
+
+
 
   return (
-    <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", display: "flex", flexDirection: "column" }}>
-
+    <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", display: "flex", flexDirection: "column" }}>
       <div style={{ padding: "52px 20px 16px", display: "flex", alignItems: "center", gap: 14 }}>
         <button onClick={() => step > 1 ? setStep(step - 1) : router.back()}
           style={{ background: "rgba(255,255,255,0.08)", border: "none", borderRadius: "50%", width: 38, height: 38, color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
