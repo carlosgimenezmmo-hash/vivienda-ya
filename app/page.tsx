@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
 import { useActiveProperty } from '@/lib/active-property-context';
 import { AuthSheet } from '@/components/auth-sheet';
+import { BuscarUsuarios } from '@/components/buscar-usuarios';
 
 export default function ViviendaYaFull() {
   const [properties, setProperties] = useState<any[]>([]);
@@ -18,6 +19,7 @@ export default function ViviendaYaFull() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [channels, setChannels] = useState<{ [key: string]: string }>({});
   const [showAuthSheet, setShowAuthSheet] = useState(false);
+const [showBuscarUsuarios, setShowBuscarUsuarios] = useState(false);
   const [authAction, setAuthAction] = useState('');
   const videoRefs = useRef<HTMLVideoElement[]>([]);
   const { isLoggedIn, user, likedProperties, savedProperties, toggleLike, toggleSave } = useAuth();
@@ -219,7 +221,10 @@ export default function ViviendaYaFull() {
                   <span style={{ color: '#fff', fontSize: 12, fontWeight: 600 }}>Guardar</span>
                 </button>
 
-                <button onClick={() => handleShare(p.title)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: 0 }}>
+                <button onClick={() => setShowBuscarUsuarios(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: 0 }}>
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+  <span style={{ color: '#fff', fontSize: 12, fontWeight: 600 }}>Buscar</span>
+</button><button onClick={() => handleShare(p.title)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: 0 }}>
                   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
                   <span style={{ color: '#fff', fontSize: 12, fontWeight: 600 }}>Compartir</span>
                 </button>
@@ -321,7 +326,7 @@ export default function ViviendaYaFull() {
           ))
         )}
       </div>
-      <AuthSheet visible={showAuthSheet} onClose={() => setShowAuthSheet(false)} action={authAction} />
+      {showBuscarUsuarios && <BuscarUsuarios onClose={() => setShowBuscarUsuarios(false)} />}<AuthSheet visible={showAuthSheet} onClose={() => setShowAuthSheet(false)} action={authAction} />
     </div>
   );
 }
