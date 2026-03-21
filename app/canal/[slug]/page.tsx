@@ -105,7 +105,7 @@ export default function CanalPage() {
       {/* PANEL DETALLE */}
       {propActiva && (
         <div style={{ position: "fixed", inset: 0, zIndex: 50, display: "flex", alignItems: "flex-end" }} onClick={() => setPropActiva(null)}>
-          <div style={{ background: "#1a1a1a", borderRadius: "24px 24px 0 0", padding: "20px 20px 48px", width: "100%", maxWidth: 500, margin: "0 auto", maxHeight: "80vh", overflowY: "scroll" }} onClick={e => e.stopPropagation()}>
+          <div style={{ background: "#1a1a1a", borderRadius: "24px 24px 0 0", padding: "20px 20px 48px", width: "100%", maxWidth: 500, margin: "0 auto", maxHeight: "80vh", overflowY: "scroll", WebkitOverflowScrolling: "touch" } as React.CSSProperties} onClick={e => e.stopPropagation()}>
             <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.2)", margin: "0 auto 20px" }} />
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
               <div style={{ flex: 1 }}>
