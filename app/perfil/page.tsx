@@ -39,9 +39,9 @@ export default function PerfilPage() {
     { emoji: "🔖", label: "Guardados", sub: "Propiedades que te gustaron", href: "/guardados" },
     { emoji: "🔄", label: "Mis Permutas", sub: "Intercambios activos", href: "#" },
     { emoji: "💬", label: "Mensajes", sub: "Conversaciones con propietarios", href: "#" },
+    { emoji: "📺", label: "Mi Canal", sub: "Gestioná tu canal", href: "/mi-canal" },
     { emoji: "⚙️", label: "Configuracion", sub: "Cuenta y privacidad", href: "/configuracion" },
   ]
-
   return (
     <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", overflowY: "scroll" }}>
 
