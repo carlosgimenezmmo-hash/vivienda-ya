@@ -56,13 +56,13 @@ export default function ViviendaYaFull() {
     fetchChannels()
   }, [])
 
-        });
-      },
-      { threshold: 0.7 }
-    );
-    videoRefs.current.forEach((v) => { if (v) observer.observe(v); });
-    return () => observer.disconnect();
-  }, [properties]);
+
+
+
+
+
+
+
 
 const requireLogin = (action: () => void, actionLabel?: string) => {
   if (!isLoggedIn) {
