@@ -6,9 +6,9 @@ import { useAuth } from "@/lib/auth-context"
 
 const planes = [
   { id: "gratis", nombre: "Gratis", precio: 0, periodo: "", color: "#888", features: ["3 videos por mes", "60 segundos por video", "Estadisticas basicas", "Verificacion ARRYSE gratis", "Chat con interesados"] },
-  { id: "pro", nombre: "PRO", precio: 1.5, periodo: "por semana", color: "#2563EB", features: ["15 videos por mes", "60 segundos por video", "Estadisticas avanzadas", "Ver quien vio tus propiedades", "Badge PRO visible", "1 destacado por semana (24h)", "Soporte prioritario"] },
-  { id: "premium", nombre: "PREMIUM", precio: 25, periodo: "por mes", color: "#7C3AED", features: ["50 videos por mes", "Videos de hasta 5 minutos", "Hasta 5 agentes incluidos", "Dashboard profesional", "5 destacados por mes", "2 lives por mes", "API de integracion", "Carga masiva Excel/CSV", "Informes de mercado mensuales", "Badge INMOBILIARIA VERIFICADA", "Soporte VIP menos de 1 hora"] },
-  { id: "plus", nombre: "PLUS", precio: 40, periodo: "por mes", color: "#D97706", features: ["100 videos por mes", "Videos de hasta 5 minutos", "Hasta 10 agentes incluidos", "10 destacados por mes", "4 lives por mes", "Prioridad absoluta en busquedas", "Todo lo del plan PREMIUM incluido"] },
+  { id: "starter", nombre: "STARTER", precio: 10, periodo: "por mes", color: "#22C55E", features: ["Canal propio con tu nombre", "Videos organizados en tu pagina", "Boton de contacto directo", "15 videos por mes", "60 segundos por video", "Estadisticas basicas", "Badge STARTER visible"] },
+  { id: "pro", nombre: "PRO", precio: 25, periodo: "por mes", color: "#2563EB", features: ["Todo lo del plan STARTER", "Badge verificado", "Descripcion de canal", "Link externo en tu perfil", "Hasta 5 colaboradores", "Estadisticas avanzadas", "50 videos por mes", "Videos hasta 5 minutos", "5 destacados por mes", "Soporte prioritario"] },
+  { id: "elite", nombre: "ELITE", precio: 40, periodo: "por mes", color: "#D97706", features: ["Todo lo del plan PRO", "Logo y colores de marca", "Hasta 10 colaboradores", "Prioridad absoluta en busquedas", "Badge dorado ELITE", "100 videos por mes", "10 destacados por mes", "4 lives por mes", "Soporte VIP menos de 1 hora"] },
 ]
 
 const servicios = [
@@ -43,9 +43,9 @@ export default function PlanesPage() {
     if (!isLoggedIn) { router.push("/registro"); return }
     if (planId === "gratis") { router.push("/publicar"); return }
     const planInfo: Record<string, { titulo: string; precio: number }> = {
-      pro: { titulo: "Plan PRO - ViviendaYa", precio: 1.5 },
-      premium: { titulo: "Plan PREMIUM - ViviendaYa", precio: 25 },
-      plus: { titulo: "Plan PLUS - ViviendaYa", precio: 40 },
+      starter: { titulo: "Plan STARTER - ViviendaYa", precio: 10 },
+      pro: { titulo: "Plan PRO - ViviendaYa", precio: 25 },
+      elite: { titulo: "Plan ELITE - ViviendaYa", precio: 40 },
     }
     const plan = planInfo[planId]
     if (!plan) return
