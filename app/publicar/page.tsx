@@ -153,7 +153,7 @@ description: descripcion,
         ))}
       </div>
 
-      <div style={{ flex: 1, paddingLeft: "20px", paddingRight: "20px", paddingTop: 0, paddingBottom: 160, overflowY: "auto" }}>
+      <div style={{ flex: 1, paddingLeft: "20px", paddingRight: "20px", paddingTop: 0, paddingBottom: 160, overflowY: "scroll", WebkitOverflowScrolling: "touch" }}>
 
         {step === 1 && (
           <div>
