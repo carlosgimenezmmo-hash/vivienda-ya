@@ -130,7 +130,7 @@ description: descripcion,
         <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, textAlign: "center", margin: "0 0 28px" }}>Para publicar propiedades tenes que estar registrado.</p>
         <button onClick={() => router.push("/registro")} style={btn}>Registrarme gratis</button>
       </div>
-    )
+  }
 
 
 
