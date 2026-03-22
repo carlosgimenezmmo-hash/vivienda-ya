@@ -17,7 +17,7 @@ export function BuscarUsuarios({ onClose }: { onClose: () => void }) {
 
   const [{ data: canales }, { data: usuarios }] = await Promise.all([
     supabase.from("channels").select("slug, nombre, logo_url, color_primario, verificado, user_id").ilike("nombre", `%${texto}%`).limit(5),
-    supabase.from("users").select("id, full_name, avatar_url").ilike("full_name", `%${texto}%`).limit(5),
+    supabase.from("users").select("id, full_name, avatar_url").or(`full_name.ilike.%${texto}%,email.ilike.%${texto}%`)
   ])
 
   const resultadosCanales = (canales || []).map((c: any) => ({ ...c, tipo: "canal" }))
