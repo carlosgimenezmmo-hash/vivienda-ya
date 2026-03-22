@@ -25,8 +25,8 @@ export default function PublicarPage() {
   const [superficie, setSuperficie] = useState("")
   const [barrio, setBarrio] = useState("")
   const [ciudad, setCiudad] = useState("")
- const [titulo, setTitulo] = useState("")
-const [descripcion, setDescripcion] = useState("")
+  const [titulo, setTitulo] = useState("")
+  const [descripcion, setDescripcion] = useState("")
   const [whatsapp, setWhatsapp] = useState("")
   const [destacar, setDestacar] = useState("sin")
   const totalSteps = 5
@@ -99,6 +99,14 @@ const [descripcion, setDescripcion] = useState("")
     } finally {
       setLoading(false)
     }
+  }
+
+  const inp: React.CSSProperties = {
+    width: "100%", padding: "14px 16px", borderRadius: 12,
+    background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)",
+    color: "#fff", fontSize: 15, outline: "none", boxSizing: "border-box",
+    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+  }
 
   const btn: React.CSSProperties = {
     width: "100%", padding: "16px", borderRadius: 14, border: "none",
@@ -106,6 +114,7 @@ const [descripcion, setDescripcion] = useState("")
     color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer",
     fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
   }
+
   const card = (active: boolean): React.CSSProperties => ({
     width: "100%", padding: "16px", borderRadius: 14, marginBottom: 12,
     border: `2px solid ${active ? "#2563EB" : "rgba(255,255,255,0.1)"}`,
@@ -132,7 +141,6 @@ const [descripcion, setDescripcion] = useState("")
       </div>
     )
   }
-
 
   return (
     <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", display: "flex", flexDirection: "column" }}>
@@ -217,8 +225,6 @@ const [descripcion, setDescripcion] = useState("")
                 </button>
               ))}
             </div>
-
-
           </div>
         )}
 
@@ -235,9 +241,7 @@ const [descripcion, setDescripcion] = useState("")
                 {gpsOk && <p style={{ margin: 0, fontSize: 11, color: "rgba(255,255,255,0.4)" }}>{gpsLat?.toFixed(4)}, {gpsLng?.toFixed(4)}</p>}
               </div>
             </div>
-
             <input ref={videoRef} type="file" accept="video/*" capture="environment" onChange={handleVideo} style={{ display: "none" }} />
-
             {!videoPreview ? (
               <div onClick={() => videoRef.current?.click()} style={{ height: 260, borderRadius: 16, border: "2px dashed rgba(37,99,235,0.4)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", background: "rgba(37,99,235,0.05)" }}>
                 <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="rgba(37,99,235,0.6)" strokeWidth="1.5"><path d="M15 10l4.553-2.069A1 1 0 0 1 21 8.87v6.26a1 1 0 0 1-1.447.9L15 14M3 8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8z"/></svg>
@@ -260,29 +264,25 @@ const [descripcion, setDescripcion] = useState("")
             <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 4px" }}>Datos de la propiedad</h1>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 20px" }}>Se veran sobre el video en el feed</p>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Titulo de la propiedad</p>
-<input value={titulo} onChange={e => setTitulo(e.target.value)} placeholder="Ej: Hermoso depto en Palermo" style={{ ...inp, marginBottom: 16 }} />
-
+            <input value={titulo} onChange={e => setTitulo(e.target.value)} placeholder="Ej: Hermoso depto en Palermo" style={{ ...inp, marginBottom: 16 }} />
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Tipo de operacion</p>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
               {[["venta", "Venta"], ["alquiler", "Alquiler"], ["temporario", "Temporario"], ["permuta", "Permuta"]].map(([val, label]) => (
                 <button key={val} onClick={() => setOperacion(val)} style={chip(operacion === val)}>{label}</button>
               ))}
             </div>
-
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Tipo de propiedad</p>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
               {["Departamento", "Casa", "PH", "Local", "Oficina", "Terreno", "Loft", "Monoambiente", "Cabana", "Duplex", "Cochera", "Galpon"].map(t => (
                 <button key={t} onClick={() => setTipoPropiedad(t)} style={chip(tipoPropiedad === t)}>{t}</button>
               ))}
             </div>
-
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Precio</p>
             <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
               <button onClick={() => setMoneda("USD")} style={{ ...chip(moneda === "USD"), flexShrink: 0 }}>USD</button>
               <button onClick={() => setMoneda("ARS")} style={{ ...chip(moneda === "ARS"), flexShrink: 0 }}>ARS</button>
               <input value={precio} onChange={e => setPrecio(e.target.value)} placeholder="Precio" type="number" inputMode="numeric" style={{ ...inp, flex: 1 }} />
             </div>
-
             <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
               <div style={{ flex: 1 }}>
                 <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Ambientes</p>
@@ -293,17 +293,14 @@ const [descripcion, setDescripcion] = useState("")
                 <input value={superficie} onChange={e => setSuperficie(e.target.value)} placeholder="Ej: 75" type="number" inputMode="numeric" style={inp} />
               </div>
             </div>
-
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Ubicacion</p>
             <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
               <input value={barrio} onChange={e => setBarrio(e.target.value)} placeholder="Barrio" style={{ ...inp, flex: 1 }} />
               <input value={ciudad} onChange={e => setCiudad(e.target.value)} placeholder="Ciudad" style={{ ...inp, flex: 1 }} />
             </div>
-
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Descripcion corta</p>
             <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} placeholder="Describe brevemente la propiedad..." maxLength={150} style={{ ...inp, height: 80, resize: "none", marginBottom: 4 }} />
             <p style={{ textAlign: "right", color: "rgba(255,255,255,0.3)", fontSize: 12, margin: "0 0 16px" }}>{descripcion.length}/150</p>
-
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>WhatsApp de contacto</p>
             <input value={whatsapp} onChange={e => setWhatsapp(e.target.value)} placeholder="Ej: 5491112345678" type="tel" style={{ ...inp, marginBottom: 20 }} />
             <button onClick={() => setStep(4)} style={btn}>Continuar</button>
@@ -314,7 +311,6 @@ const [descripcion, setDescripcion] = useState("")
           <div>
             <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Destacar tu propiedad?</h1>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 24px" }}>Aparece primero en el feed</p>
-
             <button onClick={() => setDestacar("sin")} style={card(destacar === "sin")}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
@@ -324,7 +320,6 @@ const [descripcion, setDescripcion] = useState("")
                 <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#22C55E" }}>Gratis</p>
               </div>
             </button>
-
             <button onClick={() => setDestacar("24h")} style={card(destacar === "24h")}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
@@ -334,7 +329,6 @@ const [descripcion, setDescripcion] = useState("")
                 <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#60A5FA" }}>USD 1</p>
               </div>
             </button>
-
             <button onClick={() => setDestacar("7d")} style={card(destacar === "7d")}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
@@ -344,7 +338,6 @@ const [descripcion, setDescripcion] = useState("")
                 <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#60A5FA" }}>USD 5</p>
               </div>
             </button>
-
             <button onClick={() => setStep(5)} style={{ ...btn, marginTop: 8 }}>Continuar</button>
           </div>
         )}
@@ -353,11 +346,9 @@ const [descripcion, setDescripcion] = useState("")
           <div>
             <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Todo listo!</h1>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 24px" }}>Revisa los datos antes de publicar</p>
-
             {videoPreview && (
               <video src={videoPreview} style={{ width: "100%", borderRadius: 14, maxHeight: 200, objectFit: "cover", marginBottom: 16 }} />
             )}
-
             <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: 16, marginBottom: 16 }}>
               {[
                 ["Operacion", operacion],
@@ -373,13 +364,11 @@ const [descripcion, setDescripcion] = useState("")
                 </div>
               ))}
             </div>
-
             {error && (
               <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 10, padding: "10px 14px", marginBottom: 16 }}>
                 <p style={{ color: "#EF4444", fontSize: 13, margin: 0 }}>{error}</p>
               </div>
             )}
-
             <button onClick={handlePublicar} disabled={loading} style={{ ...btn, opacity: loading ? 0.6 : 1 }}>
               {loading ? "Publicando..." : "Publicar ahora"}
             </button>
