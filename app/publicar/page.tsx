@@ -51,6 +51,16 @@ const [descripcion, setDescripcion] = useState("")
     setLoading(true)
     setError("")
     try {
+      const { data: sessionData } = await supabase.auth.getSession()
+      const uid = sessionData?.session?.user?.id
+      if (uid) {
+        const { count } = await supabase.from("properties").select("*", { count: "exact", head: true }).eq("user_id", uid)
+        if ((count || 0) >= 3) {
+          setError("Alcanzaste el limite de 3 videos del plan gratuito. Mejora tu plan para publicar mas.")
+          setLoading(false)
+          return
+        }
+      }
       let videoUrl = ""
       if (video) {
         const ext = video.name.split(".").pop()
@@ -72,9 +82,8 @@ const [descripcion, setDescripcion] = useState("")
         neighborhood: barrio,
         city: ciudad,
         location: `${barrio}, ${ciudad}`,
-       title: titulo,
-       title: titulo,
-description: descripcion,
+        title: titulo,
+        description: descripcion,
         whatsapp_number: whatsapp,
         video_url: videoUrl,
         verified: gpsOk,
@@ -83,15 +92,6 @@ description: descripcion,
         highlighted: destacar !== "sin",
         likes: 0,
       })
-      if (insertError) throw insertError
-      router.push("/")
-    } catch (err: any) {
-      setError(err.message || "Error al publicar")
-    } finally {
-      setLoading(false)
-    }
-  }
-
   const inp: React.CSSProperties = {
     width: "100%", padding: "14px 16px", borderRadius: 12,
     background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)",
