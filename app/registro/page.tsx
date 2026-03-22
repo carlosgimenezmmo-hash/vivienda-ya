@@ -137,14 +137,14 @@ export default function RegistroPage() {
           plan: "gratis",
           verificado: false,
         })
-        const slug = `${nombre}-${apellido}`.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")
-        await supabase.from("channels").insert({
-          user_id: signUpData.user.id,
-          slug: slug + "-" + signUpData.user.id.slice(0, 6),
-          nombre: `${nombre} ${apellido}`,
-          plan: "gratis",
-          verificado: false,
-        })
+
+
+
+
+
+
+
+
         router.push("/")
     } catch (err: any) {
       setError(err.message === "User already registered" ? "Este email ya tiene una cuenta. Inicia sesion." : err.message || "Error al registrarse")
