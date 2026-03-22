@@ -91,6 +91,7 @@ const [descripcion, setDescripcion] = useState("")
         lng: gpsLng,
         highlighted: destacar !== "sin",
         likes: 0,
+      })
       if (insertError) throw insertError
       router.push("/")
     } catch (err: any) {
@@ -100,7 +101,6 @@ const [descripcion, setDescripcion] = useState("")
     }
   }
 
-    width: "100%", padding: "16px", borderRadius: 14, border: "none",
     background: "linear-gradient(135deg, #2563EB, #1d4ed8)",
     color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer",
     fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
