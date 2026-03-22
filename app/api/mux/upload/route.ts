@@ -12,10 +12,9 @@ export async function POST(request: NextRequest) {
     const { metadata } = body;
 
     const upload = await mux.video.uploads.create({
-      new_asset_settings: {
-        playback_policy: ['public'],
-        mp4_support: 'standard',
-      },
+     new_asset_settings: {
+  playback_policy: ['public'],
+},
       cors_origin: '*',
     });
 
