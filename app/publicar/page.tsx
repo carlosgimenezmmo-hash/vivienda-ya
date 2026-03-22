@@ -99,13 +99,13 @@ const [descripcion, setDescripcion] = useState("")
     } finally {
       setLoading(false)
     }
-  }
 
+  const btn: React.CSSProperties = {
+    width: "100%", padding: "16px", borderRadius: 14, border: "none",
     background: "linear-gradient(135deg, #2563EB, #1d4ed8)",
     color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer",
     fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
   }
-
   const card = (active: boolean): React.CSSProperties => ({
     width: "100%", padding: "16px", borderRadius: 14, marginBottom: 12,
     border: `2px solid ${active ? "#2563EB" : "rgba(255,255,255,0.1)"}`,
