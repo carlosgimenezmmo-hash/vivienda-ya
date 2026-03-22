@@ -91,15 +91,15 @@ const [descripcion, setDescripcion] = useState("")
         lng: gpsLng,
         highlighted: destacar !== "sin",
         likes: 0,
-      })
-  const inp: React.CSSProperties = {
-    width: "100%", padding: "14px 16px", borderRadius: 12,
-    background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)",
-    color: "#fff", fontSize: 15, outline: "none", boxSizing: "border-box",
-    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+      if (insertError) throw insertError
+      router.push("/")
+    } catch (err: any) {
+      setError(err.message || "Error al publicar")
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const btn: React.CSSProperties = {
     width: "100%", padding: "16px", borderRadius: 14, border: "none",
     background: "linear-gradient(135deg, #2563EB, #1d4ed8)",
     color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer",
