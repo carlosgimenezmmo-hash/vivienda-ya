@@ -156,31 +156,32 @@ export default function MuxVideoUploader({
 
   return (
     <div className="space-y-4">
-      <div
-        className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors cursor-pointer"
-        onClick={() => document.getElementById('mux-file-input')?.click()}
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={(e) => {
-          e.preventDefault();
-          handleFileSelect(e.dataTransfer.files);
-        }}
-      >
-        <input
-          id="mux-file-input"
-          type="file"
-          accept="video/*"
-          multiple
-          className="hidden"
-          onChange={(e) => handleFileSelect(e.target.files)}
-        />
-        <p className="text-gray-600">
-          Arrastrá videos aquí o hacé click para seleccionar
-        </p>
-        <p className="text-sm text-gray-400 mt-2">
-          Máximo {maxFiles} videos • Plan gratuito
-        </p>
-      </div>
-
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+  <input
+    id="mux-file-input"
+    type="file"
+    accept="video/*"
+    capture="environment"
+    style={{ display: 'none' }}
+    onChange={(e) => handleFileSelect(e.target.files)}
+  />
+  <button
+    onClick={() => document.getElementById('mux-file-input')?.click()}
+    style={{
+      width: '100%', padding: '20px', borderRadius: 14,
+      background: 'rgba(37,99,235,0.15)', border: '2px dashed rgba(37,99,235,0.4)',
+      color: '#60A5FA', fontSize: 16, fontWeight: 700, cursor: 'pointer',
+      fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+      display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8,
+    }}
+  >
+    <span style={{ fontSize: 36 }}>📹</span>
+    <span>Grabar propiedad</span>
+    <span style={{ fontSize: 13, fontWeight: 400, color: 'rgba(255,255,255,0.4)' }}>
+      Se abrirá la cámara del celular
+    </span>
+  </button>
+</div>
       <div className="space-y-3">
         {uploads.map((upload, index) => (
           <div

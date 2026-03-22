@@ -9,6 +9,7 @@ export default function PublicarPage() {
   const { user, isLoggedIn } = useAuth()
   const router = useRouter()
   const [step, setStep] = useState(1)
+  const totalSteps = 6
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [planElegido, setPlanElegido] = useState("gratis")
