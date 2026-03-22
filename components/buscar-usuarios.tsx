@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -32,7 +32,7 @@ export function BuscarUsuarios({ onClose }: { onClose: () => void }) {
         
         <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.2)", margin: "0 auto 20px" }} />
         
-        <h2 style={{ fontSize: 18onClick={() => { if (r.slug) { router.push(`/canal/${r.slug}`); onClose() } }}
+        <h2 style={{ fontSize: 18, fontWeight: 800, color: "#fff", margin: "0 0 16px" }}>Buscar usuarios</h2>
         <input
           autoFocus
           value={query}
@@ -49,7 +49,7 @@ export function BuscarUsuarios({ onClose }: { onClose: () => void }) {
 
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {resultados.map((r) => (
-            <div key={r.slug}  style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 16px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, cursor: "pointer" }}>
+            <div key={r.slug || r.nombre} onClick={() => { if (r.slug) { router.push(`/canal/${r.slug}`); onClose() } }} style={{ display: "flex", alignItems: "center", gap: 14, padding: "12px 16px", background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, cursor: r.slug ? "pointer" : "default" }}>
               <div style={{ width: 46, height: 46, borderRadius: "50%", background: r.logo_url ? "transparent" : r.color_primario, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20, fontWeight: 900, color: "#fff", overflow: "hidden", flexShrink: 0 }}>
                 {r.logo_url ? <img src={r.logo_url} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : r.nombre[0].toUpperCase()}
               </div>
