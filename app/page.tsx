@@ -67,30 +67,7 @@ const [showBuscarUsuarios, setShowBuscarUsuarios] = useState(false);
             video.play().catch(() => {});
             const index = videoRefs.current.indexOf(video);
             if (index !== -1) {
-              setActiveIndex(index);
-              setActiveProperty({ id: properties[index]?.id, title: properties[index]?.title, whatsapp_number: properties[index]?.whatsapp_number });
-            }
-          } else {
-            video.pause();
-          }
-        });
-      },
-      { threshold: 0.7 }
-    );
-    videoRefs.current.forEach((v) => { if (v) observer.observe(v); });
-    return () => observer.disconnect();
-  }, [properties]);
-
-  const requireLogin = (action: () => void, actionLabel?: string) => {
-    if (!isLoggedIn) {
-      setAuthAction(actionLabel || '');
-      setShowAuthSheet(true);
-    } else {
-      action();
-    }
-  };
-
-  const fetchComments = async (propertyId: number) => {
+             const fetchComments = async (propertyId: number) => {
     const { data } = await supabase.from("comments").select("*").eq("property_id", propertyId).order("created_at", { ascending: true });
     if (data) setComments(prev => ({ ...prev, [propertyId]: data }));
   };
