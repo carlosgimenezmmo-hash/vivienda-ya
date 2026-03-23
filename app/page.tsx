@@ -19,7 +19,7 @@ export default function ViviendaYaFull() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [channels, setChannels] = useState<{ [key: string]: string }>({});
   const [showAuthSheet, setShowAuthSheet] = useState(false);
-const [showBuscarUsuarios, setShowBuscarUsuarios] = useState(false);
+  const [showBuscarUsuarios, setShowBuscarUsuarios] = useState(false);
   const [authAction, setAuthAction] = useState('');
   const videoRefs = useRef<HTMLVideoElement[]>([]);
   const { isLoggedIn, user, likedProperties, savedProperties, toggleLike, toggleSave } = useAuth();
@@ -67,7 +67,24 @@ const [showBuscarUsuarios, setShowBuscarUsuarios] = useState(false);
             video.play().catch(() => {});
             const index = videoRefs.current.indexOf(video);
             if (index !== -1) {
-             const fetchComments = async (propertyId: number) => {
+              setActiveIndex(index);
+              const prop = properties[index];
+              if (prop) {
+                setActiveProperty({ id: prop.id, title: prop.title, whatsapp_number: prop.whatsapp_number });
+              }
+            }
+          } else {
+            video.pause();
+          }
+        });
+      },
+      { threshold: 0.7 }
+    );
+    videoRefs.current.forEach((v) => { if (v) observer.observe(v); });
+    return () => observer.disconnect();
+  }, [properties]);
+
+  const fetchComments = async (propertyId: number) => {
     const { data } = await supabase.from("comments").select("*").eq("property_id", propertyId).order("created_at", { ascending: true });
     if (data) setComments(prev => ({ ...prev, [propertyId]: data }));
   };
@@ -114,6 +131,15 @@ const [showBuscarUsuarios, setShowBuscarUsuarios] = useState(false);
     } else {
       navigator.clipboard.writeText(window.location.href);
       alert('Link copiado!');
+    }
+  };
+
+  const requireLogin = (action: () => void, actionLabel?: string) => {
+    if (!isLoggedIn) {
+      setAuthAction(actionLabel || '');
+      setShowAuthSheet(true);
+    } else {
+      action();
     }
   };
 
@@ -199,9 +225,11 @@ const [showBuscarUsuarios, setShowBuscarUsuarios] = useState(false);
                 </button>
 
                 <button onClick={() => setShowBuscarUsuarios(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: 0 }}>
-  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-  <span style={{ color: '#fff', fontSize: 12, fontWeight: 600 }}>Buscar</span>
-</button><button onClick={() => handleShare(p.title)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: 0 }}>
+                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                  <span style={{ color: '#fff', fontSize: 12, fontWeight: 600 }}>Buscar</span>
+                </button>
+
+                <button onClick={() => handleShare(p.title)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: 0 }}>
                   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
                   <span style={{ color: '#fff', fontSize: 12, fontWeight: 600 }}>Compartir</span>
                 </button>
@@ -303,7 +331,8 @@ const [showBuscarUsuarios, setShowBuscarUsuarios] = useState(false);
           ))
         )}
       </div>
-      {showBuscarUsuarios && <BuscarUsuarios onClose={() => setShowBuscarUsuarios(false)} />}<AuthSheet visible={showAuthSheet} onClose={() => setShowAuthSheet(false)} action={authAction} />
+      {showBuscarUsuarios && <BuscarUsuarios onClose={() => setShowBuscarUsuarios(false)} />}
+      <AuthSheet visible={showAuthSheet} onClose={() => setShowAuthSheet(false)} action={authAction} />
     </div>
   );
 }
