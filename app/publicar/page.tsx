@@ -3,7 +3,6 @@ import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabaseClient"
 import { useAuth } from "@/lib/auth-context"
-import VideoCompressor from "@/components/VideoCompressor"
 
 export default function PublicarPage() {
   const { user, isLoggedIn } = useAuth()
@@ -31,9 +30,7 @@ export default function PublicarPage() {
   const [descripcion, setDescripcion] = useState("")
   const [whatsapp, setWhatsapp] = useState("")
   const [destacar, setDestacar] = useState("sin")
-  const [originalVideo, setOriginalVideo] = useState<File | null>(null)
-  const [compressing, setCompressing] = useState(false)
-
+ 
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -43,44 +40,13 @@ export default function PublicarPage() {
     }
   }, [])
 
- const handleVideo = async (e: React.ChangeEvent<HTMLInputElement>) => {
+const handleVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
   const file = e.target.files?.[0]
   if (!file) return
-  
-  setOriginalVideo(file)
+  setVideo(file)
   setVideoPreview(URL.createObjectURL(file))
-  setCompressing(true)
-  setVideo(null)
-  
-  try {
-    const compressed = await compressVideo(file)
-    setVideo(compressed)
-    setVideoPreview(URL.createObjectURL(compressed))
-  } catch (err) {
-    console.error(err)
-    setError("Error al comprimir. Se usará el original.")
-    setVideo(file)
-  } finally {
-    setCompressing(false)
-  }
 }
-const compressVideo = (file: File): Promise<File> => {
-  return new Promise((resolve, reject) => {
-    const video = document.createElement('video')
-    const canvas = document.createElement('canvas')
-    
-    video.onloadedmetadata = () => {
-      let width = video.videoWidth
-      let height = video.videoHeight
-      if (width > 1280) {
-        height = (height * 1280) / width
-        width = 1280
-      }
-      canvas.width = width
-      canvas.height = height
-      video.currentTime = 0
-    }
-    
+
     video.onseeked = () => {
       const ctx = canvas.getContext('2d')
       ctx?.drawImage(video, 0, 0, canvas.width, canvas.height)
@@ -310,17 +276,10 @@ const compressVideo = (file: File): Promise<File> => {
     ) : (
       <div>
         <video src={videoPreview} style={{ width: "100%", borderRadius: 16, maxHeight: 300, objectFit: "cover", marginBottom: 12 }} controls />
-        <button onClick={() => { setOriginalVideo(null); setVideo(null); setVideoPreview(null) }} style={{ width: "100%", padding: "14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.7)", fontSize: 15, cursor: "pointer", marginBottom: 12 }}>
+        <button onClick={() => { setVideo(null); setVideoPreview(null) }} style={{ width: "100%", padding: "14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.7)", fontSize: 15, cursor: "pointer", marginBottom: 12 }}>
           Volver a grabar
         </button>
-        
-        {compressing ? (
-          <div style={{ textAlign: "center", marginTop: 12, marginBottom: 12 }}>
-            <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 13 }}>Comprimiendo video...</p>
-          </div>
-        ) : (
-          <button onClick={() => setStep(3)} style={btn}>Usar este video</button>
-        )}
+        <button onClick={() => setStep(3)} style={btn}>Usar este video</button>
       </div>
     )}
   </div>
