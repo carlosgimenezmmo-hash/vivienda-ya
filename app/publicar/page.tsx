@@ -198,8 +198,8 @@ videoData = {
         title: titulo,
         description: descripcion,
         whatsapp_number: whatsapp,
-       video_data: videoData,
-video_url: videoData?.url || null, // Mantener compatibilidad con lo viejo
+
+
         verified: gpsOk,
         lat: gpsLat,
         lng: gpsLng,
