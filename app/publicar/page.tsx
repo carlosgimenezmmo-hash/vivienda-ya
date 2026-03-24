@@ -43,20 +43,64 @@ export default function PublicarPage() {
     }
   }, [])
 
- const handleVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
+ const handleVideo = async (e: React.ChangeEvent<HTMLInputElement>) => {
   const file = e.target.files?.[0]
   if (!file) return
+  
   setOriginalVideo(file)
   setVideoPreview(URL.createObjectURL(file))
-  setVideo(null)  // todavía no está comprimido
+  setCompressing(true)
+  setVideo(null)
+  
+  try {
+    const compressed = await compressVideo(file)
+    setVideo(compressed)
+    setVideoPreview(URL.createObjectURL(compressed))
+  } catch (err) {
+    console.error(err)
+    setError("Error al comprimir. Se usará el original.")
+    setVideo(file)
+  } finally {
+    setCompressing(false)
+  }
 }
-const handleCompressed = (compressedFile: File) => {
-  setVideo(compressedFile)
-  setCompressing(false)
-  setVideoPreview(URL.createObjectURL(compressedFile))
+const compressVideo = (file: File): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    const video = document.createElement('video')
+    const canvas = document.createElement('canvas')
+    
+    video.onloadedmetadata = () => {
+      let width = video.videoWidth
+      let height = video.videoHeight
+      if (width > 1280) {
+        height = (height * 1280) / width
+        width = 1280
+      }
+      canvas.width = width
+      canvas.height = height
+      video.currentTime = 0
+    }
+    
+    video.onseeked = () => {
+      const ctx = canvas.getContext('2d')
+      ctx?.drawImage(video, 0, 0, canvas.width, canvas.height)
+      canvas.toBlob((blob) => {
+        if (blob) {
+          resolve(new File([blob], file.name, { type: 'video/mp4' }))
+        } else {
+          reject(new Error('No se pudo comprimir'))
+        }
+      }, 'video/mp4', 0.8)
+      video.pause()
+      URL.revokeObjectURL(video.src)
+    }
+    
+    video.onerror = () => reject(new Error('Error al cargar el video'))
+    video.src = URL.createObjectURL(file)
+    video.load()
+  })
 }
-
-  const handlePublicar = async () => {
+    const handlePublicar = async () => {
     setLoading(true)
     setError("")
     try {
@@ -270,16 +314,13 @@ const handleCompressed = (compressedFile: File) => {
           Volver a grabar
         </button>
         
-        {/* 👇 ESTO ES LO NUEVO 👇 */}
-        {!video && originalVideo && (
-          <VideoCompressor
-            videoFile={originalVideo}
-            onCompressed={handleCompressed}
-            onError={(err) => setError(err)}
-          />
+        {compressing ? (
+          <div style={{ textAlign: "center", marginTop: 12, marginBottom: 12 }}>
+            <p style={{ color: "rgba(255,255,255,0.6)", fontSize: 13 }}>Comprimiendo video...</p>
+          </div>
+        ) : (
+          <button onClick={() => setStep(3)} style={btn}>Usar este video</button>
         )}
-        
-        <button onClick={() => setStep(3)} style={btn}>Usar este video</button>
       </div>
     )}
   </div>
