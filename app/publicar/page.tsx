@@ -29,6 +29,7 @@ export default function PublicarPage() {
   const [ciudad, setCiudad] = useState("")
   const [titulo, setTitulo] = useState("")
   const [descripcion, setDescripcion] = useState("")
+  const [whatsapp, setWhatsapp] = useState("")
  const [muxVideos, setMuxVideos] = useState<Array<{playbackId: string, assetId: string}>>([])
 const [isUploadingToMux, setIsUploadingToMux] = useState(false)
   useEffect(() => {
@@ -51,19 +52,71 @@ const handleMuxUploadComplete = (playbackId: string, assetId: string) => {
   }
 
   const handlePublicar = async () => {
-    setLoading(true)
-    setError("")
-    try {
-      const { data: sessionData } = await supabase.auth.getSession()
-      const uid = sessionData?.session?.user?.id
-      if (uid) {
-        const { count } = await supabase.from("properties").select("*", { count: "exact", head: true }).eq("user_id", uid)
-        if ((count || 0) >= 3) {
-          setError("Alcanzaste el limite de 3 videos del plan gratuito. Mejora tu plan para publicar mas.")
-          setLoading(false)
-          return
-        }
+  setLoading(true)
+  setError("")
+  try {
+    const { data: sessionData } = await supabase.auth.getSession()
+    const uid = sessionData?.session?.user?.id
+    if (uid) {
+      const { count } = await supabase
+        .from("properties")
+        .select("*", { count: "exact", head: true })
+        .eq("user_id", uid)
+      if ((count || 0) >= 3) {
+        setError("Alcanzaste el limite de 3 videos del plan gratuito. Mejora tu plan para publicar mas.")
+        setLoading(false)
+        return
       }
+    }
+
+    // 👇 SUBIR VIDEO A SUPABASE STORAGE
+    let videoUrl = ""
+    if (video) {
+      const ext = video.name.split(".").pop()
+      const path = `${Date.now()}.${ext}`
+      const { error: uploadError } = await supabase.storage
+        .from("videos-app")
+        .upload(path, video, { contentType: video.type })
+      if (uploadError) throw uploadError
+      const { data } = supabase.storage.from("videos-app").getPublicUrl(path)
+      videoUrl = data.publicUrl
+    } else {
+      throw new Error("Debes grabar un video desde la app")
+    }
+
+    // 👇 GUARDAR EN LA BASE DE DATOS
+    const { error: insertError } = await supabase.from("properties").insert({
+      user_id: uid,
+      owner_name: user?.name || "Propietario",
+      owner_avatar: user?.avatar_url || null,
+      operation_type: operacion,
+      property_type: tipoPropiedad,
+      price: parseFloat(precio) || 0,
+      rooms: parseInt(ambientes) || null,
+      surface: parseInt(superficie) || null,
+      neighborhood: barrio,
+      city: ciudad,
+      location: `${barrio}, ${ciudad}`,
+      title: titulo,
+      description: descripcion,
+      whatsapp_number: whatsapp,
+      video_url: videoUrl,
+      verified: gpsOk,
+      lat: gpsLat,
+      lng: gpsLng,
+      highlighted: destacar !== "sin",
+      likes: 0,
+      status: "approved"
+    })
+    if (insertError) throw insertError
+
+    router.push("/")
+  } catch (err: any) {
+    setError(err.message || "Error al publicar")
+  } finally {
+    setLoading(false)
+  }
+}
      // Usar Mux si hay videos subidos, sino el método viejo
 let videoData = null
 
@@ -379,7 +432,14 @@ video_url: videoData?.url || null, // Mantener compatibilidad con lo viejo
             </div>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Descripcion corta</p>
             <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} placeholder="Describe brevemente la propiedad..." maxLength={150} style={{ ...inp, height: 80, resize: "none", marginBottom: 4 }} />
-            <p style={{ textAlign: "right", color: "rgba(255,255,255,0.3)", fontSize: 12, margin: "0 0 16px" }}>{descripcion.length}/150</p>
+            <p style={{ textAlign: "right", color: "rgba(255,255,255,0.3)", fontSize: 12, margin: "0 0 16px" }}>{descripcion.length}/150</p><p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>WhatsApp de contacto</p>
+<input 
+  value={whatsapp} 
+  onChange={e => setWhatsapp(e.target.value)} 
+  placeholder="Ej: 5491112345678" 
+  type="tel" 
+  style={inp} 
+/>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>WhatsApp de contacto</p>
             <input value={whatsapp} onChange={e => setWhatsapp(e.target.value)} placeholder="Ej: 5491112345678" type="tel" style={{ ...inp, marginBottom: 20 }} />
             <button onClick={() => setStep(4)} style={btn}>Continuar</button>
