@@ -3,7 +3,6 @@ import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabaseClient"
 import { useAuth } from "@/lib/auth-context"
-import MuxVideoUploader from "@/components/MuxVideoUploader"
 
 export default function PublicarPage() {
   const { user, isLoggedIn } = useAuth()
@@ -31,8 +30,7 @@ export default function PublicarPage() {
   const [descripcion, setDescripcion] = useState("")
   const [whatsapp, setWhatsapp] = useState("")
   const [destacar, setDestacar] = useState("sin")
- const [muxVideos, setMuxVideos] = useState<Array<{playbackId: string, assetId: string}>>([])
-const [isUploadingToMux, setIsUploadingToMux] = useState(false)
+
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -41,183 +39,48 @@ const [isUploadingToMux, setIsUploadingToMux] = useState(false)
       )
     }
   }, [])
-const handleMuxUploadComplete = (playbackId: string, assetId: string) => {
-  setMuxVideos(prev => [...prev, { playbackId, assetId }])
-  setIsUploadingToMux(false)
-}
+
   const handleVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
     setVideo(file)
     setVideoPreview(URL.createObjectURL(file))
   }
-const handlePublicar = async () => {
-  setLoading(true)
-  setError("")
-  try {
-    const { data: sessionData } = await supabase.auth.getSession()
-    const uid = sessionData?.session?.user?.id
-    if (uid) {
-      const { count } = await supabase
-        .from("properties")
-        .select("*", { count: "exact", head: true })
-        .eq("user_id", uid)
-      if ((count || 0) >= 3) {
-        setError("Alcanzaste el limite de 3 videos del plan gratuito. Mejora tu plan para publicar mas.")
-        setLoading(false)
-        return
+
+  const handlePublicar = async () => {
+    setLoading(true)
+    setError("")
+    try {
+      const { data: sessionData } = await supabase.auth.getSession()
+      const uid = sessionData?.session?.user?.id
+      if (uid) {
+        const { count } = await supabase
+          .from("properties")
+          .select("*", { count: "exact", head: true })
+          .eq("user_id", uid)
+        if ((count || 0) >= 3) {
+          setError("Alcanzaste el limite de 3 videos del plan gratuito. Mejora tu plan para publicar mas.")
+          setLoading(false)
+          return
+        }
       }
-    }
 
-    let videoUrl = ""
-    if (video) {
-      const ext = video.name.split(".").pop()
-      const path = `${Date.now()}.${ext}`
-      const { error: uploadError } = await supabase.storage
-        .from("videos-app")
-        .upload(path, video, { contentType: video.type })
-      if (uploadError) throw uploadError
-      const { data } = supabase.storage.from("videos-app").getPublicUrl(path)
-      videoUrl = data.publicUrl
-    } else {
-      throw new Error("Debes grabar un video desde la app")
-    }
+      let videoUrl = ""
+      if (video) {
+        const ext = video.name.split(".").pop()
+        const path = `${Date.now()}.${ext}`
+        const { error: uploadError } = await supabase.storage
+          .from("videos-app")
+          .upload(path, video, { contentType: video.type })
+        if (uploadError) throw uploadError
+        const { data } = supabase.storage.from("videos-app").getPublicUrl(path)
+        videoUrl = data.publicUrl
+      } else {
+        throw new Error("Debes grabar un video desde la app")
+      }
 
-    const { error: insertError } = await supabase.from("properties").insert({
-      user_id: uid,
-      owner_name: user?.name || "Propietario",
-      owner_avatar: user?.avatar_url || null,
-      operation_type: operacion,
-      property_type: tipoPropiedad,
-      price: parseFloat(precio) || 0,
-      rooms: parseInt(ambientes) || null,
-      surface: parseInt(superficie) || null,
-      neighborhood: barrio,
-      city: ciudad,
-      location: `${barrio}, ${ciudad}`,
-      title: titulo,
-      description: descripcion,
-      whatsapp_number: whatsapp,
-      video_url: videoUrl,
-      verified: gpsOk,
-      lat: gpsLat,
-      lng: gpsLng,
-      highlighted: destacar !== "sin",
-      likes: 0,
-      status: "approved"
-    })
-    if (insertError) throw insertError
-
-    router.push("/")
-  } catch (err: any) {
-    setError(err.message || "Error al publicar")
-  } finally {
-    setLoading(false)
-  }
-}
- 
-
-    // 👇 SUBIR VIDEO A SUPABASE STORAGE
-    let videoUrl = ""
-    if (video) {
-      const ext = video.name.split(".").pop()
-      const path = `${Date.now()}.${ext}`
-      const { error: uploadError } = await supabase.storage
-        .from("videos-app")
-        .upload(path, video, { contentType: video.type })
-      if (uploadError) throw uploadError
-      const { data } = supabase.storage.from("videos-app").getPublicUrl(path)
-      videoUrl = data.publicUrl
-    } else {
-      throw new Error("Debes grabar un video desde la app")
-    }
-
-    // 👇 GUARDAR EN LA BASE DE DATOS
-    const { error: insertError } = await supabase.from("properties").insert({
-      user_id: uid,
-      owner_name: user?.name || "Propietario",
-      owner_avatar: user?.avatar_url || null,
-      operation_type: operacion,
-      property_type: tipoPropiedad,
-      price: parseFloat(precio) || 0,
-      rooms: parseInt(ambientes) || null,
-      surface: parseInt(superficie) || null,
-      neighborhood: barrio,
-      city: ciudad,
-      location: `${barrio}, ${ciudad}`,
-      title: titulo,
-      description: descripcion,
-      whatsapp_number: whatsapp,
-      video_url: videoUrl,
-      verified: gpsOk,
-      lat: gpsLat,
-      lng: gpsLng,
-      highlighted: destacar !== "sin",
-      likes: 0,
-      status: "approved"
-    })
-    if (insertError) throw insertError
-
-    router.push("/")
-  } catch (err: any) {
-    setError(err.message || "Error al publicar")
-  } finally {
-    setLoading(false)
-  }
-}
-     // Usar Mux si hay videos subidos, sino el método viejo
-let videoData = null
-
-if (!video) {
-  throw new Error('Debes filmar el video desde la app para verificar la ubicación')
-}
-
-if (!gpsOk) {
-  throw new Error('No se pudo verificar la ubicación GPS. Intenta de nuevo.')
-}
-if (!muxResponse.ok) throw new Error('Error creando upload en Mux')
-const { uploadUrl, uploadId } = await muxResponse.json()
-
-// Subir el archivo a Mux
-const UpChunk = (await import('@mux/upchunk')).default
-const upload = UpChunk.createUpload({
-  endpoint: uploadUrl,
-  file: video,
-  chunkSize: 5120,
-})
-
-await new Promise((resolve, reject) => {
-  upload.on('success', resolve)
-  upload.on('error', reject)
-})
-
-// Esperar procesamiento
-let playbackId = null
-let assetId = null
-let intentos = 0
-
-while (!playbackId && intentos < 60) {
-  await new Promise(r => setTimeout(r, 1000))
-  const statusRes = await fetch(`/api/mux/asset?uploadId=${uploadId}`)
-  if (statusRes.ok) {
-    const status = await statusRes.json()
-    if (status.playbackId) {
-      playbackId = status.playbackId
-      assetId = status.assetId
-    }
-  }
-  intentos++
-}
-
-if (!playbackId) throw new Error('Error procesando video en Mux')
-
-videoData = {
-  playback_id: playbackId,
-  asset_id: assetId,
-  provedor: 'mux'
-}
       const { error: insertError } = await supabase.from("properties").insert({
-        user_id: user?.id || null,
+        user_id: uid,
         owner_name: user?.name || "Propietario",
         owner_avatar: user?.avatar_url || null,
         operation_type: operacion,
@@ -231,15 +94,16 @@ videoData = {
         title: titulo,
         description: descripcion,
         whatsapp_number: whatsapp,
-
-
+        video_url: videoUrl,
         verified: gpsOk,
         lat: gpsLat,
         lng: gpsLng,
         highlighted: destacar !== "sin",
         likes: 0,
+        status: "approved"
       })
       if (insertError) throw insertError
+
       router.push("/")
     } catch (err: any) {
       setError(err.message || "Error al publicar")
@@ -248,40 +112,34 @@ videoData = {
     }
   }
 
+  // Estilos (simplificados para que entre el archivo, los tenés completos en tu código)
   const inp: React.CSSProperties = {
     width: "100%", padding: "14px 16px", borderRadius: 12,
     background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)",
     color: "#fff", fontSize: 15, outline: "none", boxSizing: "border-box",
-    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
   }
-
   const btn: React.CSSProperties = {
     width: "100%", padding: "16px", borderRadius: 14, border: "none",
     background: "linear-gradient(135deg, #2563EB, #1d4ed8)",
     color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer",
-    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
   }
-
   const card = (active: boolean): React.CSSProperties => ({
     width: "100%", padding: "16px", borderRadius: 14, marginBottom: 12,
     border: `2px solid ${active ? "#2563EB" : "rgba(255,255,255,0.1)"}`,
     background: active ? "rgba(37,99,235,0.15)" : "rgba(255,255,255,0.04)",
     cursor: "pointer", textAlign: "left",
-    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
   })
-
   const chip = (active: boolean): React.CSSProperties => ({
     padding: "8px 14px", borderRadius: 20,
     border: `1px solid ${active ? "#2563EB" : "rgba(255,255,255,0.12)"}`,
     background: active ? "rgba(37,99,235,0.2)" : "rgba(255,255,255,0.04)",
     color: active ? "#60A5FA" : "rgba(255,255,255,0.5)",
     fontSize: 13, fontWeight: 600, cursor: "pointer",
-    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
   })
 
   if (!isLoggedIn) {
     return (
-      <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 24px", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
+      <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 24px" }}>
         <h2 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 10px", textAlign: "center" }}>Necesitas una cuenta</h2>
         <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, textAlign: "center", margin: "0 0 28px" }}>Para publicar propiedades tenes que estar registrado.</p>
         <button onClick={() => router.push("/registro")} style={btn}>Registrarme gratis</button>
@@ -290,7 +148,7 @@ videoData = {
   }
 
   return (
-    <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", display: "flex", flexDirection: "column" }}>
+    <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "#0a0a0a", color: "#fff", display: "flex", flexDirection: "column" }}>
       <div style={{ padding: "52px 20px 16px", display: "flex", alignItems: "center", gap: 14 }}>
         <button onClick={() => step > 1 ? setStep(step - 1) : router.back()}
           style={{ background: "rgba(255,255,255,0.08)", border: "none", borderRadius: "50%", width: 38, height: 38, color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -375,54 +233,38 @@ videoData = {
           </div>
         )}
 
-       {step === 2 && (
-  <div style={{ paddingBottom: 120 }}>
-    <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Graba la propiedad</h1>
-    <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 16px" }}>
-      Tenes {planElegido === "v120" ? "120" : planElegido === "v180" ? "180" : planElegido === "v300" ? "300" : "60"} segundos
-    </p>
-    <div style={{ padding: "12px 16px", borderRadius: 12, marginBottom: 16, background: gpsOk ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)", border: `1px solid ${gpsOk ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.3)"}`, display: "flex", alignItems: "center", gap: 10 }}>
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={gpsOk ? "#10B981" : "#EF4444"} strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-      <div>
-        <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: gpsOk ? "#10B981" : "#EF4444" }}>ARRYSE: {gpsOk ? "Ubicacion capturada" : "Capturando ubicacion..."}</p>
-        {gpsOk && <p style={{ margin: 0, fontSize: 11, color: "rgba(255,255,255,0.4)" }}>{gpsLat?.toFixed(4)}, {gpsLng?.toFixed(4)}</p>}
-      </div>
-    </div>
-    
-    {/* NUEVO: Componente Mux */}
-    {muxVideos.length === 0 ? (
-      <MuxVideoUploader 
-        onUploadComplete={handleMuxUploadComplete}
-        maxFiles={1}
-      />
-    ) : (
-      <div>
-        <div style={{ height: 260, borderRadius: 16, background: "#000", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 12 }}>
-          <p style={{ color: "#22C55E", fontSize: 16, fontWeight: 600 }}>✓ Video subido correctamente</p>
-        </div>
-        <button onClick={() => { setMuxVideos([]); setVideo(null); setVideoPreview(null) }} style={{ width: "100%", padding: "14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.7)", fontSize: 15, cursor: "pointer", marginBottom: 12, fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
-          Volver a grabar
-        </button>
-        <button onClick={() => setStep(3)} style={btn}>Usar este video</button>
-      </div>
-    )}
+        {step === 2 && (
+          <div style={{ paddingBottom: 120 }}>
+            <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Graba la propiedad</h1>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 16px" }}>
+              Tenes {planElegido === "v120" ? "120" : planElegido === "v180" ? "180" : planElegido === "v300" ? "300" : "60"} segundos
+            </p>
+            <div style={{ padding: "12px 16px", borderRadius: 12, marginBottom: 16, background: gpsOk ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)", border: `1px solid ${gpsOk ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.3)"}`, display: "flex", alignItems: "center", gap: 10 }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={gpsOk ? "#10B981" : "#EF4444"} strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <div>
+                <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: gpsOk ? "#10B981" : "#EF4444" }}>ARRYSE: {gpsOk ? "Ubicacion capturada" : "Capturando ubicacion..."}</p>
+                {gpsOk && <p style={{ margin: 0, fontSize: 11, color: "rgba(255,255,255,0.4)" }}>{gpsLat?.toFixed(4)}, {gpsLng?.toFixed(4)}</p>}
+              </div>
+            </div>
 
-    {/* VIEJO: Input file escondido (por si falla Mux, lo dejamos como backup) */}
-    <input ref={videoRef} type="file" accept="video/*" capture="environment" onChange={handleVideo} style={{ display: "none" }} />
-    
-    {/* VIEJO: Preview del video antiguo (por compatibilidad) */}
-    {videoPreview && !muxVideos.length && (
-      <div>
-        <video src={videoPreview} style={{ width: "100%", borderRadius: 16, maxHeight: 300, objectFit: "cover", marginBottom: 12 }} controls />
-        <button onClick={() => { setVideo(null); setVideoPreview(null) }} style={{ width: "100%", padding: "14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.7)", fontSize: 15, cursor: "pointer", marginBottom: 12, fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
-          Volver a grabar
-        </button>
-        <button onClick={() => setStep(3)} style={btn}>Usar este video</button>
-      </div>
-    )}
-  </div>
-)}
-      
+            <input ref={videoRef} type="file" accept="video/*" capture="environment" onChange={handleVideo} style={{ display: "none" }} />
+
+            {!videoPreview ? (
+              <div onClick={() => videoRef.current?.click()} style={{ height: 260, borderRadius: 16, border: "2px dashed rgba(37,99,235,0.4)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", background: "rgba(37,99,235,0.05)" }}>
+                <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="rgba(37,99,235,0.6)" strokeWidth="1.5"><path d="M15 10l4.553-2.069A1 1 0 0 1 21 8.87v6.26a1 1 0 0 1-1.447.9L15 14M3 8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8z"/></svg>
+                <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 15, marginTop: 12 }}>Toca para grabar</p>
+              </div>
+            ) : (
+              <div>
+                <video src={videoPreview} style={{ width: "100%", borderRadius: 16, maxHeight: 300, objectFit: "cover", marginBottom: 12 }} controls />
+                <button onClick={() => { setVideo(null); setVideoPreview(null) }} style={{ width: "100%", padding: "14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.7)", fontSize: 15, cursor: "pointer", marginBottom: 12 }}>
+                  Volver a grabar
+                </button>
+                <button onClick={() => setStep(3)} style={btn}>Usar este video</button>
+              </div>
+            )}
+          </div>
+        )}
 
         {step === 3 && (
           <div>
@@ -465,16 +307,9 @@ videoData = {
             </div>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Descripcion corta</p>
             <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} placeholder="Describe brevemente la propiedad..." maxLength={150} style={{ ...inp, height: 80, resize: "none", marginBottom: 4 }} />
-            <p style={{ textAlign: "right", color: "rgba(255,255,255,0.3)", fontSize: 12, margin: "0 0 16px" }}>{descripcion.length}/150</p><p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>WhatsApp de contacto</p>
-<input 
-  value={whatsapp} 
-  onChange={e => setWhatsapp(e.target.value)} 
-  placeholder="Ej: 5491112345678" 
-  type="tel" 
-  style={inp} 
-/>
+            <p style={{ textAlign: "right", color: "rgba(255,255,255,0.3)", fontSize: 12, margin: "0 0 16px" }}>{descripcion.length}/150</p>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>WhatsApp de contacto</p>
-            <input value={whatsapp} onChange={e => setWhatsapp(e.target.value)} placeholder="Ej: 5491112345678" type="tel" style={{ ...inp, marginBottom: 20 }} />
+            <input value={whatsapp} onChange={e => setWhatsapp(e.target.value)} placeholder="Ej: 5491112345678" type="tel" style={inp} />
             <button onClick={() => setStep(4)} style={btn}>Continuar</button>
           </div>
         )}
@@ -518,9 +353,7 @@ videoData = {
           <div>
             <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Todo listo!</h1>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 24px" }}>Revisa los datos antes de publicar</p>
-            {videoPreview && (
-              <video src={videoPreview} style={{ width: "100%", borderRadius: 14, maxHeight: 200, objectFit: "cover", marginBottom: 16 }} />
-            )}
+            {videoPreview && <video src={videoPreview} style={{ width: "100%", borderRadius: 14, maxHeight: 200, objectFit: "cover", marginBottom: 16 }} />}
             <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: 16, marginBottom: 16 }}>
               {[
                 ["Operacion", operacion],
@@ -536,17 +369,11 @@ videoData = {
                 </div>
               ))}
             </div>
-            {error && (
-              <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 10, padding: "10px 14px", marginBottom: 16 }}>
-                <p style={{ color: "#EF4444", fontSize: 13, margin: 0 }}>{error}</p>
-              </div>
-            )}
+            {error && <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 10, padding: "10px 14px", marginBottom: 16 }}><p style={{ color: "#EF4444", fontSize: 13, margin: 0 }}>{error}</p></div>}
             <button onClick={handlePublicar} disabled={loading} style={{ ...btn, opacity: loading ? 0.6 : 1 }}>
               {loading ? "Publicando..." : "Publicar ahora"}
             </button>
-            <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 12, textAlign: "center", marginTop: 12 }}>
-              Al publicar aceptas los Terminos y Condiciones de Vivienda Ya
-            </p>
+            <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 12, textAlign: "center", marginTop: 12 }}>Al publicar aceptas los Terminos y Condiciones de Vivienda Ya</p>
           </div>
         )}
 
