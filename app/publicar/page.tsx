@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabaseClient"
 import { useAuth } from "@/lib/auth-context"
+import VideoCompressor from "@/components/VideoCompressor"
 
 export default function PublicarPage() {
   const { user, isLoggedIn } = useAuth()
@@ -30,6 +31,8 @@ export default function PublicarPage() {
   const [descripcion, setDescripcion] = useState("")
   const [whatsapp, setWhatsapp] = useState("")
   const [destacar, setDestacar] = useState("sin")
+  const [originalVideo, setOriginalVideo] = useState<File | null>(null)
+  const [compressing, setCompressing] = useState(false)
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -40,12 +43,18 @@ export default function PublicarPage() {
     }
   }, [])
 
-  const handleVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    setVideo(file)
-    setVideoPreview(URL.createObjectURL(file))
-  }
+ const handleVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0]
+  if (!file) return
+  setOriginalVideo(file)
+  setVideoPreview(URL.createObjectURL(file))
+  setVideo(null)  // todavía no está comprimido
+}
+const handleCompressed = (compressedFile: File) => {
+  setVideo(compressedFile)
+  setCompressing(false)
+  setVideoPreview(URL.createObjectURL(compressedFile))
+}
 
   const handlePublicar = async () => {
     setLoading(true)
@@ -233,39 +242,48 @@ export default function PublicarPage() {
           </div>
         )}
 
-        {step === 2 && (
-          <div style={{ paddingBottom: 120 }}>
-            <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Graba la propiedad</h1>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 16px" }}>
-              Tenes {planElegido === "v120" ? "120" : planElegido === "v180" ? "180" : planElegido === "v300" ? "300" : "60"} segundos
-            </p>
-            <div style={{ padding: "12px 16px", borderRadius: 12, marginBottom: 16, background: gpsOk ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)", border: `1px solid ${gpsOk ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.3)"}`, display: "flex", alignItems: "center", gap: 10 }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={gpsOk ? "#10B981" : "#EF4444"} strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-              <div>
-                <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: gpsOk ? "#10B981" : "#EF4444" }}>ARRYSE: {gpsOk ? "Ubicacion capturada" : "Capturando ubicacion..."}</p>
-                {gpsOk && <p style={{ margin: 0, fontSize: 11, color: "rgba(255,255,255,0.4)" }}>{gpsLat?.toFixed(4)}, {gpsLng?.toFixed(4)}</p>}
-              </div>
-            </div>
+       {step === 2 && (
+  <div style={{ paddingBottom: 120 }}>
+    <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Graba la propiedad</h1>
+    <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 16px" }}>
+      Tenes {planElegido === "v120" ? "120" : planElegido === "v180" ? "180" : planElegido === "v300" ? "300" : "60"} segundos
+    </p>
+    <div style={{ padding: "12px 16px", borderRadius: 12, marginBottom: 16, background: gpsOk ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)", border: `1px solid ${gpsOk ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.3)"}`, display: "flex", alignItems: "center", gap: 10 }}>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={gpsOk ? "#10B981" : "#EF4444"} strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <div>
+        <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: gpsOk ? "#10B981" : "#EF4444" }}>ARRYSE: {gpsOk ? "Ubicacion capturada" : "Capturando ubicacion..."}</p>
+        {gpsOk && <p style={{ margin: 0, fontSize: 11, color: "rgba(255,255,255,0.4)" }}>{gpsLat?.toFixed(4)}, {gpsLng?.toFixed(4)}</p>}
+      </div>
+    </div>
 
-            <input ref={videoRef} type="file" accept="video/*" capture="environment" onChange={handleVideo} style={{ display: "none" }} />
+    <input ref={videoRef} type="file" accept="video/*" capture="environment" onChange={handleVideo} style={{ display: "none" }} />
 
-            {!videoPreview ? (
-              <div onClick={() => videoRef.current?.click()} style={{ height: 260, borderRadius: 16, border: "2px dashed rgba(37,99,235,0.4)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", background: "rgba(37,99,235,0.05)" }}>
-                <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="rgba(37,99,235,0.6)" strokeWidth="1.5"><path d="M15 10l4.553-2.069A1 1 0 0 1 21 8.87v6.26a1 1 0 0 1-1.447.9L15 14M3 8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8z"/></svg>
-                <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 15, marginTop: 12 }}>Toca para grabar</p>
-              </div>
-            ) : (
-              <div>
-                <video src={videoPreview} style={{ width: "100%", borderRadius: 16, maxHeight: 300, objectFit: "cover", marginBottom: 12 }} controls />
-                <button onClick={() => { setVideo(null); setVideoPreview(null) }} style={{ width: "100%", padding: "14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.7)", fontSize: 15, cursor: "pointer", marginBottom: 12 }}>
-                  Volver a grabar
-                </button>
-                <button onClick={() => setStep(3)} style={btn}>Usar este video</button>
-              </div>
-            )}
-          </div>
+    {!videoPreview ? (
+      <div onClick={() => videoRef.current?.click()} style={{ height: 260, borderRadius: 16, border: "2px dashed rgba(37,99,235,0.4)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", background: "rgba(37,99,235,0.05)" }}>
+        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="rgba(37,99,235,0.6)" strokeWidth="1.5"><path d="M15 10l4.553-2.069A1 1 0 0 1 21 8.87v6.26a1 1 0 0 1-1.447.9L15 14M3 8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8z"/></svg>
+        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 15, marginTop: 12 }}>Toca para grabar</p>
+      </div>
+    ) : (
+      <div>
+        <video src={videoPreview} style={{ width: "100%", borderRadius: 16, maxHeight: 300, objectFit: "cover", marginBottom: 12 }} controls />
+        <button onClick={() => { setOriginalVideo(null); setVideo(null); setVideoPreview(null) }} style={{ width: "100%", padding: "14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.7)", fontSize: 15, cursor: "pointer", marginBottom: 12 }}>
+          Volver a grabar
+        </button>
+        
+        {/* 👇 ESTO ES LO NUEVO 👇 */}
+        {!video && originalVideo && (
+          <VideoCompressor
+            videoFile={originalVideo}
+            onCompressed={handleCompressed}
+            onError={(err) => setError(err)}
+          />
         )}
-
+        
+        <button onClick={() => setStep(3)} style={btn}>Usar este video</button>
+      </div>
+    )}
+  </div>
+)}
         {step === 3 && (
           <div>
             <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 4px" }}>Datos de la propiedad</h1>
