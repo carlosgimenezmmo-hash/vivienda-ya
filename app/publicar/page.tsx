@@ -51,8 +51,7 @@ const handleMuxUploadComplete = (playbackId: string, assetId: string) => {
     setVideo(file)
     setVideoPreview(URL.createObjectURL(file))
   }
-
-  const handlePublicar = async () => {
+const handlePublicar = async () => {
   setLoading(true)
   setError("")
   try {
@@ -69,6 +68,54 @@ const handleMuxUploadComplete = (playbackId: string, assetId: string) => {
         return
       }
     }
+
+    let videoUrl = ""
+    if (video) {
+      const ext = video.name.split(".").pop()
+      const path = `${Date.now()}.${ext}`
+      const { error: uploadError } = await supabase.storage
+        .from("videos-app")
+        .upload(path, video, { contentType: video.type })
+      if (uploadError) throw uploadError
+      const { data } = supabase.storage.from("videos-app").getPublicUrl(path)
+      videoUrl = data.publicUrl
+    } else {
+      throw new Error("Debes grabar un video desde la app")
+    }
+
+    const { error: insertError } = await supabase.from("properties").insert({
+      user_id: uid,
+      owner_name: user?.name || "Propietario",
+      owner_avatar: user?.avatar_url || null,
+      operation_type: operacion,
+      property_type: tipoPropiedad,
+      price: parseFloat(precio) || 0,
+      rooms: parseInt(ambientes) || null,
+      surface: parseInt(superficie) || null,
+      neighborhood: barrio,
+      city: ciudad,
+      location: `${barrio}, ${ciudad}`,
+      title: titulo,
+      description: descripcion,
+      whatsapp_number: whatsapp,
+      video_url: videoUrl,
+      verified: gpsOk,
+      lat: gpsLat,
+      lng: gpsLng,
+      highlighted: destacar !== "sin",
+      likes: 0,
+      status: "approved"
+    })
+    if (insertError) throw insertError
+
+    router.push("/")
+  } catch (err: any) {
+    setError(err.message || "Error al publicar")
+  } finally {
+    setLoading(false)
+  }
+}
+ 
 
     // 👇 SUBIR VIDEO A SUPABASE STORAGE
     let videoUrl = ""
