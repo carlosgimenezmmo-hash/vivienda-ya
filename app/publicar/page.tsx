@@ -30,6 +30,7 @@ export default function PublicarPage() {
   const [titulo, setTitulo] = useState("")
   const [descripcion, setDescripcion] = useState("")
   const [whatsapp, setWhatsapp] = useState("")
+  const [destacar, setDestacar] = useState("sin")
  const [muxVideos, setMuxVideos] = useState<Array<{playbackId: string, assetId: string}>>([])
 const [isUploadingToMux, setIsUploadingToMux] = useState(false)
   useEffect(() => {
