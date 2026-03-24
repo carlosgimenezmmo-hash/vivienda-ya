@@ -128,21 +128,6 @@ if (!video) {
 if (!gpsOk) {
   throw new Error('No se pudo verificar la ubicación GPS. Intenta de nuevo.')
 }
-
-// Subir a Mux (con ARRYSE/GPS verificado)
-const muxResponse = await fetch('/api/mux/upload', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ 
-    metadata: { 
-      filename: video.name,
-      gps_lat: gpsLat,
-      gps_lng: gpsLng,
-      gps_verified: gpsOk
-    } 
-  })
-})
-
 if (!muxResponse.ok) throw new Error('Error creando upload en Mux')
 const { uploadUrl, uploadId } = await muxResponse.json()
 
