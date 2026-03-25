@@ -3,34 +3,60 @@ import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabaseClient"
 import { useAuth } from "@/lib/auth-context"
-  
-const handleVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
+import VideoCompressor from "@/components/VideoCompressor"
+
+export default function PublicarPage() {
+  const { user, isLoggedIn } = useAuth()
+  const router = useRouter()
+  const [step, setStep] = useState(1)
+  const totalSteps = 6
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
+  const [planElegido, setPlanElegido] = useState("gratis")
+  const [video, setVideo] = useState<File | null>(null)
+  const [videoPreview, setVideoPreview] = useState<string | null>(null)
+  const [gpsLat, setGpsLat] = useState<number | null>(null)
+  const [gpsLng, setGpsLng] = useState<number | null>(null)
+  const [gpsOk, setGpsOk] = useState(false)
+  const videoRef = useRef<HTMLInputElement>(null)
+  const [operacion, setOperacion] = useState("venta")
+  const [tipoPropiedad, setTipoPropiedad] = useState("")
+  const [precio, setPrecio] = useState("")
+  const [moneda, setMoneda] = useState("USD")
+  const [ambientes, setAmbientes] = useState("")
+  const [superficie, setSuperficie] = useState("")
+  const [barrio, setBarrio] = useState("")
+  const [ciudad, setCiudad] = useState("")
+  const [titulo, setTitulo] = useState("")
+  const [descripcion, setDescripcion] = useState("")
+  const [whatsapp, setWhatsapp] = useState("")
+  const [destacar, setDestacar] = useState("sin")
+  const [originalVideo, setOriginalVideo] = useState<File | null>(null)
+  const [compressing, setCompressing] = useState(false)
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => { setGpsLat(pos.coords.latitude); setGpsLng(pos.coords.longitude); setGpsOk(true) },
+        () => setGpsOk(false)
+      )
+    }
+  }, [])
+
+ const handleVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
   const file = e.target.files?.[0]
   if (!file) return
-  setVideo(file)
+  setOriginalVideo(file)
   setVideoPreview(URL.createObjectURL(file))
+  setVideo(null)  // todavía no está comprimido
+}
+const handleCompressed = (compressedFile: File) => {
+  setVideo(compressedFile)
+  setCompressing(false)
+  setVideoPreview(URL.createObjectURL(compressedFile))
 }
 
-    video.onseeked = () => {
-      const ctx = canvas.getContext('2d')
-      ctx?.drawImage(video, 0, 0, canvas.width, canvas.height)
-      canvas.toBlob((blob) => {
-        if (blob) {
-          resolve(new File([blob], file.name, { type: 'video/mp4' }))
-        } else {
-          reject(new Error('No se pudo comprimir'))
-        }
-      }, 'video/mp4', 0.8)
-      video.pause()
-      URL.revokeObjectURL(video.src)
-    }
-    
-    video.onerror = () => reject(new Error('Error al cargar el video'))
-    video.src = URL.createObjectURL(file)
-    video.load()
-  })
-}
-    const handlePublicar = async () => {
+  const handlePublicar = async () => {
     setLoading(true)
     setError("")
     try {
@@ -240,9 +266,19 @@ const handleVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
     ) : (
       <div>
         <video src={videoPreview} style={{ width: "100%", borderRadius: 16, maxHeight: 300, objectFit: "cover", marginBottom: 12 }} controls />
-        <button onClick={() => { setVideo(null); setVideoPreview(null) }} style={{ width: "100%", padding: "14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.7)", fontSize: 15, cursor: "pointer", marginBottom: 12 }}>
+        <button onClick={() => { setOriginalVideo(null); setVideo(null); setVideoPreview(null) }} style={{ width: "100%", padding: "14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.7)", fontSize: 15, cursor: "pointer", marginBottom: 12 }}>
           Volver a grabar
         </button>
+        
+        {/* 👇 ESTO ES LO NUEVO 👇 */}
+        {!video && originalVideo && (
+          <VideoCompressor
+            videoFile={originalVideo}
+            onCompressed={handleCompressed}
+            onError={(err) => setError(err)}
+          />
+        )}
+        
         <button onClick={() => setStep(3)} style={btn}>Usar este video</button>
       </div>
     )}
