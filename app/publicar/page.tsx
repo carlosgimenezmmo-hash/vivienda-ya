@@ -3,9 +3,8 @@ import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabaseClient"
 import { useAuth } from "@/lib/auth-context"
-import VideoCompressor from "@/components/VideoCompressor"
 
-export default function PublicarPage() {
+  export default function PublicarPage() {
   const { user, isLoggedIn } = useAuth()
   const router = useRouter()
   const [step, setStep] = useState(1)
