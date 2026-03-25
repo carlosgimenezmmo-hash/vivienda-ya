@@ -3,43 +3,7 @@ import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabaseClient"
 import { useAuth } from "@/lib/auth-context"
-
-export default function PublicarPage() {
-  const { user, isLoggedIn } = useAuth()
-  const router = useRouter()
-  const [step, setStep] = useState(1)
-  const totalSteps = 6
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
-  const [planElegido, setPlanElegido] = useState("gratis")
-  const [video, setVideo] = useState<File | null>(null)
-  const [videoPreview, setVideoPreview] = useState<string | null>(null)
-  const [gpsLat, setGpsLat] = useState<number | null>(null)
-  const [gpsLng, setGpsLng] = useState<number | null>(null)
-  const [gpsOk, setGpsOk] = useState(false)
-  const videoRef = useRef<HTMLInputElement>(null)
-  const [operacion, setOperacion] = useState("venta")
-  const [tipoPropiedad, setTipoPropiedad] = useState("")
-  const [precio, setPrecio] = useState("")
-  const [moneda, setMoneda] = useState("USD")
-  const [ambientes, setAmbientes] = useState("")
-  const [superficie, setSuperficie] = useState("")
-  const [barrio, setBarrio] = useState("")
-  const [ciudad, setCiudad] = useState("")
-  const [titulo, setTitulo] = useState("")
-  const [descripcion, setDescripcion] = useState("")
-  const [whatsapp, setWhatsapp] = useState("")
-  const [destacar, setDestacar] = useState("sin")
- 
-  useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => { setGpsLat(pos.coords.latitude); setGpsLng(pos.coords.longitude); setGpsOk(true) },
-        () => setGpsOk(false)
-      )
-    }
-  }, [])
-
+  
 const handleVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
   const file = e.target.files?.[0]
   if (!file) return
