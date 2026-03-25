@@ -268,15 +268,7 @@ const handleCompressed = (compressedFile: File) => {
         <button onClick={() => { setOriginalVideo(null); setVideo(null); setVideoPreview(null) }} style={{ width: "100%", padding: "14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.7)", fontSize: 15, cursor: "pointer", marginBottom: 12 }}>
           Volver a grabar
         </button>
-        
-        {/* 👇 ESTO ES LO NUEVO 👇 */}
-        {!video && originalVideo && (
-          <VideoCompressor
-            videoFile={originalVideo}
-            onCompressed={handleCompressed}
-            onError={(err) => setError(err)}
-          />
-        )}
+      
         
         <button onClick={() => setStep(3)} style={btn}>Usar este video</button>
       </div>
