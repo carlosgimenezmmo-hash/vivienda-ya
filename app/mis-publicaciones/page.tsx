@@ -11,24 +11,32 @@ export default function MisPublicacionesPage() {
   const [properties, setProperties] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState<number | null>(null)
+  const [filtro, setFiltro] = useState("todas")
 
   useEffect(() => {
     if (!isLoggedIn || !user) return
     fetchProperties()
-  }, [isLoggedIn, user])
+  }, [isLoggedIn, user, filtro])
 
-  const fetchProperties = async () => {
-    const { data: sessionData } = await supabase.auth.getSession()
-    const uid = sessionData?.session?.user?.id || user?.id
-    if (!uid) { setLoading(false); return }
-    const { data, error } = await supabase
-      .from("properties")
-      .select("*")
-      .eq("user_id", uid)
-      .order("created_at", { ascending: false })
-    if (!error) setProperties(data || [])
-    setLoading(false)
+ const fetchProperties = async () => {
+  const { data: sessionData } = await supabase.auth.getSession()
+  const uid = sessionData?.session?.user?.id || user?.id
+  if (!uid) { setLoading(false); return }
+  
+  let query = supabase
+    .from("properties")
+    .select("*")
+    .eq("user_id", uid)
+    .order("created_at", { ascending: false })
+  
+  if (filtro !== "todas") {
+    query = query.eq("operation_type", filtro)
   }
+  
+  const { data, error } = await query
+  if (!error) setProperties(data || [])
+  setLoading(false)
+}
 
   const handleDelete = async (id: number) => {
     if (!confirm("Seguro que queres eliminar esta propiedad?")) return
@@ -56,7 +64,7 @@ export default function MisPublicacionesPage() {
   }
 
   return (
-    <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", paddingBottom: 100 }}>
+   <div style={{ height: "100dvh", background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", display: "flex", flexDirection: "column", overflow: "hidden" }}>
 
       {/* HEADER */}
       <div style={{ padding: "52px 20px 20px", display: "flex", alignItems: "center", gap: 14 }}>
@@ -65,7 +73,49 @@ export default function MisPublicacionesPage() {
         </button>
         <h1 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Mis Publicaciones</h1>
       </div>
-
+      {/* FILTROS */}
+<div style={{ display: "flex", gap: 8, padding: "0 20px 16px", flexWrap: "wrap" }}>
+  <button onClick={() => setFiltro("todas")} style={{
+    padding: "8px 16px",
+    borderRadius: 20,
+    border: `1px solid ${filtro === "todas" ? "#2563EB" : "rgba(255,255,255,0.2)"}`,
+    background: filtro === "todas" ? "rgba(37,99,235,0.2)" : "rgba(255,255,255,0.05)",
+    color: filtro === "todas" ? "#60A5FA" : "rgba(255,255,255,0.7)",
+    fontSize: 13,
+    fontWeight: 600,
+    cursor: "pointer"
+  }}>Todas</button>
+  <button onClick={() => setFiltro("venta")} style={{
+    padding: "8px 16px",
+    borderRadius: 20,
+    border: `1px solid ${filtro === "venta" ? "#2563EB" : "rgba(255,255,255,0.2)"}`,
+    background: filtro === "venta" ? "rgba(37,99,235,0.2)" : "rgba(255,255,255,0.05)",
+    color: filtro === "venta" ? "#60A5FA" : "rgba(255,255,255,0.7)",
+    fontSize: 13,
+    fontWeight: 600,
+    cursor: "pointer"
+  }}>Ventas</button>
+  <button onClick={() => setFiltro("alquiler")} style={{
+    padding: "8px 16px",
+    borderRadius: 20,
+    border: `1px solid ${filtro === "alquiler" ? "#2563EB" : "rgba(255,255,255,0.2)"}`,
+    background: filtro === "alquiler" ? "rgba(37,99,235,0.2)" : "rgba(255,255,255,0.05)",
+    color: filtro === "alquiler" ? "#60A5FA" : "rgba(255,255,255,0.7)",
+    fontSize: 13,
+    fontWeight: 600,
+    cursor: "pointer"
+  }}>Alquileres</button>
+  <button onClick={() => setFiltro("permuta")} style={{
+    padding: "8px 16px",
+    borderRadius: 20,
+    border: `1px solid ${filtro === "permuta" ? "#2563EB" : "rgba(255,255,255,0.2)"}`,
+    background: filtro === "permuta" ? "rgba(37,99,235,0.2)" : "rgba(255,255,255,0.05)",
+    color: filtro === "permuta" ? "#60A5FA" : "rgba(255,255,255,0.7)",
+    fontSize: 13,
+    fontWeight: 600,
+    cursor: "pointer"
+  }}>Permutas</button>
+</div>
       {loading ? (
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: 60 }}>
           <p style={{ color: "rgba(255,255,255,0.4)" }}>Cargando...</p>
@@ -80,7 +130,7 @@ export default function MisPublicacionesPage() {
           </button>
         </div>
       ) : (
-        <div style={{ padding: "0 20px", display: "flex", flexDirection: "column", gap: 12 }}>
+       <div style={{ flex: 1, overflowY: "auto", padding: "0 20px", display: "flex", flexDirection: "column", gap: 12 }}>
           {properties.map((p) => (
             <div key={p.id} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, overflow: "hidden" }}>
               {/* VIDEO THUMBNAIL */}

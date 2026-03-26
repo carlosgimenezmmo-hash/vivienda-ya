@@ -66,7 +66,7 @@ const handleCompressed = (compressedFile: File) => {
           .from("properties")
           .select("*", { count: "exact", head: true })
           .eq("user_id", uid)
-        if ((count || 0) >= 3) {
+        if ((count || 0) >= 99) {
           setError("Alcanzaste el limite de 3 videos del plan gratuito. Mejora tu plan para publicar mas.")
           setLoading(false)
           return
