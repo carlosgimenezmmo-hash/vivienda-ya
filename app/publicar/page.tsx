@@ -30,9 +30,7 @@ import { useAuth } from "@/lib/auth-context"
   const [descripcion, setDescripcion] = useState("")
   const [whatsapp, setWhatsapp] = useState("")
   const [destacar, setDestacar] = useState("sin")
-  const [originalVideo, setOriginalVideo] = useState<File | null>(null)
-  const [compressing, setCompressing] = useState(false)
-
+ 
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -44,16 +42,11 @@ import { useAuth } from "@/lib/auth-context"
 
  const handleVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
   const file = e.target.files?.[0]
+  console.log("handleVideo ejecutado. Archivo:", file?.name)
   if (!file) return
-  setOriginalVideo(file)
+  setVideo(file)
   setVideoPreview(URL.createObjectURL(file))
-  setVideo(null)  // todavía no está comprimido
-}
-const handleCompressed = (compressedFile: File) => {
-  setVideo(compressedFile)
-  setCompressing(false)
-  setVideoPreview(URL.createObjectURL(compressedFile))
-}
+   }
 
   const handlePublicar = async () => {
     setLoading(true)
@@ -66,16 +59,10 @@ const handleCompressed = (compressedFile: File) => {
           .from("properties")
           .select("*", { count: "exact", head: true })
           .eq("user_id", uid)
-        if ((count || 0) >= 99) {
-          setError("Alcanzaste el limite de 3 videos del plan gratuito. Mejora tu plan para publicar mas.")
-          setLoading(false)
-          return
+        if ((count || 0) >= 99) { setError("Alcanzaste el limite de videos del plan gratuito."); setLoading(false); return }
         }
-      }
-
-      let videoUrl = ""
-      if (video) {
-        const ext = video.name.split(".").pop()
+        if (video) {
+          const ext = video.name.split(".").pop()
         const path = `${Date.now()}.${ext}`
         const { error: uploadError } = await supabase.storage
           .from("videos-app")
