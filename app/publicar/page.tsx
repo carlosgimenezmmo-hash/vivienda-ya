@@ -70,9 +70,9 @@ import { useAuth } from "@/lib/auth-context"
         throw new Error("Debes grabar un video desde la app")
       }
 
-      } else {
-        throw new Error("Debes grabar un video desde la app")
-      }
+
+
+
 
       const { error: insertError } = await supabase.from("properties").insert({
         user_id: uid,
