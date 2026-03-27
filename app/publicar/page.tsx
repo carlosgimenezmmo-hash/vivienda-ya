@@ -251,7 +251,7 @@ import { useAuth } from "@/lib/auth-context"
       </div>
     ) : (
       <div>
-        <video src={videoPreview} style={{ width: "100%", borderRadius: 16, maxHeight: 300, objectFit: "cover", marginBottom: 12 }} controls />
+        <button onClick={() => { setVideo(null); setVideoPreview(null) }} style={{ width: "100%", padding: "14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.7)", fontSize: 15, cursor: "pointer", marginBottom: 12 }}>
         <button onClick={() => { setOriginalVideo(null); setVideo(null); setVideoPreview(null) }} style={{ width: "100%", padding: "14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.7)", fontSize: 15, cursor: "pointer", marginBottom: 12 }}>
           Volver a grabar
           </button>
