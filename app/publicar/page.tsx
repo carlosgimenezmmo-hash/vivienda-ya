@@ -55,21 +55,21 @@ import { useAuth } from "@/lib/auth-context"
       const { data: sessionData } = await supabase.auth.getSession()
       const uid = sessionData?.session?.user?.id
       if (uid) {
-        const { count } = await supabase
-          .from("properties")
-          .select("*", { count: "exact", head: true })
-          .eq("user_id", uid)
+        const { count } = await supabase.from("properties").select("*", { count: "exact", head: true }).eq("user_id", uid)
         if ((count || 0) >= 99) { setError("Alcanzaste el limite de videos del plan gratuito."); setLoading(false); return }
-        }
-        if (video) {
-          const ext = video.name.split(".").pop()
+      }
+      let videoUrl = ""
+      if (video) {
+        const ext = video.name.split(".").pop()
         const path = `${Date.now()}.${ext}`
-        const { error: uploadError } = await supabase.storage
-          .from("videos-app")
-          .upload(path, video, { contentType: video.type })
+        const { error: uploadError } = await supabase.storage.from("videos-app").upload(path, video, { contentType: video.type })
         if (uploadError) throw uploadError
         const { data } = supabase.storage.from("videos-app").getPublicUrl(path)
         videoUrl = data.publicUrl
+      } else {
+        throw new Error("Debes grabar un video desde la app")
+      }
+
       } else {
         throw new Error("Debes grabar un video desde la app")
       }
