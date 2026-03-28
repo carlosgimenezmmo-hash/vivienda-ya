@@ -63,7 +63,7 @@ export default function MisPublicacionesPage() {
     )
   }
   return (
-   <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", display: "flex", flexDirection: "column" }}>
+   <div style={{ background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", paddingBottom: 100 }}>
 
 
       {/* HEADER */}
