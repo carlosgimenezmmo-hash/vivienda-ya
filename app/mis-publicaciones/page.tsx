@@ -130,7 +130,7 @@ export default function MisPublicacionesPage() {
           </button>
         </div>
         <div style={{ flex: 1, overflowY: "auto", padding: "0 20px 100px", display: "flex", flexDirection: "column", gap: 12 }}>
-       <div style={{ flex: 1, overflowY: "auto", padding: "0 20px", display: "flex", flexDirection: "column", gap: 12 }}>
+
           {properties.map((p) => (
             <div key={p.id} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, overflow: "hidden" }}>
               {/* VIDEO THUMBNAIL */}
