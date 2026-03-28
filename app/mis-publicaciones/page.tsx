@@ -122,13 +122,13 @@ export default function MisPublicacionesPage() {
         </div>
       ) : properties.length === 0 ? (
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "60px 20px", textAlign: "center" }}>
-          <span style={{ fontSize: 48, marginBottom: 16 }}>ðŸ </span>
+          <span style={{ fontSize: 48, marginBottom: 16 }}>🏠</span>
           <h2 style={{ fontSize: 20, fontWeight: 700, margin: "0 0 8px" }}>No tenes publicaciones</h2>
           <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 24px" }}>Publica tu primera propiedad y aparecera en el feed</p>
-          <button onClick={() => router.push("/publicar")} style={{ background: "linear-gradient(135deg, #2563EB, #1d4ed8)", border: "none", borderRadius: 14, padding: "14px 28px", color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>
-            Publicar propiedad
-          </button>
+          <button onClick={() => router.push("/publicar")} style={{ background: "linear-gradient(135deg, #2563EB, #1d4ed8)", border: "none", borderRadius: 14, padding: "14px 28px", color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>Publicar propiedad</button>
         </div>
+      ) : (
+
         <div style={{ flex: 1, overflowY: "auto", padding: "0 20px 100px", display: "flex", flexDirection: "column", gap: 12 }}>
 
           {properties.map((p) => (
