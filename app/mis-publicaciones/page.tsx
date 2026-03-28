@@ -128,7 +128,7 @@ export default function MisPublicacionesPage() {
           <button onClick={() => router.push("/publicar")} style={{ background: "linear-gradient(135deg, #2563EB, #1d4ed8)", border: "none", borderRadius: 14, padding: "14px 28px", color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer" }}>Publicar propiedad</button>
         </div>
       ) : (
-
+        <div style={{ padding: "0 20px 100px", display: "flex", flexDirection: "column", gap: 12 }}>
         <div style={{ flex: 1, overflowY: "auto", padding: "0 20px 100px", display: "flex", flexDirection: "column", gap: 12 }}>
 
           {properties.map((p) => (
