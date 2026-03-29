@@ -272,13 +272,13 @@ export function SearchWizard() {
 
         {step === 5 && (
           <div>
-            <h2 style={title}>Que tamano necesitas?</h2>
+            <h2 style={title}>Que tamaño necesitas?</h2>
             <p style={subtitle}>Minimo de ambientes y dormitorios</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               {[
                 { label: "Ambientes", key: "rooms" },
                 { label: "Dormitorios", key: "bedrooms" },
-                { label: "Banos", key: "bathrooms" },
+                { label: "Baños", key: "bathrooms" },
               ].map(({ label, key }) => (
                 <div key={key} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "16px 20px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <span style={{ fontSize: 15, fontWeight: 600 }}>{label}</span>
