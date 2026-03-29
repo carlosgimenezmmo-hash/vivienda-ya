@@ -13,7 +13,7 @@ export function BottomNav() {
   const router = useRouter()
   const [showSheet, setShowSheet] = useState(false)
   const { activeProperty } = useActiveProperty()
-  const active = pathname === "/" ? "inicio" : pathname.startsWith("/buscar") ? "buscar" : pathname.startsWith("/publicar") ? "publicar" : pathname.startsWith("/perfil") ? "perfil" : "inicio"
+  const active = pathname === "/feed" ? "inicio" : pathname.startsWith("/buscar") ? "buscar" : pathname.startsWith("/publicar") ? "publicar" : pathname.startsWith("/perfil") ? "perfil" : "otro"
   const handleWhatsApp = (e: React.MouseEvent) => {
     e.preventDefault()
     if (!isLoggedIn) { setShowSheet(true); return }
@@ -28,7 +28,8 @@ export function BottomNav() {
   }
   const col = (id: string) => active === id ? '#fff' : 'rgba(255,255,255,0.45)'
   if (pathname === "/") return null
-  return (<>
+  return (
+    <>
       <AuthSheet visible={showSheet} onClose={() => setShowSheet(false)} action="contactar por WhatsApp" />
       <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'space-around', background: '#0f0f0f', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 10, paddingBottom: 'calc(10px + env(safe-area-inset-bottom))', height: 64 }}>
         <Link href="/feed" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, textDecoration: 'none' }}>
@@ -55,7 +56,7 @@ export function BottomNav() {
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={col('perfil')} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           <span style={{ fontSize: 10, color: col('perfil'), fontWeight: active === 'perfil' ? 700 : 400 }}>Perfil</span>
         </Link>
-
+      </nav>
     </>
   )
 }
