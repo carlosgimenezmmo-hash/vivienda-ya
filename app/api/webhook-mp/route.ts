@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server"
+﻿import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
+import crypto from "crypto"
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -15,6 +16,19 @@ const PLANES_VENCIMIENTO: Record<string, number> = {
 
 export async function POST(req: NextRequest) {
   try {
+    const secret = process.env.MP_WEBHOOK_SECRET
+    if (secret) {
+      const signature = req.headers.get("x-signature") || ""
+      const requestId = req.headers.get("x-request-id") || ""
+      const dataId = req.nextUrl.searchParams.get("data.id") || ""
+      const signedTemplate = `id:${dataId};request-id:${requestId};ts:${signature.split("ts=")[1]?.split(",")[0]};`
+      const hash = crypto.createHmac("sha256", secret).update(signedTemplate).digest("hex")
+      const v1 = signature.split("v1=")[1]
+      if (v1 && hash !== v1) {
+        return NextResponse.json({ error: "Invalid signature" }, { status: 401 })
+      }
+    }
+
     const body = await req.json()
     const { type, data } = body
 
