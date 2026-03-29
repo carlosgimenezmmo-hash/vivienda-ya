@@ -67,7 +67,7 @@ export default function LandingPage() {
           El mercado de videos<br /><span style={{ color: "#22C55E" }}>mas grande de Argentina</span>
         </h1>
         <p style={{ fontSize: "clamp(16px, 2.5vw, 20px)", color: "#6B7280", maxWidth: 560, margin: "0 0 40px", lineHeight: 1.6 }}>
-          Publica, busca y conecta con propiedades reales usando video. Sin fotos trucadas, sin intermediarios.
+          Donde podes encontrar la propiedad que buscas, para comprar, vender, alquilar o permutar. Con ubicacion real verificada por ARRYSE para evitar estafas.
         </p>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center", marginBottom: 60 }}>
           <button onClick={() => router.push("/registro")} style={{ padding: "16px 32px", borderRadius: 14, border: "none", background: "#22C55E", color: "#fff", fontSize: 17, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 4px 24px rgba(34,197,94,0.35)" }}>Empezar gratis</button>
@@ -261,6 +261,7 @@ export default function LandingPage() {
     </div>
   )
 }
+
 
 
 
