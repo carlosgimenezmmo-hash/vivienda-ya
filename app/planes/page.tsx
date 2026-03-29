@@ -25,10 +25,10 @@ const servicios = [
 ]
 
 const pagarMP = async (titulo: string, precio: number, planId: string) => {
-  const res = await fetch("/api/pago", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-   body: JSON.stringify({ titulo: plan.titulo, precio: plan.precio, planId, userId: (await supabase.auth.getSession()).data.session?.user?.id }),
+    body: JSON.stringify({ titulo, precio, planId, userId: (await supabase.auth.getSession()).data.session?.user?.id }),
+  })
   const data = await res.json()
   if (data.url) window.location.href = data.url
   else alert("Error al procesar el pago.")
