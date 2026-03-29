@@ -110,6 +110,36 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+      {/* VIDEOS */}
+      <section style={{ padding: "80px 24px", background: "#0a0a0a" }}>
+        <div style={{ maxWidth: 1000, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 56 }}>
+            <h2 style={{ fontSize: "clamp(28px, 5vw, 48px)", fontWeight: 900, letterSpacing: -1, margin: "0 0 12px", color: "#fff" }}>Ve como funciona</h2>
+            <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 17, margin: 0 }}>Todo lo que necesitas saber en menos de 2 minutos</p>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 24 }}>
+            {[
+              { titulo: "Publicar una propiedad", duracion: "1:20", descripcion: "Graba el video, carga los datos y publicas en 3 minutos." },
+              { titulo: "Buscar y contactar", duracion: "0:55", descripcion: "Scrollea el feed, ve los detalles y contacta por WhatsApp." },
+              { titulo: "Crear tu canal", duracion: "1:05", descripcion: "Configura tu canal y mostra todas tus propiedades juntas." },
+            ].map((v, i) => (
+              <div key={i} style={{ borderRadius: 20, overflow: "hidden", background: "#1a1a1a", border: "1px solid rgba(255,255,255,0.08)" }}>
+                <div style={{ position: "relative", aspectRatio: "16/9", background: "linear-gradient(135deg, #1a1a1a, #2a2a2a)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <div style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(34,197,94,0.15)", border: "2px solid rgba(34,197,94,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ width: 0, height: 0, borderTop: "11px solid transparent", borderBottom: "11px solid transparent", borderLeft: "18px solid #22C55E", marginLeft: 4 }} />
+                  </div>
+                  <span style={{ position: "absolute", bottom: 12, right: 12, background: "rgba(0,0,0,0.7)", color: "#fff", fontSize: 12, fontWeight: 700, padding: "3px 10px", borderRadius: 20 }}>{v.duracion}</span>
+                </div>
+                <div style={{ padding: "16px 20px 20px" }}>
+                  <h3 style={{ fontSize: 17, fontWeight: 800, color: "#fff", margin: "0 0 8px" }}>{v.titulo}</h3>
+                  <p style={{ fontSize: 14, color: "rgba(255,255,255,0.5)", margin: 0, lineHeight: 1.5 }}>{v.descripcion}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
 
       <section style={{ padding: "80px 24px", background: "#f9fafb" }}>
         <div style={{ maxWidth: 1000, margin: "0 auto" }}>
