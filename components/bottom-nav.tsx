@@ -31,7 +31,7 @@ export function BottomNav() {
     <>
       <AuthSheet visible={showSheet} onClose={() => setShowSheet(false)} action="contactar por WhatsApp" />
       <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'space-around', background: '#0f0f0f', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 10, paddingBottom: 'calc(10px + env(safe-area-inset-bottom))', height: 64 }}>
-        <Link href="/" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, textDecoration: 'none' }}>
+        <Link href="/feed" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, textDecoration: 'none' }}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill={active === 'inicio' ? '#fff' : 'none'} stroke={col('inicio')} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
           <span style={{ fontSize: 10, color: col('inicio'), fontWeight: active === 'inicio' ? 700 : 400 }}>Inicio</span>
         </Link>
