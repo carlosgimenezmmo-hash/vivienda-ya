@@ -51,6 +51,15 @@ const planes = [
 export default function LandingPage() {
   const router = useRouter()
   const [scrolled, setScrolled] = useState(false)
+const [showInstall, setShowInstall] = useState(false)
+const [os, setOs] = useState<"ios" | "android" | "desktop">("desktop")
+
+useEffect(() => {
+  const ua = navigator.userAgent
+  if (/iPad|iPhone|iPod/.test(ua)) setOs("ios")
+  else if (/Android/.test(ua)) setOs("android")
+  else setOs("desktop")
+}, [])
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 40)
@@ -93,6 +102,13 @@ export default function LandingPage() {
         </p>
 
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center", marginBottom: 60 }}>
+  <button onClick={() => router.push("/registro")} style={{ padding: "16px 32px", borderRadius: 14, border: "none", background: "#22C55E", color: "#fff", fontSize: 17, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 4px 24px rgba(34,197,94,0.35)" }}>Empezar gratis</button>
+  <button onClick={() => router.push("/feed")} style={{ padding: "16px 32px", borderRadius: 14, border: "1px solid rgba(0,0,0,0.12)", background: "#fff", color: "#0a0a0a", fontSize: 17, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>Ver propiedades</button>
+  <button onClick={() => setShowInstall(true)} style={{ padding: "16px 32px", borderRadius: 14, border: "1px solid rgba(34,197,94,0.4)", background: "rgba(34,197,94,0.06)", color: "#16a34a", fontSize: 17, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 8 }}>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    Instalar app
+  </button>
+</div>
           <button onClick={() => router.push("/registro")} style={{ padding: "16px 32px", borderRadius: 14, border: "none", background: "#22C55E", color: "#fff", fontSize: 17, fontWeight: 800, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 4px 24px rgba(34,197,94,0.35)" }}>
             Empezar gratis
           </button>
@@ -213,7 +229,74 @@ export default function LandingPage() {
           Crear cuenta gratis
         </button>
       </section>
+{/* PANEL INSTALACION */}
+{showInstall && (
+  <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "flex", alignItems: "flex-end", justifyContent: "center", background: "rgba(0,0,0,0.5)" }} onClick={() => setShowInstall(false)}>
+    <div style={{ background: "#fff", borderRadius: "24px 24px 0 0", padding: "28px 24px 48px", width: "100%", maxWidth: 500 }} onClick={e => e.stopPropagation()}>
+      <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(0,0,0,0.1)", margin: "0 auto 24px" }} />
+      <h3 style={{ fontSize: 22, fontWeight: 900, margin: "0 0 8px", textAlign: "center" }}>Instalar ViviendaYa</h3>
+      <p style={{ color: "#6B7280", fontSize: 15, textAlign: "center", margin: "0 0 28px" }}>Agrega la app a tu pantalla de inicio, sin pasar por ninguna tienda.</p>
 
+      {os === "ios" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {[
+            { paso: "1", texto: 'Toca el boton compartir', icono: "📤" },
+            { paso: "2", texto: 'Selecciona "Agregar a pantalla de inicio"', icono: "➕" },
+            { paso: "3", texto: 'Toca "Agregar" arriba a la derecha', icono: "✅" },
+          ].map(p => (
+            <div key={p.paso} style={{ display: "flex", alignItems: "center", gap: 16, padding: "14px 16px", background: "#f9fafb", borderRadius: 14 }}>
+              <span style={{ fontSize: 24 }}>{p.icono}</span>
+              <div>
+                <span style={{ fontSize: 11, fontWeight: 800, color: "#22C55E" }}>PASO {p.paso}</span>
+                <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: "#0a0a0a" }}>{p.texto}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {os === "android" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {[
+            { paso: "1", texto: 'Toca los tres puntos arriba a la derecha', icono: "⋮" },
+            { paso: "2", texto: 'Selecciona "Agregar a pantalla de inicio"', icono: "➕" },
+            { paso: "3", texto: 'Toca "Agregar" para confirmar', icono: "✅" },
+          ].map(p => (
+            <div key={p.paso} style={{ display: "flex", alignItems: "center", gap: 16, padding: "14px 16px", background: "#f9fafb", borderRadius: 14 }}>
+              <span style={{ fontSize: 24 }}>{p.icono}</span>
+              <div>
+                <span style={{ fontSize: 11, fontWeight: 800, color: "#22C55E" }}>PASO {p.paso}</span>
+                <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: "#0a0a0a" }}>{p.texto}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {os === "desktop" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {[
+            { paso: "1", texto: 'Abre esta pagina en Chrome en tu celular', icono: "📱" },
+            { paso: "2", texto: 'Toca el menu del navegador', icono: "☰" },
+            { paso: "3", texto: 'Selecciona "Agregar a pantalla de inicio"', icono: "✅" },
+          ].map(p => (
+            <div key={p.paso} style={{ display: "flex", alignItems: "center", gap: 16, padding: "14px 16px", background: "#f9fafb", borderRadius: 14 }}>
+              <span style={{ fontSize: 24 }}>{p.icono}</span>
+              <div>
+                <span style={{ fontSize: 11, fontWeight: 800, color: "#22C55E" }}>PASO {p.paso}</span>
+                <p style={{ margin: 0, fontSize: 15, fontWeight: 600, color: "#0a0a0a" }}>{p.texto}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <button onClick={() => setShowInstall(false)} style={{ width: "100%", marginTop: 24, padding: "16px", borderRadius: 14, border: "none", background: "#22C55E", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
+        Entendido
+      </button>
+    </div>
+  </div>
+)}
       {/* FOOTER */}
       <footer style={{ padding: "40px 24px", background: "#0a0a0a", borderTop: "1px solid rgba(255,255,255,0.06)" }}>
         <div style={{ maxWidth: 1000, margin: "0 auto", display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 16 }}>
