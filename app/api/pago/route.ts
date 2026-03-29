@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
+import { createClient } from "@supabase/supabase-js"
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
 
 export async function POST(req: NextRequest) {
   try {
-    const { titulo, precio, planId } = await req.json()
+    const { titulo, precio, planId, userId } = await req.json()
 
     const response = await fetch("https://api.mercadopago.com/checkout/preferences", {
       method: "POST",
@@ -25,7 +31,8 @@ export async function POST(req: NextRequest) {
           pending: "https://vivienda-ya.vercel.app/planes?pago=pendiente",
         },
         auto_return: "approved",
-        metadata: { planId },
+        metadata: { planId, userId },
+        notification_url: "https://vivienda-ya.vercel.app/api/webhook-mp",
       }),
     })
 
