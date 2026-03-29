@@ -64,7 +64,7 @@ export default function LandingPage() {
           Disponible ahora como PWA
         </div>
         <h1 style={{ fontSize: "clamp(40px, 8vw, 80px)", fontWeight: 900, lineHeight: 1.05, letterSpacing: -2, margin: "0 0 24px", maxWidth: 800 }}>
-          El mercado de videos<br /><span style={{ color: "#22C55E" }}>mas grande de Argentina</span>
+          El primer marketplace<br /><span style={{ color: "#22C55E" }}>inmobiliario en video</span>
         </h1>
         <p style={{ fontSize: "clamp(16px, 2.5vw, 20px)", color: "#6B7280", maxWidth: 560, margin: "0 0 40px", lineHeight: 1.6 }}>
           Donde podes encontrar la propiedad que buscas, para comprar, vender, alquilar o permutar. Con ubicacion real verificada por ARRYSE para evitar estafas.
