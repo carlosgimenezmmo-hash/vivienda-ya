@@ -7,7 +7,7 @@ import { BottomNav } from "@/components/bottom-nav"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "Vivienda Ya - Propiedades como nunca las viste",
+  title: "ViviendaYa - El primer marketplace de propiedades en video",
   description: "La app tipo TikTok de propiedades inmobiliarias.",
   generator: "v0.app",
   icons: {
@@ -51,3 +51,4 @@ export default function RootLayout({
     </html>
   )
 }
+
