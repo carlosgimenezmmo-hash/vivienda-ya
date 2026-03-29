@@ -30,7 +30,7 @@ export default function MisPublicacionesPage() {
   }
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Seguro que queres eliminar esta propiedad?")) return
+    if (!window.confirm("Seguro que queres eliminar esta propiedad?")) return
     setDeleting(id)
     const { error } = await supabase.from("properties").delete().eq("id", id)
     if (!error) setProperties(prev => prev.filter(p => p.id !== id))
@@ -126,4 +126,5 @@ export default function MisPublicacionesPage() {
     </div>
   )
 }
+
 
