@@ -27,8 +27,8 @@ export function BottomNav() {
     if (!isLoggedIn) { setShowSheet(true) } else { router.push('/publicar') }
   }
   const col = (id: string) => active === id ? '#fff' : 'rgba(255,255,255,0.45)'
+  if (pathname === "/") return null
   return (
-    <>
       <AuthSheet visible={showSheet} onClose={() => setShowSheet(false)} action="contactar por WhatsApp" />
       <nav style={{ position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'space-around', background: '#0f0f0f', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 10, paddingBottom: 'calc(10px + env(safe-area-inset-bottom))', height: 64 }}>
         <Link href="/feed" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, textDecoration: 'none' }}>
