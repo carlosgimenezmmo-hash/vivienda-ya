@@ -36,16 +36,16 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body style={{ margin: 0, padding: 0, background: '#000', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' }}>
-        <AuthProvider>
-            <ProtectedActionProvider>
-              <div style={{ width: "100%", position: "relative" }}>
-                <main>{children}</main>
-                <BottomNav />
-              </div>
-            </ProtectedActionProvider>
-            </ProtectedActionProvider>
-          </ActivePropertyProvider>
-        </AuthProvider>
+         <AuthProvider>
+           <ActivePropertyProvider>
+             <ProtectedActionProvider>
+               <div style={{ width: "100%", position: "relative" }}>
+                 <main>{children}</main>
+                 <BottomNav />
+               </div>
+             </ProtectedActionProvider>
+           </ActivePropertyProvider>
+         </AuthProvider>
         <Analytics />
       </body>
     </html>
