@@ -13,15 +13,15 @@ const planes = [
 ]
 
 const servicios = [
-  { nombre: "Video adicional", precio: 1, desc: "1 video extra en el mes" },
-  { nombre: "Pack 5 videos", precio: 4, desc: "5 videos adicionales (20% off)" },
-  { nombre: "Pack 10 videos", precio: 7, desc: "10 videos adicionales (30% off)" },
-  { nombre: "Destacar 24 horas", precio: 1, desc: "Aparecer primero en el feed" },
-  { nombre: "Destacar 7 dias", precio: 5, desc: "Prioridad en el feed (30% off)" },
-  { nombre: "Live commerce", precio: 2, desc: "Transmision en vivo 30 minutos" },
-  { nombre: "Descripcion con IA", precio: 1, desc: "Gemini genera tu descripcion" },
-  { nombre: "Tasacion express", precio: 5, desc: "Estimacion de precio con IA" },
-  { nombre: "Informe de mercado", precio: 2, desc: "Reporte de precios por zona" },
+  { nombre: "Video adicional", precio: 1400, desc: "1 video extra en el mes" },
+  { nombre: "Pack 5 videos", precio: 5600, desc: "5 videos adicionales (20% off)" },
+  { nombre: "Pack 10 videos", precio: 9800, desc: "10 videos adicionales (30% off)" },
+  { nombre: "Destacar 24 horas", precio: 1400, desc: "Aparecer primero en el feed" },
+  { nombre: "Destacar 7 dias", precio: 7000, desc: "Prioridad en el feed (30% off)" },
+  { nombre: "Live commerce", precio: 2800, desc: "Transmision en vivo 30 minutos" },
+  { nombre: "Descripcion con IA", precio: 1400, desc: "Gemini genera tu descripcion" },
+  { nombre: "Tasacion express", precio: 7000, desc: "Estimacion de precio con IA" },
+  { nombre: "Informe de mercado", precio: 2800, desc: "Reporte de precios por zona" },
 ]
 
 const pagarMP = async (titulo: string, precio: number, planId: string) => {
@@ -123,5 +123,6 @@ export default function PlanesPage() {
     </div>
   )
 }
+
 
 
