@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server"
+﻿import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 
 const supabase = createClient(
@@ -22,9 +22,13 @@ export async function POST(req: NextRequest) {
             title: titulo,
             quantity: 1,
             unit_price: precio,
-            currency_id: "USD",
+            currency_id: "ARS",
           },
         ],
+        payment_methods: {
+          excluded_payment_types: [],
+          installments: 1,
+        },
         back_urls: {
           success: "https://vivienda-ya.vercel.app/planes?pago=ok",
           failure: "https://vivienda-ya.vercel.app/planes?pago=error",

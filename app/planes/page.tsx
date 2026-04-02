@@ -7,9 +7,9 @@ import { useAuth } from "@/lib/auth-context"
 
 const planes = [
   { id: "gratis", nombre: "Gratis", precio: 0, periodo: "", color: "#888", features: ["3 videos por mes", "60 segundos por video", "Estadisticas basicas", "Verificacion ARRYSE gratis", "Chat con interesados"] },
-  { id: "starter", nombre: "STARTER", precio: 10, periodo: "por mes", color: "#22C55E", features: ["Canal propio con tu nombre", "Videos organizados en tu pagina", "Boton de contacto directo", "15 videos por mes", "60 segundos por video", "Estadisticas basicas", "Badge STARTER visible"] },
-  { id: "pro", nombre: "PRO", precio: 25, periodo: "por mes", color: "#2563EB", features: ["Todo lo del plan STARTER", "Badge verificado", "Descripcion de canal", "Link externo en tu perfil", "Hasta 5 colaboradores", "Estadisticas avanzadas", "50 videos por mes", "Videos hasta 5 minutos", "5 destacados por mes", "Soporte prioritario"] },
-  { id: "elite", nombre: "ELITE", precio: 40, periodo: "por mes", color: "#D97706", features: ["Todo lo del plan PRO", "Logo y colores de marca", "Hasta 10 colaboradores", "Prioridad absoluta en busquedas", "Badge dorado ELITE", "100 videos por mes", "10 destacados por mes", "4 lives por mes", "Soporte VIP menos de 1 hora"] },
+  { id: "starter", nombre: "STARTER", precio: 14000, periodo: "por mes", color: "#22C55E", features: ["Canal propio con tu nombre", "Videos organizados en tu pagina", "Boton de contacto directo", "15 videos por mes", "60 segundos por video", "Estadisticas basicas", "Badge STARTER visible"] },
+  { id: "pro", nombre: "PRO", precio: 35000, periodo: "por mes", color: "#2563EB", features: ["Todo lo del plan STARTER", "Badge verificado", "Descripcion de canal", "Link externo en tu perfil", "Hasta 5 colaboradores", "Estadisticas avanzadas", "50 videos por mes", "Videos hasta 5 minutos", "5 destacados por mes", "Soporte prioritario"] },
+  { id: "elite", nombre: "ELITE", precio: 56000, periodo: "por mes", color: "#D97706", features: ["Todo lo del plan PRO", "Logo y colores de marca", "Hasta 10 colaboradores", "Prioridad absoluta en busquedas", "Badge dorado ELITE", "100 videos por mes", "10 destacados por mes", "4 lives por mes", "Soporte VIP menos de 1 hora"] },
 ]
 
 const servicios = [
@@ -123,3 +123,5 @@ export default function PlanesPage() {
     </div>
   )
 }
+
+

@@ -16,9 +16,9 @@ const pasos = [
 
 const planes = [
   { nombre: "Gratis", precio: "0", periodo: "", color: "#6B7280", features: ["3 videos por mes", "Chat con interesados", "Verificacion ARRYSE gratis"] },
-  { nombre: "Starter", precio: "10", periodo: "/mes", color: "#22C55E", features: ["Canal propio", "15 videos por mes", "Badge verificado"] },
-  { nombre: "Pro", precio: "25", periodo: "/mes", color: "#2563EB", features: ["Todo Starter", "50 videos por mes", "5 destacados por mes"] },
-  { nombre: "Elite", precio: "40", periodo: "/mes", color: "#D97706", features: ["Todo Pro", "100 videos por mes", "Prioridad absoluta"] },
+  { nombre: "Starter", precio: "14000", periodo: "/mes", color: "#22C55E", features: ["Canal propio", "15 videos por mes", "Badge verificado"] },
+  { nombre: "Pro", precio: "35000", periodo: "/mes", color: "#2563EB", features: ["Todo Starter", "50 videos por mes", "5 destacados por mes"] },
+  { nombre: "Elite", precio: "56000", periodo: "/mes", color: "#D97706", features: ["Todo Pro", "100 videos por mes", "Prioridad absoluta"] },
 ]
 
 export default function LandingPage() {
@@ -158,7 +158,7 @@ export default function LandingPage() {
               <div key={plan.nombre} style={{ padding: 24, borderRadius: 20, border: "2px solid rgba(0,0,0,0.06)", background: "#fff", display: "flex", flexDirection: "column" }}>
                 <span style={{ background: plan.color, color: "#fff", borderRadius: 20, padding: "3px 12px", fontSize: 12, fontWeight: 800, alignSelf: "flex-start", marginBottom: 16 }}>{plan.nombre}</span>
                 <div style={{ marginBottom: 16 }}>
-                  <span style={{ fontSize: 36, fontWeight: 900, letterSpacing: -1 }}>{plan.precio === "0" ? "Gratis" : `USD ${plan.precio}`}</span>
+                  <span style={{ fontSize: 36, fontWeight: 900, letterSpacing: -1 }}>{plan.precio === "0" ? "Gratis" : `$ ${Number(plan.precio).toLocaleString("es-AR")}`}</span>
                   {plan.periodo && <span style={{ fontSize: 14, color: "#9CA3AF", marginLeft: 4 }}>{plan.periodo}</span>}
                 </div>
                 <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 8, marginBottom: 20 }}>
@@ -261,6 +261,7 @@ export default function LandingPage() {
     </div>
   )
 }
+
 
 
 
