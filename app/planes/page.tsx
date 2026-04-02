@@ -74,7 +74,7 @@ export default function PlanesPage() {
                   <span style={{ fontSize: 32, fontWeight: 900 }}>Gratis</span>
                 ) : (
                   <>
-                    <span style={{ fontSize: 32, fontWeight: 900 }}>USD {plan.precio}</span>
+                    <span style={{ fontSize: 32, fontWeight: 900 }}>$ {plan.precio.toLocaleString("es-AR")}</span>
                     <span style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", marginLeft: 6 }}>{plan.periodo}</span>
                   </>
                 )}
@@ -110,7 +110,7 @@ export default function PlanesPage() {
                 <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.4)" }}>{s.desc}</p>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{ fontSize: 16, fontWeight: 800 }}>USD {s.precio}</span>
+                <span style={{ fontSize: 16, fontWeight: 800 }}>$ {s.precio.toLocaleString("es-AR")}</span>
                 <button onClick={() => pagarMP(s.nombre, s.precio, "servicio")} style={{ background: "#2563EB", border: "none", borderRadius: 10, padding: "8px 14px", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
                   Comprar
                 </button>
@@ -123,6 +123,7 @@ export default function PlanesPage() {
     </div>
   )
 }
+
 
 
 
