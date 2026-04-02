@@ -27,7 +27,8 @@ export async function POST(req: NextRequest) {
         ],
         payment_methods: {
           excluded_payment_types: [],
-          installments: 1,
+          excluded_payment_methods: [],
+          installments: 12,
         },
         back_urls: {
           success: "https://vivienda-ya.vercel.app/planes?pago=ok",
@@ -51,3 +52,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
 }
+
