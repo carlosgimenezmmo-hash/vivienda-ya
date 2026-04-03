@@ -30,6 +30,7 @@ import { useAuth } from "@/lib/auth-context"
   const [descripcion, setDescripcion] = useState("")
   const [whatsapp, setWhatsapp] = useState("")
   const [destacar, setDestacar] = useState("sin")
+  const [modoIA, setModoIA] = useState(false)
  
   useEffect(() => {
     if (navigator.geolocation) {
@@ -231,6 +232,16 @@ import { useAuth } from "@/lib/auth-context"
        {step === 2 && (
   <div style={{ paddingBottom: 120 }}>
     <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Graba la propiedad</h1>
+    <div style={{ display: "flex", gap: 10, marginBottom: 20 }}>
+      <button onClick={() => setModoIA(false)} style={{ flex: 1, padding: "14px", borderRadius: 14, border: `2px solid ${!modoIA ? "#22C55E" : "rgba(255,255,255,0.1)"}`, background: !modoIA ? "rgba(34,197,94,0.1)" : "rgba(255,255,255,0.04)", cursor: "pointer", textAlign: "center" }}>
+        <p style={{ margin: 0, fontWeight: 800, fontSize: 15, color: !modoIA ? "#22C55E" : "#fff" }}>🎥 Normal</p>
+        <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>Gratis</p>
+      </button>
+      <button onClick={() => setModoIA(true)} style={{ flex: 1, padding: "14px", borderRadius: 14, border: `2px solid ${modoIA ? "#A855F7" : "rgba(255,255,255,0.1)"}`, background: modoIA ? "rgba(168,85,247,0.1)" : "rgba(255,255,255,0.04)", cursor: "pointer", textAlign: "center" }}>
+        <p style={{ margin: 0, fontWeight: 800, fontSize: 15, color: modoIA ? "#A855F7" : "#fff" }}>✨ Con IA</p>
+        <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>Pago al publicar</p>
+      </button>
+    </div>
     <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 16px" }}>
       Tenes {planElegido === "v120" ? "120" : planElegido === "v180" ? "180" : planElegido === "v300" ? "300" : "60"} segundos
     </p>
@@ -380,3 +391,5 @@ import { useAuth } from "@/lib/auth-context"
     </div>
   )
 }
+
+
