@@ -16,6 +16,8 @@ const PLANES_VENCIMIENTO: Record<string, number> = {
 
 export async function POST(req: NextRequest) {
   try {
+    console.log("WEBHOOK RECIBIDO:", new Date().toISOString())
+    console.log("BODY:", JSON.stringify(await req.clone().json()))
     const secret = process.env.MP_WEBHOOK_SECRET
     if (secret) {
       const signature = req.headers.get("x-signature") || ""
@@ -69,3 +71,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
 }
+
