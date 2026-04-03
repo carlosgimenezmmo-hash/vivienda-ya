@@ -420,9 +420,19 @@ import { useAuth } from "@/lib/auth-context"
               ))}
             </div>
             {error && <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 10, padding: "10px 14px", marginBottom: 16 }}><p style={{ color: "#EF4444", fontSize: 13, margin: 0 }}>{error}</p></div>}
-            <button onClick={handlePublicar} disabled={loading} style={{ ...btn, opacity: loading ? 0.6 : 1 }}>
+            {modoIA && !videoProcessed ? (
+              <div style={{ background: "rgba(168,85,247,0.1)", border: "1px solid rgba(168,85,247,0.3)", borderRadius: 14, padding: 16, marginBottom: 16 }}>
+                <p style={{ margin: "0 0 4px", fontWeight: 800, color: "#A855F7", fontSize: 15 }}>✨ Video procesado con IA</p>
+                <p style={{ margin: "0 0 12px", color: "rgba(255,255,255,0.5)", fontSize: 13 }}>Se cobrara $ 7.000 al publicar</p>
+                <button onClick={handlePublicar} disabled={loading} style={{ ...btn, background: "linear-gradient(135deg, #A855F7, #7C3AED)", opacity: loading ? 0.6 : 1 }}>
+                  {loading ? "Publicando..." : "Pagar $ 7.000 y publicar"}
+                </button>
+              </div>
+            ) : (
+              <button onClick={handlePublicar} disabled={loading} style={{ ...btn, opacity: loading ? 0.6 : 1 }}>
               {loading ? "Publicando..." : "Publicar ahora"}
-            </button>
+                </button>
+            )}
             <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 12, textAlign: "center", marginTop: 12 }}>Al publicar aceptas los Terminos y Condiciones de Vivienda Ya</p>
           </div>
         )}
@@ -436,6 +446,7 @@ import { useAuth } from "@/lib/auth-context"
     </div>
   )
 }
+
 
 
 
