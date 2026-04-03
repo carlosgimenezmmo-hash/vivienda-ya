@@ -31,6 +31,10 @@ import { useAuth } from "@/lib/auth-context"
   const [whatsapp, setWhatsapp] = useState("")
   const [destacar, setDestacar] = useState("sin")
   const [modoIA, setModoIA] = useState(false)
+  const [procesando, setProcesando] = useState(false)
+  const [subtitulos, setSubtitulos] = useState("")
+  const [descripcionIA, setDescripcionIA] = useState("")
+  const [videoProcessed, setVideoProcessed] = useState(false)
  
   useEffect(() => {
     if (navigator.geolocation) {
@@ -48,6 +52,37 @@ import { useAuth } from "@/lib/auth-context"
   setVideo(file)
   setVideoPreview(URL.createObjectURL(file))
    }
+
+  const procesarConIA = async () => {
+    if (!video) return
+    setProcesando(true)
+    try {
+      const ext = video.name.split(".").pop()
+      const path = `temp-${Date.now()}.${ext}`
+      const { error: uploadError } = await supabase.storage.from("videos-app").upload(path, video, { contentType: video.type })
+      if (uploadError) throw uploadError
+      const { data } = supabase.storage.from("videos-app").getPublicUrl(path)
+      const videoUrl = data.publicUrl
+
+      const res = await fetch("/api/procesar-video", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ videoUrl, modo: "completo" }),
+      })
+      const result = await res.json()
+      if (result.subtitulos) setSubtitulos(result.subtitulos)
+      if (result.descripcionIA) {
+        setDescripcionIA(result.descripcionIA)
+        setDescripcion(result.descripcionIA)
+      }
+      setVideoProcessed(true)
+      setStep(3)
+    } catch (err: any) {
+      setError("Error procesando el video con IA")
+    } finally {
+      setProcesando(false)
+    }
+  }
 
   const handlePublicar = async () => {
     setLoading(true)
@@ -264,7 +299,17 @@ import { useAuth } from "@/lib/auth-context"
       <div>
         <video src={videoPreview} style={{ width: "100%", borderRadius: 16, maxHeight: 300, objectFit: "cover", marginBottom: 12 }} controls />
         <button onClick={() => { setVideo(null); setVideoPreview(null) }} style={{ width: "100%", padding: "14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.7)", fontSize: 15, cursor: "pointer", marginBottom: 12 }}>Volver a grabar</button>
-        <button onClick={() => setStep(3)} style={btn}>Usar este video</button>
+        {procesando ? (
+          <div style={{ textAlign: "center", padding: "20px 0" }}>
+            <div style={{ width: 40, height: 40, border: "3px solid rgba(168,85,247,0.3)", borderTop: "3px solid #A855F7", borderRadius: "50%", margin: "0 auto 16px", animation: "spin 1s linear infinite" }} />
+            <p style={{ color: "#A855F7", fontWeight: 700, fontSize: 15 }}>Procesando con IA...</p>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13 }}>Generando subtitulos y descripcion</p>
+          </div>
+        ) : (
+          <button onClick={() => modoIA ? procesarConIA() : setStep(3)} style={{ ...btn, background: modoIA ? "linear-gradient(135deg, #A855F7, #7C3AED)" : "linear-gradient(135deg, #2563EB, #1d4ed8)" }}>
+            {modoIA ? "✨ Procesar con IA" : "Usar este video"}
+          </button>
+        )}
       </div>
     )}
   </div>
@@ -391,5 +436,8 @@ import { useAuth } from "@/lib/auth-context"
     </div>
   )
 }
+
+
+
 
 
