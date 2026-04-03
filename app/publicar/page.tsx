@@ -52,7 +52,6 @@ import { useAuth } from "@/lib/auth-context"
   setVideo(file)
   setVideoPreview(URL.createObjectURL(file))
    }
-
   const procesarConIA = async () => {
     if (!video) return
     setProcesando(true)
@@ -63,21 +62,22 @@ import { useAuth } from "@/lib/auth-context"
       if (uploadError) throw uploadError
       const { data } = supabase.storage.from("videos-app").getPublicUrl(path)
       const videoUrl = data.publicUrl
-
       const res = await fetch("/api/procesar-video", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ videoUrl, modo: "completo" }),
+        body: JSON.stringify({ videoUrl, modo: "iniciar" }),
       })
       const result = await res.json()
-      if (result.subtitulos) setSubtitulos(result.subtitulos)
-      if (result.descripcionIA) {
-        setDescripcionIA(result.descripcionIA)
-        setDescripcion(result.descripcionIA)
-      }
+      if (result.transcriptId) setSubtitulos(result.transcriptId)
       setVideoProcessed(true)
       setStep(3)
     } catch (err: any) {
+      setError("Error iniciando el procesamiento con IA")
+    } finally {
+      setProcesando(false)
+    }
+  }
+
       setError("Error procesando el video con IA")
     } finally {
       setProcesando(false)
@@ -446,6 +446,7 @@ import { useAuth } from "@/lib/auth-context"
     </div>
   )
 }
+
 
 
 
