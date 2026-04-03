@@ -23,6 +23,9 @@ export async function POST(req: NextRequest) {
             quantity: 1,
             unit_price: precio,
             currency_id: "ARS",
+            description: titulo,
+            category_id: "services",
+            id: planId,
           },
         ],
         payment_methods: {
@@ -37,6 +40,7 @@ export async function POST(req: NextRequest) {
         },
         auto_return: "approved",
         metadata: { planId, userId },
+        external_reference: `${userId}-${planId}-${Date.now()}`,
         notification_url: "https://vivienda-ya.vercel.app/api/webhook-mp",
       }),
     })
@@ -52,4 +56,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
 }
+
+
 
