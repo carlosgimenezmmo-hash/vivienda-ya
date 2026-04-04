@@ -276,7 +276,7 @@ import { useAuth } from "@/lib/auth-context"
 
 
 
-    </div>
+
     <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 16px" }}>
       Tenes {planElegido === "v120" ? "120" : planElegido === "v180" ? "180" : planElegido === "v300" ? "300" : "60"} segundos
     </p>
