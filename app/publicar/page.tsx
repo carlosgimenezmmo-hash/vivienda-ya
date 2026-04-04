@@ -78,11 +78,11 @@ import { useAuth } from "@/lib/auth-context"
     }
   }
 
-      setError("Error procesando el video con IA")
-    } finally {
-      setProcesando(false)
-    }
-  }
+
+
+
+
+
 
   const handlePublicar = async () => {
     setLoading(true)
