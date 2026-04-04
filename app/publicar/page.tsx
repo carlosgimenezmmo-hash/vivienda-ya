@@ -298,18 +298,18 @@ import { useAuth } from "@/lib/auth-context"
     ) : (
       <div>
         <video src={videoPreview} style={{ width: "100%", borderRadius: 16, maxHeight: 300, objectFit: "cover", marginBottom: 12 }} controls />
-        <button onClick={() => { setVideo(null); setVideoPreview(null) }} style={{ width: "100%", padding: "14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.7)", fontSize: 15, cursor: "pointer", marginBottom: 12 }}>Volver a grabar</button>
-        {procesando ? (
-          <div style={{ textAlign: "center", padding: "20px 0" }}>
-            <div style={{ width: 40, height: 40, border: "3px solid rgba(168,85,247,0.3)", borderTop: "3px solid #A855F7", borderRadius: "50%", margin: "0 auto 16px", animation: "spin 1s linear infinite" }} />
-            <p style={{ color: "#A855F7", fontWeight: 700, fontSize: 15 }}>Procesando con IA...</p>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13 }}>Generando subtitulos y descripcion</p>
-          </div>
-        ) : (
-          <button onClick={() => setStep(3)} style={btn}>
-            "Usar este video"
-          </button>
-        )}
+        <button onClick={() => setStep(3)} style={btn}>Usar este video</button>
+
+
+
+
+
+
+
+
+
+
+
       </div>
     )}
   </div>
