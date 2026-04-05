@@ -140,9 +140,9 @@ export default function MisPublicacionesPage() {
         </div>
       </div>
     )}
+  </div>
   )
-    </div>
-  )
+
 }
 
 
