@@ -12,6 +12,7 @@ export default function MisPublicacionesPage() {
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState<number | null>(null)
   const [filtro, setFiltro] = useState("todas")
+  const [confirmarId, setConfirmarId] = useState<number | null>(null)
 
   useEffect(() => {
     if (!isLoggedIn || !user) return
@@ -28,14 +29,14 @@ export default function MisPublicacionesPage() {
     if (!error) setProperties(data || [])
     setLoading(false)
   }
-
   const handleDelete = async (id: number) => {
-    if (!window.confirm("Seguro que queres eliminar esta propiedad?")) return
+    setConfirmarId(null)
     setDeleting(id)
     const { error } = await supabase.from("properties").delete().eq("id", id)
     if (!error) setProperties(prev => prev.filter(p => p.id !== id))
     else alert("Error al eliminar: " + error.message)
     setDeleting(null)
+  }
   }
 
   if (!isLoggedIn || !user) {
@@ -113,7 +114,7 @@ export default function MisPublicacionesPage() {
                 </p>
                 <p style={{ margin: "0 0 12px", fontSize: 18, fontWeight: 800 }}>USD {Number(p.price)?.toLocaleString() || "Consultar"}</p>
                 <div style={{ display: "flex", gap: 8 }}>
-                  <button onClick={() => handleDelete(p.id)} disabled={deleting === p.id}
+                  <button onClick={() => setConfirmarId(p.id)} disabled={deleting === p.id}
                     style={{ flex: 1, padding: "10px", borderRadius: 10, border: "1px solid rgba(239,68,68,0.3)", background: "rgba(239,68,68,0.1)", color: "#FCA5A5", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
                     {deleting === p.id ? "Eliminando..." : "Eliminar"}
                   </button>
@@ -122,9 +123,28 @@ export default function MisPublicacionesPage() {
             </div>
           ))}
         </div>
-      )}
+    </div>
+    {confirmarId !== null && (
+      <div style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "flex-end", justifyContent: "center" }} onClick={() => setConfirmarId(null)}>
+        <div style={{ background: "#1a1a1a", borderRadius: "24px 24px 0 0", padding: "28px 24px 48px", width: "100%", maxWidth: 500 }} onClick={e => e.stopPropagation()}>
+          <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.1)", margin: "0 auto 24px" }} />
+          <h3 style={{ fontSize: 20, fontWeight: 900, color: "#fff", margin: "0 0 8px", textAlign: "center" }}>Eliminar propiedad</h3>
+          <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 15, textAlign: "center", margin: "0 0 28px" }}>Esta accion no se puede deshacer.</p>
+          <button onClick={() => handleDelete(confirmarId)} style={{ width: "100%", padding: "16px", borderRadius: 14, border: "none", background: "#EF4444", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer", marginBottom: 12, fontFamily: "inherit" }}>
+            {deleting === confirmarId ? "Eliminando..." : "Si, eliminar"}
+          </button>
+          <button onClick={() => setConfirmarId(null)} style={{ width: "100%", padding: "16px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.6)", fontSize: 16, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+            Cancelar
+          </button>
+        </div>
+      </div>
+    )}
+  )
     </div>
   )
 }
+
+
+
 
 
