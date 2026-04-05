@@ -125,8 +125,7 @@ export default function MisPublicacionesPage() {
             </div>
           ))}
         </div>
-    </div>
-    {confirmarId !== null && (
+      {confirmarId !== null && (
       <div style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "flex-end", justifyContent: "center" }} onClick={() => setConfirmarId(null)}>
         <div style={{ background: "#1a1a1a", borderRadius: "24px 24px 0 0", padding: "28px 24px 48px", width: "100%", maxWidth: 500 }} onClick={e => e.stopPropagation()}>
           <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.1)", margin: "0 auto 24px" }} />
@@ -140,8 +139,9 @@ export default function MisPublicacionesPage() {
           </button>
         </div>
       </div>
-    )}
-  </div>
+      )}
+    </div>
+  )
   )
 
 }
