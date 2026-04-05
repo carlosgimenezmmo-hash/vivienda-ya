@@ -14,6 +14,7 @@ export default function MisPublicacionesPage() {
   const [filtro, setFiltro] = useState("todas")
   const [confirmarId, setConfirmarId] = useState<number | null>(null)
 
+
   useEffect(() => {
     if (!isLoggedIn || !user) return
     fetchProperties()
@@ -143,6 +144,7 @@ export default function MisPublicacionesPage() {
     </div>
   )
 }
+
 
 
 
