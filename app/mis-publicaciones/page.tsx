@@ -11,7 +11,8 @@ export default function MisPublicacionesPage() {
   const [properties, setProperties] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState<number | null>(null)
-  const [filtro, setFiltro] = useState("todas")
+ const [filtro, setFiltro] = useState ("todas")
+ const [confirmarId, setConfirmarId] = useState<number | null>(null)
   const [confirmarId, setConfirmarId] = useState<number | null>(null)
 
 
@@ -35,9 +36,9 @@ export default function MisPublicacionesPage() {
     setDeleting(id)
     const { error } = await supabase.from("properties").delete().eq("id", id)
     if (!error) setProperties(prev => prev.filter(p => p.id !== id))
-    else alert("Error al eliminar: " + error.message)
     setDeleting(null)
-  }
+
+
   }
 
   if (!isLoggedIn || !user) {
