@@ -16,35 +16,33 @@ export async function POST(req: NextRequest) {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${process.env.MP_ACCESS_TOKEN}`,
       },
-      body: JSON.stringify({
-       items: [
-  {
-    id: planId,
-    title: titulo,
-    description: titulo,
-    category_id: "services",
-    quantity: 1,
-    unit_price: precio,
-    currency_id: "ARS",
+     body: JSON.stringify({
+  items: [
+    {
+      id: planId,
+      title: titulo,
+      description: titulo,
+      category_id: "services",
+      quantity: 1,
+      unit_price: Number(precio),
+      currency_id: "ARS",
+    },
+  ],
+  payment_methods: {
+    excluded_payment_types: [],
+    excluded_payment_methods: [],
+    installments: 12,
   },
-],
-        payment_methods: {
-          excluded_payment_types: [],
-          excluded_payment_methods: [],
-          installments: 12,
-        },
-        back_urls: {
-          success: "https://vivienda-ya.vercel.app/planes?pago=ok",
-          failure: "https://vivienda-ya.vercel.app/planes?pago=error",
-          pending: "https://vivienda-ya.vercel.app/planes?pago=pendiente",
-        },
-        auto_return: "approved",
-        metadata: { planId, userId },
-        external_reference: `${userId}-${planId}-${Date.now()}`,
-        notification_url: "https://vivienda-ya.vercel.app/api/webhook-mp",
-      }),
-    })
-
+  back_urls: {
+    success: "https://vivienda-ya.vercel.app/planes?pago=ok",
+    failure: "https://vivienda-ya.vercel.app/planes?pago=error",
+    pending: "https://vivienda-ya.vercel.app/planes?pago=pendiente",
+  },
+  auto_return: "approved",
+  metadata: { planId, userId },
+  external_reference: `${userId}-${planId}-${Date.now()}`,
+  notification_url: "https://vivienda-ya.vercel.app/api/webhook-mp",
+}),
     const data = await response.json()
 
     if (!data.init_point) {
