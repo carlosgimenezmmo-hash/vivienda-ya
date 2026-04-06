@@ -342,9 +342,9 @@ const handleVideo = (e: React.ChangeEvent<HTMLInputElement>, desdeGaleria = fals
     ) : (
       <button onClick={() => setStep(1)} style={{ ...btn, background: "rgba(245,158,11,0.8)" }}>Elegir plan con mas duracion</button>
     )}
+        </div>
+        )}
 
-  </div>
-  )}
 
 
 
