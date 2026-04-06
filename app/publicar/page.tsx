@@ -4,11 +4,11 @@ import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabaseClient"
 import { useAuth } from "@/lib/auth-context"
 
-  export default function PublicarPage() {
+export default function PublicarPage() {
   const { user, isLoggedIn } = useAuth()
   const router = useRouter()
   const [step, setStep] = useState(1)
-  const totalSteps = 6
+  const totalSteps = 5
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [planElegido, setPlanElegido] = useState("gratis")
@@ -31,15 +31,9 @@ import { useAuth } from "@/lib/auth-context"
   const [descripcion, setDescripcion] = useState("")
   const [whatsapp, setWhatsapp] = useState("")
   const [destacar, setDestacar] = useState("sin")
-  const [modoIA, setModoIA] = useState(false)
-  const [procesando, setProcesando] = useState(false)
-  const [subtitulos, setSubtitulos] = useState("")
-  const [descripcionIA, setDescripcionIA] = useState("")
- const [videoProcessed, setVideoProcessed] = useState(false)
-const [videoDesdeGaleria, setVideoDesdeGaleria] = useState(false)
-const [videoDuracion, setVideoDuracion] = useState(0)
-const galeriaRef = useRef<HTMLInputElement>(null)
- 
+  const [videoDesdeGaleria, setVideoDesdeGaleria] = useState(false)
+  const [videoDuracion, setVideoDuracion] = useState(0)
+
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -49,58 +43,20 @@ const galeriaRef = useRef<HTMLInputElement>(null)
     }
   }, [])
 
-const handleVideo = (e: React.ChangeEvent<HTMLInputElement>, desdeGaleria = false) => {
-  const file = e.target.files?.[0]
-  if (!file) return
-  const url = URL.createObjectURL(file)
-  const tempVideo = document.createElement("video")
-  tempVideo.preload = "metadata"
-  tempVideo.src = url
-  tempVideo.onloadedmetadata = () => {
-    const duracion = tempVideo.duration
-    setVideoDuracion(duracion)
-    setVideoDesdeGaleria(desdeGaleria)
-    setVideo(file)
-    setVideoPreview(url)
-  }
-
-
-
-
-
-
-
-  const procesarConIA = async () => {
-    if (!video) return
-    setProcesando(true)
-    try {
-      const ext = video.name.split(".").pop()
-      const path = `temp-${Date.now()}.${ext}`
-      const { error: uploadError } = await supabase.storage.from("videos-app").upload(path, video, { contentType: video.type })
-      if (uploadError) throw uploadError
-      const { data } = supabase.storage.from("videos-app").getPublicUrl(path)
-      const videoUrl = data.publicUrl
-      const res = await fetch("/api/procesar-video", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ videoUrl, modo: "iniciar" }),
-      })
-      const result = await res.json()
-      if (result.transcriptId) setSubtitulos(result.transcriptId)
-      setVideoProcessed(true)
-      setStep(3)
-    } catch (err: any) {
-      setError("Error iniciando el procesamiento con IA")
-    } finally {
-      setProcesando(false)
+  const handleVideo = (e: React.ChangeEvent<HTMLInputElement>, desdeGaleria = false) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const url = URL.createObjectURL(file)
+    const tempVideo = document.createElement("video")
+    tempVideo.preload = "metadata"
+    tempVideo.src = url
+    tempVideo.onloadedmetadata = () => {
+      setVideoDuracion(tempVideo.duration)
+      setVideoDesdeGaleria(desdeGaleria)
+      setVideo(file)
+      setVideoPreview(url)
     }
   }
-
-
-
-
-
-
 
   const handlePublicar = async () => {
     setLoading(true)
@@ -108,26 +64,13 @@ const handleVideo = (e: React.ChangeEvent<HTMLInputElement>, desdeGaleria = fals
     try {
       const { data: sessionData } = await supabase.auth.getSession()
       const uid = sessionData?.session?.user?.id
-      if (uid) {
-        const { count } = await supabase.from("properties").select("*", { count: "exact", head: true }).eq("user_id", uid)
-        if ((count || 0) >= 99) { setError("Alcanzaste el limite de videos del plan gratuito."); setLoading(false); return }
-      }
-      let videoUrl = ""
-      if (video) {
-        const ext = video.name.split(".").pop()
-        const path = `${Date.now()}.${ext}`
-        const { error: uploadError } = await supabase.storage.from("videos-app").upload(path, video, { contentType: video.type })
-        if (uploadError) throw uploadError
-        const { data } = supabase.storage.from("videos-app").getPublicUrl(path)
-        videoUrl = data.publicUrl
-      } else {
-        throw new Error("Debes grabar un video desde la app")
-      }
-
-
-
-
-
+      if (!video) throw new Error("Debes seleccionar un video")
+      const ext = video.name.split(".").pop()
+      const path = `${Date.now()}.${ext}`
+      const { error: uploadError } = await supabase.storage.from("videos-app").upload(path, video, { contentType: video.type })
+      if (uploadError) throw uploadError
+      const { data } = supabase.storage.from("videos-app").getPublicUrl(path)
+      const videoUrl = data.publicUrl
       const { error: insertError } = await supabase.from("properties").insert({
         user_id: uid,
         owner_name: user?.name || "Propietario",
@@ -144,7 +87,7 @@ const handleVideo = (e: React.ChangeEvent<HTMLInputElement>, desdeGaleria = fals
         description: descripcion,
         whatsapp_number: whatsapp,
         video_url: videoUrl,
-       verified: gpsOk && !videoDesdeGaleria,
+        verified: gpsOk && !videoDesdeGaleria,
         lat: gpsLat,
         lng: gpsLng,
         highlighted: destacar !== "sin",
@@ -152,8 +95,7 @@ const handleVideo = (e: React.ChangeEvent<HTMLInputElement>, desdeGaleria = fals
         status: "approved"
       })
       if (insertError) throw insertError
-
-      router.push("/")
+      router.push("/feed")
     } catch (err: any) {
       setError(err.message || "Error al publicar")
     } finally {
@@ -161,22 +103,24 @@ const handleVideo = (e: React.ChangeEvent<HTMLInputElement>, desdeGaleria = fals
     }
   }
 
-  // Estilos (simplificados para que entre el archivo, los tenés completos en tu código)
   const inp: React.CSSProperties = {
     width: "100%", padding: "14px 16px", borderRadius: 12,
     background: "rgba(255,255,255,0.07)", border: "1px solid rgba(255,255,255,0.1)",
     color: "#fff", fontSize: 15, outline: "none", boxSizing: "border-box",
+    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
   }
   const btn: React.CSSProperties = {
     width: "100%", padding: "16px", borderRadius: 14, border: "none",
     background: "linear-gradient(135deg, #2563EB, #1d4ed8)",
     color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer",
+    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
   }
   const card = (active: boolean): React.CSSProperties => ({
     width: "100%", padding: "16px", borderRadius: 14, marginBottom: 12,
     border: `2px solid ${active ? "#2563EB" : "rgba(255,255,255,0.1)"}`,
     background: active ? "rgba(37,99,235,0.15)" : "rgba(255,255,255,0.04)",
     cursor: "pointer", textAlign: "left",
+    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
   })
   const chip = (active: boolean): React.CSSProperties => ({
     padding: "8px 14px", borderRadius: 20,
@@ -184,11 +128,12 @@ const handleVideo = (e: React.ChangeEvent<HTMLInputElement>, desdeGaleria = fals
     background: active ? "rgba(37,99,235,0.2)" : "rgba(255,255,255,0.04)",
     color: active ? "#60A5FA" : "rgba(255,255,255,0.5)",
     fontSize: 13, fontWeight: 600, cursor: "pointer",
+    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
   })
 
   if (!isLoggedIn) {
     return (
-      <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 24px" }}>
+      <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 24px", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
         <h2 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 10px", textAlign: "center" }}>Necesitas una cuenta</h2>
         <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, textAlign: "center", margin: "0 0 28px" }}>Para publicar propiedades tenes que estar registrado.</p>
         <button onClick={() => router.push("/registro")} style={btn}>Registrarme gratis</button>
@@ -197,10 +142,9 @@ const handleVideo = (e: React.ChangeEvent<HTMLInputElement>, desdeGaleria = fals
   }
 
   return (
-    <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "#0a0a0a", color: "#fff", display: "flex", flexDirection: "column" }}>
+    <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", display: "flex", flexDirection: "column" }}>
       <div style={{ padding: "52px 20px 16px", display: "flex", alignItems: "center", gap: 14 }}>
-        <button onClick={() => step > 1 ? setStep(step - 1) : router.back()}
-          style={{ background: "rgba(255,255,255,0.08)", border: "none", borderRadius: "50%", width: 38, height: 38, color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        <button onClick={() => step > 1 ? setStep(step - 1) : router.back()} style={{ background: "rgba(255,255,255,0.08)", border: "none", borderRadius: "50%", width: 38, height: 38, color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
         </button>
         <div style={{ flex: 1 }}>
@@ -215,13 +159,12 @@ const handleVideo = (e: React.ChangeEvent<HTMLInputElement>, desdeGaleria = fals
         ))}
       </div>
 
-      <div style={{ position: "absolute", top: 120, bottom: 0, left: 0, right: 0, paddingLeft: "20px", paddingRight: "20px", paddingBottom: 160, overflowY: "scroll", WebkitOverflowScrolling: "touch" }}>
+      <div style={{ position: "absolute", top: 120, bottom: 0, left: 0, right: 0, paddingLeft: "20px", paddingRight: "20px", paddingBottom: 160, overflowY: "scroll", WebkitOverflowScrolling: "touch" } as React.CSSProperties}>
 
         {step === 1 && (
           <div>
             <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Tu plan</h1>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 20px" }}>Videos disponibles este mes</p>
-
             <button onClick={() => setPlanElegido("gratis")} style={card(planElegido === "gratis")}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div>
@@ -231,41 +174,26 @@ const handleVideo = (e: React.ChangeEvent<HTMLInputElement>, desdeGaleria = fals
                 <p style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "#22C55E" }}>$0</p>
               </div>
             </button>
-
             <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", margin: "16px 0 10px", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" }}>Videos extra</p>
-
             <button onClick={() => setPlanElegido("extra1")} style={card(planElegido === "extra1")}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#fff" }}>1 video extra</p>
-                  <p style={{ margin: "2px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>Pago unico</p>
-                </div>
+                <div><p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#fff" }}>1 video extra</p><p style={{ margin: "2px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>Pago unico</p></div>
                 <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#60A5FA" }}>USD 1</p>
               </div>
             </button>
-
             <button onClick={() => setPlanElegido("pack5")} style={card(planElegido === "pack5")}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#fff" }}>Pack 5 videos</p>
-                  <p style={{ margin: "2px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>Ahorro 20%</p>
-                </div>
+                <div><p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#fff" }}>Pack 5 videos</p><p style={{ margin: "2px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>Ahorro 20%</p></div>
                 <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#60A5FA" }}>USD 4</p>
               </div>
             </button>
-
             <button onClick={() => setPlanElegido("pack10")} style={card(planElegido === "pack10")}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#fff" }}>Pack 10 videos</p>
-                  <p style={{ margin: "2px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>Ahorro 30%</p>
-                </div>
+                <div><p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#fff" }}>Pack 10 videos</p><p style={{ margin: "2px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>Ahorro 30%</p></div>
                 <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#60A5FA" }}>USD 7</p>
               </div>
             </button>
-
             <p style={{ fontSize: 12, color: "rgba(255,255,255,0.35)", margin: "16px 0 10px", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" }}>Duracion del video</p>
-
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 24 }}>
               {[
                 { id: "gratis", label: "60 seg", precio: "Incluido", color: "#22C55E" },
@@ -281,6 +209,7 @@ const handleVideo = (e: React.ChangeEvent<HTMLInputElement>, desdeGaleria = fals
             </div>
           </div>
         )}
+
         {step === 2 && (
           <div style={{ paddingBottom: 120 }}>
             <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Graba la propiedad</h1>
@@ -332,23 +261,6 @@ const handleVideo = (e: React.ChangeEvent<HTMLInputElement>, desdeGaleria = fals
           </div>
         )}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         {step === 3 && (
           <div>
             <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 4px" }}>Datos de la propiedad</h1>
@@ -392,7 +304,7 @@ const handleVideo = (e: React.ChangeEvent<HTMLInputElement>, desdeGaleria = fals
             <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} placeholder="Describe brevemente la propiedad..." maxLength={150} style={{ ...inp, height: 80, resize: "none", marginBottom: 4 }} />
             <p style={{ textAlign: "right", color: "rgba(255,255,255,0.3)", fontSize: 12, margin: "0 0 16px" }}>{descripcion.length}/150</p>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>WhatsApp de contacto</p>
-            <input value={whatsapp} onChange={e => setWhatsapp(e.target.value)} placeholder="Ej: 5491112345678" type="tel" style={inp} />
+            <input value={whatsapp} onChange={e => setWhatsapp(e.target.value)} placeholder="Ej: 5491112345678" type="tel" style={{ ...inp, marginBottom: 20 }} />
             <button onClick={() => setStep(4)} style={btn}>Continuar</button>
           </div>
         )}
@@ -403,28 +315,19 @@ const handleVideo = (e: React.ChangeEvent<HTMLInputElement>, desdeGaleria = fals
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 24px" }}>Aparece primero en el feed</p>
             <button onClick={() => setDestacar("sin")} style={card(destacar === "sin")}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#fff" }}>Sin destacar</p>
-                  <p style={{ margin: "4px 0 0", fontSize: 13, color: "rgba(255,255,255,0.5)" }}>Aparece en orden normal</p>
-                </div>
+                <div><p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#fff" }}>Sin destacar</p><p style={{ margin: "4px 0 0", fontSize: 13, color: "rgba(255,255,255,0.5)" }}>Aparece en orden normal</p></div>
                 <p style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#22C55E" }}>Gratis</p>
               </div>
             </button>
             <button onClick={() => setDestacar("24h")} style={card(destacar === "24h")}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#fff" }}>Destacar 24 horas</p>
-                  <p style={{ margin: "4px 0 0", fontSize: 13, color: "rgba(255,255,255,0.5)" }}>Primero en el feed por 1 dia</p>
-                </div>
+                <div><p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#fff" }}>Destacar 24 horas</p><p style={{ margin: "4px 0 0", fontSize: 13, color: "rgba(255,255,255,0.5)" }}>Primero en el feed por 1 dia</p></div>
                 <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#60A5FA" }}>USD 1</p>
               </div>
             </button>
             <button onClick={() => setDestacar("7d")} style={card(destacar === "7d")}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                  <p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#fff" }}>Destacar 7 dias</p>
-                  <p style={{ margin: "4px 0 0", fontSize: 13, color: "rgba(255,255,255,0.5)" }}>Prioridad toda la semana · Ahorro 30%</p>
-                </div>
+                <div><p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#fff" }}>Destacar 7 dias</p><p style={{ margin: "4px 0 0", fontSize: 13, color: "rgba(255,255,255,0.5)" }}>Prioridad toda la semana</p></div>
                 <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#60A5FA" }}>USD 5</p>
               </div>
             </button>
@@ -444,28 +347,18 @@ const handleVideo = (e: React.ChangeEvent<HTMLInputElement>, desdeGaleria = fals
                 ["Precio", `${moneda} ${parseInt(precio).toLocaleString()}`],
                 ["Ubicacion", `${barrio}, ${ciudad}`],
                 ["Destacar", destacar === "sin" ? "No" : destacar === "24h" ? "24 horas" : "7 dias"],
-                ["ARRYSE GPS", gpsOk ? "Verificado" : "No verificado"],
+                ["ARRYSE GPS", gpsOk && !videoDesdeGaleria ? "Verificado" : "No verificado"],
               ].map(([label, value], i, arr) => (
                 <div key={label} style={{ display: "flex", justifyContent: "space-between", marginBottom: i < arr.length - 1 ? 10 : 0 }}>
                   <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>{label}</span>
-                  <span style={{ color: label === "ARRYSE GPS" ? (gpsOk ? "#22C55E" : "#EF4444") : "#fff", fontSize: 13, fontWeight: 600 }}>{value}</span>
+                  <span style={{ color: label === "ARRYSE GPS" ? (gpsOk && !videoDesdeGaleria ? "#22C55E" : "#EF4444") : "#fff", fontSize: 13, fontWeight: 600 }}>{value}</span>
                 </div>
               ))}
             </div>
             {error && <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 10, padding: "10px 14px", marginBottom: 16 }}><p style={{ color: "#EF4444", fontSize: 13, margin: 0 }}>{error}</p></div>}
-            {modoIA && !videoProcessed ? (
-              <div style={{ background: "rgba(168,85,247,0.1)", border: "1px solid rgba(168,85,247,0.3)", borderRadius: 14, padding: 16, marginBottom: 16 }}>
-                <p style={{ margin: "0 0 4px", fontWeight: 800, color: "#A855F7", fontSize: 15 }}>✨ Video procesado con IA</p>
-                <p style={{ margin: "0 0 12px", color: "rgba(255,255,255,0.5)", fontSize: 13 }}>Se cobrara $ 7.000 al publicar</p>
-                <button onClick={handlePublicar} disabled={loading} style={{ ...btn, background: "linear-gradient(135deg, #A855F7, #7C3AED)", opacity: loading ? 0.6 : 1 }}>
-                  {loading ? "Publicando..." : "Pagar $ 7.000 y publicar"}
-                </button>
-              </div>
-            ) : (
-              <button onClick={handlePublicar} disabled={loading} style={{ ...btn, opacity: loading ? 0.6 : 1 }}>
+            <button onClick={handlePublicar} disabled={loading} style={{ ...btn, opacity: loading ? 0.6 : 1 }}>
               {loading ? "Publicando..." : "Publicar ahora"}
-                </button>
-            )}
+            </button>
             <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 12, textAlign: "center", marginTop: 12 }}>Al publicar aceptas los Terminos y Condiciones de Vivienda Ya</p>
           </div>
         )}
@@ -479,12 +372,3 @@ const handleVideo = (e: React.ChangeEvent<HTMLInputElement>, desdeGaleria = fals
     </div>
   )
 }
-
-
-
-
-
-
-
-
-
