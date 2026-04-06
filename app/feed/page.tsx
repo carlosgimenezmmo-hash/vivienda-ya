@@ -254,12 +254,12 @@ export default function ViviendaYaFull() {
                       GPS
                     </span>
                   )}
-                </div>
-
-                <h3 style={{ margin: '0 0 5px 0', fontSize: 22, fontWeight: 800, lineHeight: 1.2, letterSpacing: -0.3 }}>{p.title}</h3>
-                <p style={{ margin: '0 0 6px 0', fontSize: 13, color: 'rgba(255,255,255,0.8)' }}>{[p.neighborhood, p.city].filter(Boolean).join(", ") || p.location || "Sin ubicacion"}</p>
-                <p style={{ margin: '0 0 6px 0', fontSize: 28, fontWeight: 800, letterSpacing: -0.5 }}>USD {Number(p.price)?.toLocaleString() || "Consultar"}</p>
-                <p style={{ margin: 0, fontSize: 13, color: '#ccc' }}>{[p.rooms ? `${p.rooms} amb.` : null, p.surface ? `${p.surface} m2` : null, p.bedrooms ? `${p.bedrooms} dorm.` : null].filter(Boolean).join(" | ")}</p>
+                  {!p.verified && (
+                    <span style={{ background: "rgba(245,158,11,0.8)", color: "#fff", padding: "4px 12px", borderRadius: 6, fontSize: 12, fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                      Sin verificar
+                    </span>
+                  )}
 
                 <p onClick={() => setShowDetails(showDetails === p.id ? null : p.id)} style={{ margin: '8px 0 0 0', fontSize: 13, color: '#22C55E', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
