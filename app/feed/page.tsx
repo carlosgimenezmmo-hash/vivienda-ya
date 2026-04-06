@@ -260,7 +260,7 @@ export default function ViviendaYaFull() {
                       Sin verificar
                     </span>
                   )}
-
+                </div>
                 <p onClick={() => setShowDetails(showDetails === p.id ? null : p.id)} style={{ margin: '8px 0 0 0', fontSize: 13, color: '#22C55E', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
                   Ver detalles
