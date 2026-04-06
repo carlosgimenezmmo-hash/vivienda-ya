@@ -43,10 +43,10 @@ export default function PlanesPage() {
     if (planId === "gratis") { router.push("/publicar"); return }
     const planInfo: Record<string, { titulo: string; precio: number }> = {
       starter: { titulo: "Plan STARTER - ViviendaYa", precio: 14000 },
-pro: { titulo: "Plan PRO - ViviendaYa", precio: 35000 },
-elite: { titulo: "Plan ELITE - ViviendaYa", precio: 56000 },
+      pro: { titulo: "Plan PRO - ViviendaYa", precio: 35000 },
+      elite: { titulo: "Plan ELITE - ViviendaYa", precio: 56000 },
+    }
     const plan = planInfo[planId]
-    if (!plan) return
     setPlanSeleccionado(planId)
     await pagarMP(plan.titulo, plan.precio, planId)
   }
