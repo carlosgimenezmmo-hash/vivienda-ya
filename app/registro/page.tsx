@@ -101,11 +101,29 @@ export default function RegistroPage() {
     }
   }
 
-  const handlePaso3 = () => {
-    setError("")
-    if (!dniFront || !dniBack) return setError("Necesitamos foto del frente y dorso de tu DNI")
+ const handlePaso3 = async () => {
+  setError("")
+  if (!dniFront || !dniBack) return setError("Necesitamos foto del frente y dorso de tu DNI")
+  setScanning(true)
+  try {
+    const res = await fetch("/api/verificar-dni", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ dniFront, dniBack, userId: null }),
+    })
+    const data = await res.json()
+    if (!data.result?.valido) {
+      setError(data.result?.motivo || "DNI no valido. Por favor saca una foto mas clara.")
+      setScanning(false)
+      return
+    }
     setStep(4)
+  } catch {
+    setError("Error al verificar el DNI. Intenta de nuevo.")
+  } finally {
+    setScanning(false)
   }
+}
 
   const handleRegistro = async () => {
     if (!aceptaTyC) return setError("Debes aceptar los Terminos y Condiciones")
