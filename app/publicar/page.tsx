@@ -63,13 +63,13 @@ const handleVideo = (e: React.ChangeEvent<HTMLInputElement>, desdeGaleria = fals
     setVideo(file)
     setVideoPreview(url)
   }
-}
-  const file = e.target.files?.[0]
-  console.log("handleVideo ejecutado. Archivo:", file?.name)
-  if (!file) return
-  setVideo(file)
-  setVideoPreview(URL.createObjectURL(file))
-   }
+
+
+
+
+
+
+
   const procesarConIA = async () => {
     if (!video) return
     setProcesando(true)
