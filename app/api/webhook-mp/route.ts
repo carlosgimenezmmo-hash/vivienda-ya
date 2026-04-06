@@ -10,16 +10,18 @@ const PLANES_VENCIMIENTO: Record<string, number> = {
   starter: 30,
   pro: 30,
   elite: 30,
-  servicio: 0,
+}
+
+const SERVICIOS_VIDEOS: Record<string, number> = {
+  video_1: 1,
+  video_5: 5,
+  video_10: 10,
 }
 
 export async function POST(req: NextRequest) {
   try {
-    console.log("WEBHOOK RECIBIDO:", new Date().toISOString())
     const body = await req.json()
-    console.log("BODY:", JSON.stringify(body))
     const { type, data } = body
-
     if (type !== "payment") return NextResponse.json({ ok: true })
 
     const paymentId = data?.id
@@ -29,31 +31,62 @@ export async function POST(req: NextRequest) {
       headers: { Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}` },
     })
     const payment = await response.json()
-    console.log("PAYMENT STATUS:", payment.status)
-    console.log("PAYMENT METADATA:", JSON.stringify(payment.metadata))
 
     if (payment.status !== "approved") return NextResponse.json({ ok: true })
 
-    const planId = payment.metadata?.planId || "servicio"
+    const planId = payment.metadata?.planId
     const userId = payment.metadata?.userId
 
-    if (!userId || planId === "servicio") return NextResponse.json({ ok: true })
+    if (!userId || !planId) return NextResponse.json({ ok: true })
 
-    const dias = PLANES_VENCIMIENTO[planId] || 30
-    const fechaVencimiento = new Date()
-    fechaVencimiento.setDate(fechaVencimiento.getDate() + dias)
+    // Es un plan de suscripcion
+    if (PLANES_VENCIMIENTO[planId]) {
+      const dias = PLANES_VENCIMIENTO[planId]
+      const fechaVencimiento = new Date()
+      fechaVencimiento.setDate(fechaVencimiento.getDate() + dias)
+      await supabase.from("subscriptions").upsert({
+        user_id: userId,
+        plan: planId,
+        estado: "activo",
+        mp_payment_id: String(paymentId),
+        fecha_inicio: new Date().toISOString(),
+        fecha_vencimiento: fechaVencimiento.toISOString(),
+        precio_usd: payment.transaction_amount,
+      }, { onConflict: "user_id" })
+      return NextResponse.json({ ok: true })
+    }
 
-    await supabase.from("subscriptions").upsert({
+    // Es un servicio de videos adicionales
+    if (SERVICIOS_VIDEOS[planId]) {
+      const videosExtra = SERVICIOS_VIDEOS[planId]
+      const { data: userData } = await supabase
+        .from("users")
+        .select("videos_extra")
+        .eq("id", userId)
+        .single()
+      const actual = userData?.videos_extra || 0
+      await supabase.from("users").update({
+        videos_extra: actual + videosExtra
+      }).eq("id", userId)
+      await supabase.from("pagos_servicios").insert({
+        user_id: userId,
+        servicio: planId,
+        mp_payment_id: String(paymentId),
+        precio: payment.transaction_amount,
+        fecha: new Date().toISOString(),
+      })
+      return NextResponse.json({ ok: true })
+    }
+
+    // Otros servicios (destacar, live, etc)
+    await supabase.from("pagos_servicios").insert({
       user_id: userId,
-      plan: planId,
-      estado: "activo",
+      servicio: planId,
       mp_payment_id: String(paymentId),
-      fecha_inicio: new Date().toISOString(),
-      fecha_vencimiento: fechaVencimiento.toISOString(),
-      precio_usd: payment.transaction_amount,
-    }, { onConflict: "user_id" })
+      precio: payment.transaction_amount,
+      fecha: new Date().toISOString(),
+    })
 
-    console.log("SUBSCRIPTION GUARDADA:", userId, planId)
     return NextResponse.json({ ok: true })
   } catch (err: any) {
     console.error("Webhook error:", err)

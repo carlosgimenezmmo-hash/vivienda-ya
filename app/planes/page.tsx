@@ -13,17 +13,16 @@ const planes = [
 ]
 
 const servicios = [
-  { nombre: "Video adicional", precio: 1400, desc: "1 video extra en el mes" },
-  { nombre: "Pack 5 videos", precio: 5600, desc: "5 videos adicionales (20% off)" },
-  { nombre: "Pack 10 videos", precio: 9800, desc: "10 videos adicionales (30% off)" },
-  { nombre: "Destacar 24 horas", precio: 1400, desc: "Aparecer primero en el feed" },
-  { nombre: "Destacar 7 dias", precio: 7000, desc: "Prioridad en el feed (30% off)" },
-  { nombre: "Live commerce", precio: 2800, desc: "Transmision en vivo 30 minutos" },
-  { nombre: "Descripcion con IA", precio: 1400, desc: "Gemini genera tu descripcion" },
-  { nombre: "Tasacion express", precio: 7000, desc: "Estimacion de precio con IA" },
-  { nombre: "Informe de mercado", precio: 2800, desc: "Reporte de precios por zona" },
+  { id: "video_1", nombre: "Video adicional", precio: 1400, desc: "1 video extra en el mes", videos: 1 },
+  { id: "video_5", nombre: "Pack 5 videos", precio: 5600, desc: "5 videos adicionales (20% off)", videos: 5 },
+  { id: "video_10", nombre: "Pack 10 videos", precio: 9800, desc: "10 videos adicionales (30% off)", videos: 10 },
+  { id: "destacar_1d", nombre: "Destacar 24 horas", precio: 1400, desc: "Aparecer primero en el feed", videos: 0 },
+  { id: "destacar_7d", nombre: "Destacar 7 dias", precio: 7000, desc: "Prioridad en el feed (30% off)", videos: 0 },
+  { id: "live", nombre: "Live commerce", precio: 2800, desc: "Transmision en vivo 30 minutos", videos: 0 },
+  { id: "desc_ia", nombre: "Descripcion con IA", precio: 1400, desc: "Gemini genera tu descripcion", videos: 0 },
+  { id: "tasacion", nombre: "Tasacion express", precio: 7000, desc: "Estimacion de precio con IA", videos: 0 },
+  { id: "informe", nombre: "Informe de mercado", precio: 2800, desc: "Reporte de precios por zona", videos: 0 },
 ]
-
 const pagarMP = async (titulo: string, precio: number, planId: string) => {
   const res = await fetch("/api/pago", {
     method: "POST",
@@ -111,7 +110,7 @@ export default function PlanesPage() {
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <span style={{ fontSize: 16, fontWeight: 800 }}>$ {s.precio.toLocaleString("es-AR")}</span>
-                <button onClick={() => pagarMP(s.nombre, s.precio, "servicio")} style={{ background: "#2563EB", border: "none", borderRadius: 10, padding: "8px 14px", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
+                <button onClick={() => pagarMP(s.nombre, s.precio, s.id )} style={{ background: "#2563EB", border: "none", borderRadius: 10, padding: "8px 14px", color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
                   Comprar
                 </button>
               </div>
