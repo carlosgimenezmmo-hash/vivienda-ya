@@ -18,6 +18,7 @@ import { useAuth } from "@/lib/auth-context"
   const [gpsLng, setGpsLng] = useState<number | null>(null)
   const [gpsOk, setGpsOk] = useState(false)
   const videoRef = useRef<HTMLInputElement>(null)
+  const galeriaRef = useRef<HTMLInputElement>(null)
   const [operacion, setOperacion] = useState("venta")
   const [tipoPropiedad, setTipoPropiedad] = useState("")
   const [precio, setPrecio] = useState("")
@@ -34,7 +35,10 @@ import { useAuth } from "@/lib/auth-context"
   const [procesando, setProcesando] = useState(false)
   const [subtitulos, setSubtitulos] = useState("")
   const [descripcionIA, setDescripcionIA] = useState("")
-  const [videoProcessed, setVideoProcessed] = useState(false)
+ const [videoProcessed, setVideoProcessed] = useState(false)
+const [videoDesdeGaleria, setVideoDesdeGaleria] = useState(false)
+const [videoDuracion, setVideoDuracion] = useState(0)
+const galeriaRef = useRef<HTMLInputElement>(null)
  
   useEffect(() => {
     if (navigator.geolocation) {
@@ -45,7 +49,21 @@ import { useAuth } from "@/lib/auth-context"
     }
   }, [])
 
- const handleVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
+const handleVideo = (e: React.ChangeEvent<HTMLInputElement>, desdeGaleria = false) => {
+  const file = e.target.files?.[0]
+  if (!file) return
+  const url = URL.createObjectURL(file)
+  const tempVideo = document.createElement("video")
+  tempVideo.preload = "metadata"
+  tempVideo.src = url
+  tempVideo.onloadedmetadata = () => {
+    const duracion = tempVideo.duration
+    setVideoDuracion(duracion)
+    setVideoDesdeGaleria(desdeGaleria)
+    setVideo(file)
+    setVideoPreview(url)
+  }
+}
   const file = e.target.files?.[0]
   console.log("handleVideo ejecutado. Archivo:", file?.name)
   if (!file) return
@@ -126,7 +144,7 @@ import { useAuth } from "@/lib/auth-context"
         description: descripcion,
         whatsapp_number: whatsapp,
         video_url: videoUrl,
-        verified: gpsOk,
+       verified: gpsOk && !videoDesdeGaleria,
         lat: gpsLat,
         lng: gpsLng,
         highlighted: destacar !== "sin",
@@ -288,27 +306,42 @@ import { useAuth } from "@/lib/auth-context"
       </div>
     </div>
 
-    <input ref={videoRef} type="file" accept="video/*" capture="environment" onChange={handleVideo} style={{ display: "none" }} />
+    <input ref={videoRef} type="file" accept="video/*" capture="environment" onChange={(e) => handleVideo(e, false)} style={{ display: "none" }} />
+<input ref={galeriaRef} type="file" accept="video/*" onChange={(e) => handleVideo(e, true)} style={{ display: "none" }} />
 
     {!videoPreview ? (
-      <div onClick={() => videoRef.current?.click()} style={{ height: 260, borderRadius: 16, border: "2px dashed rgba(37,99,235,0.4)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", background: "rgba(37,99,235,0.05)" }}>
-        <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="rgba(37,99,235,0.6)" strokeWidth="1.5"><path d="M15 10l4.553-2.069A1 1 0 0 1 21 8.87v6.26a1 1 0 0 1-1.447.9L15 14M3 8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8z"/></svg>
-        <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 15, marginTop: 12 }}>Toca para grabar</p>
+  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+    <div onClick={() => videoRef.current?.click()} style={{ height: 200, borderRadius: 16, border: "2px dashed rgba(37,99,235,0.4)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", background: "rgba(37,99,235,0.05)" }}>
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="rgba(37,99,235,0.6)" strokeWidth="1.5"><path d="M15 10l4.553-2.069A1 1 0 0 1 21 8.87v6.26a1 1 0 0 1-1.447.9L15 14M3 8a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8z"/></svg>
+      <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 15, marginTop: 10, fontWeight: 600 }}>Grabar con camara</p>
+      <p style={{ color: "rgba(255,255,255,0.3)", fontSize: 12, marginTop: 4 }}>Video verificado con GPS</p>
+    </div>
+    <div onClick={() => galeriaRef.current?.click()} style={{ height: 120, borderRadius: 16, border: "2px dashed rgba(255,255,255,0.15)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", cursor: "pointer", background: "rgba(255,255,255,0.03)" }}>
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, marginTop: 8, fontWeight: 600 }}>Subir desde galeria</p>
+      <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 12, marginTop: 2 }}>Se mostrara como no verificado</p>
+    </div>
+  </div>
+) : (
+  <div>
+    {videoDesdeGaleria && (
+      <div style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 10, padding: "10px 14px", marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <p style={{ margin: 0, fontSize: 13, color: "#F59E0B", fontWeight: 600 }}>Este video se publicara como No verificado</p>
       </div>
+    )}
+    {videoDuracion > 60 && (
+      <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 10, padding: "10px 14px", marginBottom: 12 }}>
+        <p style={{ margin: "0 0 4px", fontSize: 13, color: "#EF4444", fontWeight: 700 }}>Video demasiado largo</p>
+        <p style={{ margin: 0, fontSize: 12, color: "rgba(239,68,68,0.8)" }}>Tu plan incluye hasta 60 segundos. Este video tiene {Math.round(videoDuracion)} seg. Para videos mas largos selecciona una duracion en el paso anterior.</p>
+      </div>
+    )}
+    <video src={videoPreview} style={{ width: "100%", borderRadius: 16, maxHeight: 300, objectFit: "cover", marginBottom: 12 }} controls />
+    {videoDuracion <= 60 || planElegido === "v120" || planElegido === "v180" || planElegido === "v300" ? (
+      <button onClick={() => setStep(3)} style={btn}>Usar este video</button>
     ) : (
-      <div>
-        <video src={videoPreview} style={{ width: "100%", borderRadius: 16, maxHeight: 300, objectFit: "cover", marginBottom: 12 }} controls />
-        <button onClick={() => setStep(3)} style={btn}>Usar este video</button>
-
-
-
-
-
-
-
-
-
-
+      <button onClick={() => setStep(1)} style={{ ...btn, background: "rgba(245,158,11,0.8)" }}>Elegir plan con mas duracion</button>
+    )}
 
       </div>
     )}
