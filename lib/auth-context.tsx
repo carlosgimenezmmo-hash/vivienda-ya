@@ -2,13 +2,13 @@
 
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react"
 import type { User, Transaction } from "./types"
-
 import { addRevenue } from "./revenue"
 import { supabase } from "./supabaseClient"
 
 interface AuthContextType {
   user: User | null
   isLoggedIn: boolean
+  plan: string
   transactions: Transaction[]
   login: () => void
   logout: () => void
@@ -25,34 +25,46 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
-   const [transactions, setTransactions] = useState<Transaction[]>([])
-    const [likedProperties, setLikedProperties] = useState<Set<string>>(new Set())
+  const [plan, setPlan] = useState<string>("gratis")
+  const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [likedProperties, setLikedProperties] = useState<Set<string>>(new Set())
   const [savedProperties, setSavedProperties] = useState<Set<string>>(new Set())
 
   const isLoggedIn = user !== null && user.isLoggedIn
 
-const buildUser = async (supabaseUser: any): Promise<User> => {
-  const meta = supabaseUser.user_metadata
-  const { data: userData } = await supabase
-    .from('users')
-    .select('avatar_url, credits, full_name, phone')
-    .eq('id', supabaseUser.id)
-    .single()
-  return {
-    id: supabaseUser.id,
-    name: userData?.full_name || `${meta.nombre || ''} ${meta.apellido || ''}`.trim() || supabaseUser.email || 'Usuario',
-    email: supabaseUser.email || '',
-    isLoggedIn: true,
-    avatar_url: userData?.avatar_url || meta.avatar_url || null,
-    credits: userData?.credits ?? 0,
-    phone: userData?.phone || meta.telefono || '',
-    level: 'basico',
-    verified: false,
+  const buildUser = async (supabaseUser: any): Promise<User> => {
+    const meta = supabaseUser.user_metadata
+    const { data: userData } = await supabase
+      .from('users')
+      .select('avatar_url, credits, full_name, phone')
+      .eq('id', supabaseUser.id)
+      .single()
+    const { data: subData } = await supabase
+      .from("subscriptions")
+      .select("plan, estado, fecha_vencimiento")
+      .eq("user_id", supabaseUser.id)
+      .eq("estado", "activo")
+      .single()
+    if (subData && new Date(subData.fecha_vencimiento) > new Date()) {
+      setPlan(subData.plan)
+    } else {
+      setPlan("gratis")
+    }
+    return {
+      id: supabaseUser.id,
+      name: userData?.full_name || `${meta.nombre || ''} ${meta.apellido || ''}`.trim() || supabaseUser.email || 'Usuario',
+      email: supabaseUser.email || '',
+      isLoggedIn: true,
+      avatar_url: userData?.avatar_url || meta.avatar_url || null,
+      credits: userData?.credits ?? 0,
+      phone: userData?.phone || meta.telefono || '',
+      level: 'basico',
+      verified: false,
+    }
   }
-}
 
   useEffect(() => {
- supabase.auth.getSession().then(async ({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user) setUser(await buildUser(session.user))
     })
 
@@ -61,6 +73,7 @@ const buildUser = async (supabaseUser: any): Promise<User> => {
         buildUser(session.user).then(setUser)
       } else {
         setUser(null)
+        setPlan("gratis")
       }
     })
 
@@ -72,14 +85,14 @@ const buildUser = async (supabaseUser: any): Promise<User> => {
   const logout = useCallback(async () => {
     await supabase.auth.signOut()
     setUser(null)
+    setPlan("gratis")
   }, [])
 
   const toggleAuth = useCallback(async () => {
     if (isLoggedIn) {
       await supabase.auth.signOut()
       setUser(null)
-    } else {
-      setUser(null)
+      setPlan("gratis")
     }
   }, [isLoggedIn])
 
@@ -141,7 +154,7 @@ const buildUser = async (supabaseUser: any): Promise<User> => {
 
   return (
     <AuthContext.Provider value={{
-      user, isLoggedIn, transactions,
+      user, isLoggedIn, plan, transactions,
       login, logout, toggleAuth,
       addCredits, spendCredits,
       likedProperties, savedProperties,
