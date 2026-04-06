@@ -17,17 +17,17 @@ export async function POST(req: NextRequest) {
         "Authorization": `Bearer ${process.env.MP_ACCESS_TOKEN}`,
       },
       body: JSON.stringify({
-        items: [
-          {
-            title: titulo,
-            quantity: 1,
-            unit_price: precio,
-            currency_id: "ARS",
-            description: titulo,
-            category_id: "services",
-            id: planId,
-          },
-        ],
+       items: [
+  {
+    id: planId,
+    title: titulo,
+    description: titulo,
+    category_id: "services",
+    quantity: 1,
+    unit_price: precio,
+    currency_id: "ARS",
+  },
+],
         payment_methods: {
           excluded_payment_types: [],
           excluded_payment_methods: [],
