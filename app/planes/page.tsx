@@ -42,10 +42,9 @@ export default function PlanesPage() {
     if (!isLoggedIn) { router.push("/registro"); return }
     if (planId === "gratis") { router.push("/publicar"); return }
     const planInfo: Record<string, { titulo: string; precio: number }> = {
-      starter: { titulo: "Plan STARTER - ViviendaYa", precio: 10 },
-      pro: { titulo: "Plan PRO - ViviendaYa", precio: 25 },
-      elite: { titulo: "Plan ELITE - ViviendaYa", precio: 40 },
-    }
+      starter: { titulo: "Plan STARTER - ViviendaYa", precio: 14000 },
+pro: { titulo: "Plan PRO - ViviendaYa", precio: 35000 },
+elite: { titulo: "Plan ELITE - ViviendaYa", precio: 56000 },
     const plan = planInfo[planId]
     if (!plan) return
     setPlanSeleccionado(planId)
