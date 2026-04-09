@@ -80,14 +80,14 @@ export default function ViviendaYaFull() {
           } else {
             video.pause();
           }
+        });
+      },
+      { threshold: 0.7 }
+    );
     videoRefs.current.forEach((v) => { if (v) observer.observe(v); });
     return () => observer.disconnect();
   }, [properties]);
 
-  const fetchComments = async (propertyId: number) => {
-    const { data } = await supabase.from("comments").select("*").eq("property_id", propertyId).order("created_at", { ascending: true });
-    if (data) setComments(prev => ({ ...prev, [propertyId]: data }));
-  };
 
   const sendComment = async (propertyId: number) => {
     if (!commentText.trim()) return;
