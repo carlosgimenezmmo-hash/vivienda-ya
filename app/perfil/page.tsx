@@ -35,13 +35,14 @@ export default function PerfilPage() {
     : "?"
 
   const menuItems = [
-    { emoji: "🏠", label: "Mis Publicaciones", sub: "0 propiedades activas", href: "/mis-publicaciones" },
+    { emoji: "📊", label: "Mi Dashboard", sub: "Estadisticas y analiticas", href: "/dashboard" },
+    { emoji: "🏠", label: "Mis Propiedades", sub: "Gestioná tus publicaciones", href: "/dashboard" },
     { emoji: "🔖", label: "Guardados", sub: "Propiedades que te gustaron", href: "/guardados" },
-    { emoji: "🔄", label: "Mis Permutas", sub: "Intercambios activos", href: "#" },
-    { emoji: "💬", label: "Mensajes", sub: "Conversaciones con propietarios", href: "#" },
     { emoji: "📺", label: "Mi Canal", sub: "Gestioná tu canal", href: "/mi-canal" },
+    { emoji: "💎", label: "Mis Planes", sub: "Ver y cambiar tu plan actual", href: "/planes" },
     { emoji: "⚙️", label: "Configuracion", sub: "Cuenta y privacidad", href: "/configuracion" },
   ]
+
   return (
     <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", overflowY: "scroll" }}>
 
@@ -54,7 +55,7 @@ export default function PerfilPage() {
       </div>
 
       {/* AVATAR + DATOS */}
-      <div style={{ padding: "0 20px 20px", display: "flex", alignItems: "center", gap: 16 }}>
+      <div style={{ padding: "0 20px 24px", display: "flex", alignItems: "center", gap: 16 }}>
         <div style={{ position: "relative", flexShrink: 0 }}>
           <div style={{ width: 72, height: 72, borderRadius: "50%", background: user.avatar_url ? "transparent" : "linear-gradient(135deg, #2563EB, #1d4ed8)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 26, fontWeight: 800, color: "#fff", border: "3px solid rgba(37,99,235,0.4)", overflow: "hidden" }}>
             {user.avatar_url ? <img src={user.avatar_url} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : initials}
@@ -88,41 +89,12 @@ export default function PerfilPage() {
         </div>
       </div>
 
-      {/* ESTADISTICAS */}
-      <div style={{ padding: "0 20px 20px", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10 }}>
-        {[
-          { label: "Publicaciones", value: "0" },
-          { label: "Guardados", value: "0" },
-          { label: "Creditos", value: String(user.credits || 0) },
-        ].map((stat) => (
-          <div key={stat.label} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: "14px 10px", textAlign: "center" }}>
-            <p style={{ fontSize: 22, fontWeight: 800, margin: "0 0 4px" }}>{stat.value}</p>
-            <p style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", margin: 0 }}>{stat.label}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* CREDITOS BANNER */}
-      <div style={{ padding: "0 20px 20px" }}>
-        <div style={{ background: "linear-gradient(135deg, rgba(245,158,11,0.15), rgba(245,158,11,0.05))", border: "1px solid rgba(245,158,11,0.25)", borderRadius: 16, padding: "14px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontSize: 22 }}>💰</span>
-            <div>
-              <p style={{ margin: 0, fontWeight: 700, fontSize: 14 }}>Mis Creditos</p>
-              <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.4)" }}>Usa creditos para destacar propiedades</p>
-            </div>
-          </div>
-          <div style={{ textAlign: "right" }}>
-            <p style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "#F59E0B" }}>{user.credits || 0}</p>
-          </div>
-        </div>
-      </div>
-      {/* PLANES BANNER */}
+      {/* BANNER PLANES */}
       <div style={{ padding: "0 20px 20px" }}>
         <div onClick={() => router.push("/planes")} style={{ background: "linear-gradient(135deg, rgba(37,99,235,0.3), rgba(124,58,237,0.3))", border: "1px solid rgba(37,99,235,0.4)", borderRadius: 16, padding: "16px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div>
             <p style={{ margin: 0, fontWeight: 800, fontSize: 15, color: "#fff" }}>Mejora tu plan</p>
-            <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(255,255,255,0.6)" }}>PRO desde USD 1.50/semana</p>
+            <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(255,255,255,0.6)" }}>Plata desde $11.200/mes</p>
           </div>
           <div style={{ background: "linear-gradient(135deg, #2563EB, #7C3AED)", borderRadius: 20, padding: "8px 16px" }}>
             <span style={{ color: "#fff", fontSize: 13, fontWeight: 700 }}>Ver planes</span>
@@ -131,10 +103,10 @@ export default function PerfilPage() {
       </div>
 
       {/* MENU */}
-      <div style={{ padding: "0 20px" }}>
+      <div style={{ padding: "0 20px 40px" }}>
         <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, overflow: "hidden" }}>
           {menuItems.map((item, i) => (
-            <div key={item.label} onClick={() => item.href !== "#" && router.push(item.href)} style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px", borderBottom: i < menuItems.length - 1 ? "1px solid rgba(255,255,255,0.06)" : "none", cursor: item.href !== "#" ? "pointer" : "default" }}>
+            <div key={item.label} onClick={() => router.push(item.href)} style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px", borderBottom: i < menuItems.length - 1 ? "1px solid rgba(255,255,255,0.06)" : "none", cursor: "pointer" }}>
               <span style={{ fontSize: 22, width: 36, textAlign: "center" }}>{item.emoji}</span>
               <div style={{ flex: 1 }}>
                 <p style={{ margin: 0, fontWeight: 600, fontSize: 15 }}>{item.label}</p>
