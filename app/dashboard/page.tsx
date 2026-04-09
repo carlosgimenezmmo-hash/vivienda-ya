@@ -23,13 +23,25 @@ interface Property {
   video_url: string
 }
 
+const PLAN_NIVEL: Record<string, number> = {
+  gratis: 0,
+  plata: 1,
+  oro: 2,
+  platino: 3,
+  diamante: 4,
+}
+
 export default function DashboardPage() {
-  const { user, isLoggedIn } = useAuth()
+  const { user, isLoggedIn, plan } = useAuth()
   const router = useRouter()
   const [properties, setProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)
-  const [periodo, setPeriodo] = useState<"7d" | "30d" | "todo">("30d")
   const [tab, setTab] = useState<"resumen" | "propiedades" | "zonas">("resumen")
+
+  const nivel = PLAN_NIVEL[plan] ?? 0
+  const puedeVerContactos = nivel >= 1
+  const puedeVerPropiedades = nivel >= 1
+  const puedeVerZonas = nivel >= 2
 
   useEffect(() => {
     if (!isLoggedIn) { router.push("/registro"); return }
@@ -42,13 +54,11 @@ export default function DashboardPage() {
       const { data: sessionData } = await supabase.auth.getSession()
       const uid = sessionData?.session?.user?.id
       if (!uid) return
-
       const { data } = await supabase
         .from("properties")
         .select("*")
         .eq("user_id", uid)
         .order("created_at", { ascending: false })
-
       setProperties(data || [])
     } catch (err) {
       console.error(err)
@@ -75,6 +85,14 @@ export default function DashboardPage() {
     return acc
   }, {})
 
+  const planColor: Record<string, string> = {
+    gratis: "#888",
+    plata: "#94A3B8",
+    oro: "#F59E0B",
+    platino: "#2563EB",
+    diamante: "#A855F7",
+  }
+
   const s: Record<string, React.CSSProperties> = {
     page: {
       minHeight: "100dvh",
@@ -82,17 +100,6 @@ export default function DashboardPage() {
       color: "#fff",
       fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
       paddingBottom: 100,
-    },
-    header: {
-      padding: "52px 24px 24px",
-      maxWidth: 1100,
-      margin: "0 auto",
-      borderBottom: "1px solid rgba(255,255,255,0.06)",
-    },
-    container: {
-      maxWidth: 1100,
-      margin: "0 auto",
-      padding: "24px",
     },
     card: {
       background: "rgba(255,255,255,0.04)",
@@ -108,25 +115,31 @@ export default function DashboardPage() {
       margin: "0 0 6px",
       textTransform: "uppercase" as const,
     },
-    valor: {
-      fontSize: 36,
-      fontWeight: 900,
-      margin: 0,
-      letterSpacing: -1,
+    locked: {
+      background: "rgba(255,255,255,0.02)",
+      border: "1px dashed rgba(255,255,255,0.1)",
+      borderRadius: 16,
+      padding: "32px 20px",
+      textAlign: "center" as const,
     },
-    tab: (active: boolean) => ({
-      padding: "10px 20px",
-      borderRadius: 10,
-      border: "none",
-      background: active ? "rgba(255,255,255,0.12)" : "transparent",
-      color: active ? "#fff" : "rgba(255,255,255,0.4)",
-      fontSize: 14,
-      fontWeight: 600,
-      cursor: "pointer",
-      fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
-      transition: "all 0.2s",
-    }),
   }
+
+  const LockedSection = ({ mensaje, planRequerido }: { mensaje: string; planRequerido: string }) => (
+    <div style={s.locked}>
+      <p style={{ fontSize: 28, margin: "0 0 12px" }}>🔒</p>
+      <p style={{ margin: "0 0 6px", fontWeight: 700, fontSize: 15 }}>{mensaje}</p>
+      <p style={{ margin: "0 0 20px", fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
+        Disponible desde el plan {planRequerido}
+      </p>
+      <button onClick={() => router.push("/planes")} style={{
+        padding: "10px 24px", borderRadius: 12, border: "none",
+        background: "#2563EB", color: "#fff", fontSize: 13, fontWeight: 700,
+        cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+      }}>
+        Ver planes
+      </button>
+    </div>
+  )
 
   if (loading) return (
     <div style={{ ...s.page, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -143,7 +156,7 @@ export default function DashboardPage() {
     <div style={s.page}>
 
       {/* HEADER */}
-      <div style={s.header}>
+      <div style={{ padding: "52px 24px 24px", maxWidth: 1100, margin: "0 auto", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
           <button onClick={() => router.back()} style={{
             background: "rgba(255,255,255,0.08)", border: "none", borderRadius: "50%",
@@ -154,14 +167,25 @@ export default function DashboardPage() {
               <path d="M19 12H5M12 5l-7 7 7 7"/>
             </svg>
           </button>
-          <div>
+          <div style={{ flex: 1 }}>
             <h1 style={{ fontSize: 24, fontWeight: 900, margin: 0 }}>Dashboard</h1>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", margin: "2px 0 0" }}>
               {propActivas} {propActivas === 1 ? "propiedad activa" : "propiedades activas"}
             </p>
           </div>
+
+          {/* BADGE PLAN */}
+          <span style={{
+            background: planColor[plan] || "#888",
+            borderRadius: 20, padding: "6px 14px",
+            fontSize: 12, fontWeight: 800, color: "#fff",
+            textTransform: "capitalize",
+          }}>
+            {plan}
+          </span>
+
           <button onClick={() => router.push("/publicar")} style={{
-            marginLeft: "auto", padding: "10px 18px", borderRadius: 12, border: "none",
+            padding: "10px 18px", borderRadius: 12, border: "none",
             background: "#2563EB", color: "#fff", fontSize: 13, fontWeight: 700,
             cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
           }}>
@@ -172,57 +196,74 @@ export default function DashboardPage() {
         {/* TABS */}
         <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 12, padding: 4 }}>
           {(["resumen", "propiedades", "zonas"] as const).map((t) => (
-            <button key={t} onClick={() => setTab(t)} style={s.tab(tab === t)}>
+            <button key={t} onClick={() => setTab(t)} style={{
+              padding: "10px 20px", borderRadius: 10, border: "none",
+              background: tab === t ? "rgba(255,255,255,0.12)" : "transparent",
+              color: tab === t ? "#fff" : "rgba(255,255,255,0.4)",
+              fontSize: 14, fontWeight: 600, cursor: "pointer",
+              fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+            }}>
               {t === "resumen" ? "Resumen" : t === "propiedades" ? "Mis propiedades" : "Por zona"}
+              {t === "propiedades" && !puedeVerPropiedades && " 🔒"}
+              {t === "zonas" && !puedeVerZonas && " 🔒"}
             </button>
           ))}
         </div>
       </div>
 
-      <div style={s.container}>
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "24px" }}>
 
         {/* TAB RESUMEN */}
         {tab === "resumen" && (
           <div>
-            {/* STATS PRINCIPALES */}
+            {/* STATS */}
             <div style={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-              gap: 12,
-              marginBottom: 24,
+              gap: 12, marginBottom: 24,
             }}>
               {[
-                { label: "Vistas totales", valor: totalVistas, color: "#2563EB", icono: "👁" },
-                { label: "Likes", valor: totalLikes, color: "#EF4444", icono: "❤️" },
-                { label: "Contactos WhatsApp", valor: totalContactos, color: "#25D366", icono: "📞" },
-                { label: "Guardados", valor: totalGuardados, color: "#F59E0B", icono: "🔖" },
+                { label: "Vistas totales", valor: totalVistas, color: "#2563EB", icono: "👁", libre: true },
+                { label: "Likes", valor: totalLikes, color: "#EF4444", icono: "❤️", libre: true },
+                { label: "Contactos WhatsApp", valor: totalContactos, color: "#25D366", icono: "📞", libre: puedeVerContactos },
+                { label: "Guardados", valor: totalGuardados, color: "#F59E0B", icono: "🔖", libre: puedeVerContactos },
               ].map((stat) => (
                 <div key={stat.label} style={{
                   ...s.card,
-                  borderLeft: `3px solid ${stat.color}`,
+                  borderLeft: `3px solid ${stat.libre ? stat.color : "rgba(255,255,255,0.1)"}`,
+                  position: "relative",
+                  overflow: "hidden",
                 }}>
+                  {!stat.libre && (
+                    <div style={{
+                      position: "absolute", inset: 0,
+                      background: "rgba(10,10,10,0.85)",
+                      display: "flex", flexDirection: "column",
+                      alignItems: "center", justifyContent: "center",
+                      borderRadius: 16,
+                    }}>
+                      <span style={{ fontSize: 20 }}>🔒</span>
+                      <p style={{ margin: "6px 0 0", fontSize: 11, color: "rgba(255,255,255,0.5)" }}>Plan Plata</p>
+                    </div>
+                  )}
                   <p style={s.label}>{stat.icono} {stat.label}</p>
-                  <p style={{ ...s.valor, color: stat.color }}>{stat.valor.toLocaleString()}</p>
+                  <p style={{ fontSize: 36, fontWeight: 900, margin: 0, color: stat.color }}>
+                    {stat.libre ? stat.valor.toLocaleString() : "—"}
+                  </p>
                 </div>
               ))}
             </div>
 
             {/* MEJOR PROPIEDAD */}
-            {mejorPropiedad && (
+            {mejorPropiedad && puedeVerContactos && (
               <div style={{ ...s.card, marginBottom: 24 }}>
                 <p style={{ ...s.label, marginBottom: 16 }}>⭐ Propiedad con mas vistas</p>
                 <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
                   {mejorPropiedad.video_url && (
-                    <video
-                      src={mejorPropiedad.video_url}
-                      style={{ width: 80, height: 80, borderRadius: 12, objectFit: "cover", flexShrink: 0 }}
-                      muted
-                    />
+                    <video src={mejorPropiedad.video_url} style={{ width: 80, height: 80, borderRadius: 12, objectFit: "cover", flexShrink: 0 }} muted />
                   )}
                   <div style={{ flex: 1, minWidth: 200 }}>
-                    <p style={{ margin: "0 0 4px", fontWeight: 700, fontSize: 16 }}>
-                      {mejorPropiedad.title || "Sin titulo"}
-                    </p>
+                    <p style={{ margin: "0 0 4px", fontWeight: 700, fontSize: 16 }}>{mejorPropiedad.title || "Sin titulo"}</p>
                     <p style={{ margin: "0 0 12px", fontSize: 13, color: "rgba(255,255,255,0.5)" }}>
                       {mejorPropiedad.neighborhood} {mejorPropiedad.city}
                     </p>
@@ -248,8 +289,8 @@ export default function DashboardPage() {
               <p style={{ ...s.label, color: "#60A5FA" }}>💡 Tips para mejorar tu rendimiento</p>
               {[
                 propActivas < 3 ? "Publica mas propiedades para aumentar tu visibilidad en el feed" : null,
+                !puedeVerContactos ? "Mejora al plan Plata para ver cuantas consultas recibis por WhatsApp" : null,
                 totalVistas < 100 ? "Destaca tus propiedades para aparecer primero en el feed" : null,
-                totalContactos === 0 ? "Agrega tu numero de WhatsApp para recibir consultas" : null,
                 "Compartir tus propiedades en redes sociales multiplica las vistas",
               ].filter(Boolean).slice(0, 3).map((tip, i) => (
                 <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 10 }}>
@@ -263,136 +304,122 @@ export default function DashboardPage() {
 
         {/* TAB PROPIEDADES */}
         {tab === "propiedades" && (
-          <div>
-            {properties.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "60px 0" }}>
-                <p style={{ fontSize: 40, marginBottom: 12 }}>🏠</p>
-                <p style={{ fontSize: 18, fontWeight: 700, margin: "0 0 8px" }}>No tenes propiedades publicadas</p>
-                <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 24px" }}>
-                  Publica tu primera propiedad y empeza a recibir consultas
-                </p>
-                <button onClick={() => router.push("/publicar")} style={{
-                  padding: "14px 28px", borderRadius: 14, border: "none",
-                  background: "#2563EB", color: "#fff", fontSize: 15, fontWeight: 700,
-                  cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
-                }}>
-                  Publicar ahora
-                </button>
-              </div>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {properties.map((p) => (
-                  <div key={p.id} style={{
-                    ...s.card,
-                    display: "flex",
-                    gap: 16,
-                    alignItems: "center",
-                    flexWrap: "wrap",
+          !puedeVerPropiedades ? (
+            <LockedSection mensaje="Gestion detallada de propiedades" planRequerido="Plata" />
+          ) : (
+            <div>
+              {properties.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "60px 0" }}>
+                  <p style={{ fontSize: 40, marginBottom: 12 }}>🏠</p>
+                  <p style={{ fontSize: 18, fontWeight: 700, margin: "0 0 8px" }}>No tenes propiedades publicadas</p>
+                  <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 24px" }}>
+                    Publica tu primera propiedad y empeza a recibir consultas
+                  </p>
+                  <button onClick={() => router.push("/publicar")} style={{
+                    padding: "14px 28px", borderRadius: 14, border: "none",
+                    background: "#2563EB", color: "#fff", fontSize: 15, fontWeight: 700,
+                    cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
                   }}>
-                    {p.video_url && (
-                      <video
-                        src={p.video_url}
-                        style={{ width: 70, height: 70, borderRadius: 10, objectFit: "cover", flexShrink: 0 }}
-                        muted
-                      />
-                    )}
-                    <div style={{ flex: 1, minWidth: 180 }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
-                        <p style={{ margin: 0, fontWeight: 700, fontSize: 15 }}>
-                          {p.title || "Sin titulo"}
-                        </p>
-                        {p.highlighted && (
-                          <span style={{
-                            background: "rgba(245,158,11,0.2)", border: "1px solid rgba(245,158,11,0.4)",
-                            borderRadius: 20, padding: "2px 8px", fontSize: 10, fontWeight: 700, color: "#F59E0B",
-                          }}>DESTACADO</span>
-                        )}
-                        {p.verified && (
-                          <span style={{
-                            background: "rgba(16,185,129,0.2)", border: "1px solid rgba(16,185,129,0.4)",
-                            borderRadius: 20, padding: "2px 8px", fontSize: 10, fontWeight: 700, color: "#10B981",
-                          }}>GPS</span>
-                        )}
-                      </div>
-                      <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
-                        {p.operation_type?.toUpperCase()} · {p.property_type} · USD {Number(p.price).toLocaleString()}
-                      </p>
-                    </div>
-
-                    {/* METRICAS */}
-                    <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
-                      {[
-                        { label: "Vistas", valor: p.views || 0, color: "#2563EB" },
-                        { label: "Likes", valor: p.likes || 0, color: "#EF4444" },
-                        { label: "Guardados", valor: p.saves || 0, color: "#F59E0B" },
-                        { label: "Contactos", valor: p.contacts || 0, color: "#25D366" },
-                      ].map((m) => (
-                        <div key={m.label} style={{ textAlign: "center" }}>
-                          <p style={{ margin: 0, fontSize: 20, fontWeight: 800, color: m.color }}>{m.valor}</p>
-                          <p style={{ margin: 0, fontSize: 10, color: "rgba(255,255,255,0.4)" }}>{m.label}</p>
+                    Publicar ahora
+                  </button>
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  {properties.map((p) => (
+                    <div key={p.id} style={{ ...s.card, display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
+                      {p.video_url && (
+                        <video src={p.video_url} style={{ width: 70, height: 70, borderRadius: 10, objectFit: "cover", flexShrink: 0 }} muted />
+                      )}
+                      <div style={{ flex: 1, minWidth: 180 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
+                          <p style={{ margin: 0, fontWeight: 700, fontSize: 15 }}>{p.title || "Sin titulo"}</p>
+                          {p.highlighted && (
+                            <span style={{ background: "rgba(245,158,11,0.2)", border: "1px solid rgba(245,158,11,0.4)", borderRadius: 20, padding: "2px 8px", fontSize: 10, fontWeight: 700, color: "#F59E0B" }}>DESTACADO</span>
+                          )}
+                          {p.verified && (
+                            <span style={{ background: "rgba(16,185,129,0.2)", border: "1px solid rgba(16,185,129,0.4)", borderRadius: 20, padding: "2px 8px", fontSize: 10, fontWeight: 700, color: "#10B981" }}>GPS</span>
+                          )}
                         </div>
-                      ))}
+                        <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
+                          {p.operation_type?.toUpperCase()} · {p.property_type} · USD {Number(p.price).toLocaleString()}
+                        </p>
+                      </div>
+                      <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+                        {[
+                          { label: "Vistas", valor: p.views || 0, color: "#2563EB" },
+                          { label: "Likes", valor: p.likes || 0, color: "#EF4444" },
+                          { label: "Guardados", valor: p.saves || 0, color: "#F59E0B" },
+                          { label: "Contactos", valor: p.contacts || 0, color: "#25D366" },
+                        ].map((m) => (
+                          <div key={m.label} style={{ textAlign: "center" }}>
+                            <p style={{ margin: 0, fontSize: 20, fontWeight: 800, color: m.color }}>{m.valor}</p>
+                            <p style={{ margin: 0, fontSize: 10, color: "rgba(255,255,255,0.4)" }}>{m.label}</p>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )
         )}
 
         {/* TAB ZONAS */}
         {tab === "zonas" && (
-          <div>
-            {Object.keys(zonas).length === 0 ? (
-              <div style={{ textAlign: "center", padding: "60px 0" }}>
-                <p style={{ fontSize: 18, fontWeight: 700, margin: "0 0 8px" }}>Sin datos de zonas todavia</p>
-                <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14 }}>
-                  Publica propiedades con ciudad para ver las analiticas por zona
-                </p>
-              </div>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                <p style={{ ...s.label, marginBottom: 16 }}>Rendimiento por ciudad</p>
-                {Object.entries(zonas)
-                  .sort((a, b) => b[1].vistas - a[1].vistas)
-                  .map(([zona, data]) => {
-                    const maxVistas = Math.max(...Object.values(zonas).map(z => z.vistas), 1)
-                    const pct = Math.round((data.vistas / maxVistas) * 100)
-                    return (
-                      <div key={zona} style={s.card}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-                          <div>
-                            <p style={{ margin: 0, fontWeight: 700, fontSize: 16 }}>📍 {zona}</p>
-                            <p style={{ margin: "2px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
-                              {data.propiedades} {data.propiedades === 1 ? "propiedad" : "propiedades"}
-                            </p>
+          !puedeVerZonas ? (
+            <LockedSection mensaje="Analiticas por zona y ciudad" planRequerido="Oro" />
+          ) : (
+            <div>
+              {Object.keys(zonas).length === 0 ? (
+                <div style={{ textAlign: "center", padding: "60px 0" }}>
+                  <p style={{ fontSize: 18, fontWeight: 700, margin: "0 0 8px" }}>Sin datos de zonas todavia</p>
+                  <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14 }}>
+                    Publica propiedades con ciudad para ver las analiticas por zona
+                  </p>
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  <p style={{ ...s.label, marginBottom: 8 }}>Rendimiento por ciudad</p>
+                  {Object.entries(zonas)
+                    .sort((a, b) => b[1].vistas - a[1].vistas)
+                    .map(([zona, data]) => {
+                      const maxVistas = Math.max(...Object.values(zonas).map(z => z.vistas), 1)
+                      const pct = Math.round((data.vistas / maxVistas) * 100)
+                      return (
+                        <div key={zona} style={s.card}>
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                            <div>
+                              <p style={{ margin: 0, fontWeight: 700, fontSize: 16 }}>📍 {zona}</p>
+                              <p style={{ margin: "2px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
+                                {data.propiedades} {data.propiedades === 1 ? "propiedad" : "propiedades"}
+                              </p>
+                            </div>
+                            <div style={{ display: "flex", gap: 20 }}>
+                              <div style={{ textAlign: "center" }}>
+                                <p style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "#2563EB" }}>{data.vistas}</p>
+                                <p style={{ margin: 0, fontSize: 10, color: "rgba(255,255,255,0.4)" }}>vistas</p>
+                              </div>
+                              <div style={{ textAlign: "center" }}>
+                                <p style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "#EF4444" }}>{data.likes}</p>
+                                <p style={{ margin: 0, fontSize: 10, color: "rgba(255,255,255,0.4)" }}>likes</p>
+                              </div>
+                            </div>
                           </div>
-                          <div style={{ display: "flex", gap: 20 }}>
-                            <div style={{ textAlign: "center" }}>
-                              <p style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "#2563EB" }}>{data.vistas}</p>
-                              <p style={{ margin: 0, fontSize: 10, color: "rgba(255,255,255,0.4)" }}>vistas</p>
-                            </div>
-                            <div style={{ textAlign: "center" }}>
-                              <p style={{ margin: 0, fontSize: 22, fontWeight: 800, color: "#EF4444" }}>{data.likes}</p>
-                              <p style={{ margin: 0, fontSize: 10, color: "rgba(255,255,255,0.4)" }}>likes</p>
-                            </div>
+                          <div style={{ height: 6, borderRadius: 3, background: "rgba(255,255,255,0.06)" }}>
+                            <div style={{
+                              height: "100%", borderRadius: 3,
+                              background: "linear-gradient(90deg, #2563EB, #60A5FA)",
+                              width: `${pct}%`,
+                            }} />
                           </div>
                         </div>
-                        {/* BARRA DE PROGRESO */}
-                        <div style={{ height: 6, borderRadius: 3, background: "rgba(255,255,255,0.06)" }}>
-                          <div style={{
-                            height: "100%", borderRadius: 3,
-                            background: "linear-gradient(90deg, #2563EB, #60A5FA)",
-                            width: `${pct}%`,
-                            transition: "width 0.5s ease",
-                          }} />
-                        </div>
-                      </div>
-                    )
-                  })}
-              </div>
-            )}
-          </div>
+                      )
+                    })}
+                </div>
+              )}
+            </div>
+          )
         )}
 
       </div>
