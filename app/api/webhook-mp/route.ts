@@ -7,9 +7,10 @@ const supabase = createClient(
 )
 
 const PLANES_VENCIMIENTO: Record<string, number> = {
-  starter: 30,
-  pro: 30,
-  elite: 30,
+  plata: 30,
+  oro: 30,
+  platino: 30,
+  diamante: 30,
 }
 
 const SERVICIOS_VIDEOS: Record<string, number> = {
