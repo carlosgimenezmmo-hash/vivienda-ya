@@ -15,10 +15,11 @@ const pasos = [
 ]
 
 const planes = [
-  { nombre: "Gratis", precio: "0", periodo: "", color: "#6B7280", features: ["3 videos por mes", "Chat con interesados", "Verificacion ARRYSE gratis"] },
-  { nombre: "Starter", precio: "14000", periodo: "/mes", color: "#22C55E", features: ["Canal propio", "15 videos por mes", "Badge verificado"] },
-  { nombre: "Pro", precio: "35000", periodo: "/mes", color: "#2563EB", features: ["Todo Starter", "50 videos por mes", "5 destacados por mes"] },
-  { nombre: "Elite", precio: "56000", periodo: "/mes", color: "#D97706", features: ["Todo Pro", "100 videos por mes", "Prioridad absoluta"] },
+  { nombre: "Gratis", precio: "0", periodo: "", color: "#6B7280", features: ["3 videos activos", "60 seg por video", "Chat con interesados", "Verificacion ARRYSE gratis"] },
+  { nombre: "Plata", precio: "11200", periodo: "/mes", color: "#94A3B8", features: ["10 videos activos", "Videos hasta 2 minutos", "Canal con logo propio", "Badge Plata verificado"] },
+  { nombre: "Oro", precio: "28000", periodo: "/mes", color: "#F59E0B", features: ["25 videos activos", "Videos hasta 3 minutos", "Dashboard con metricas", "Prioridad en busquedas"] },
+  { nombre: "Platino", precio: "63000", periodo: "/mes", color: "#2563EB", features: ["60 videos activos", "Videos hasta 5 minutos", "Reportes para clientes", "Soporte por WhatsApp"] },
+  { nombre: "Diamante", precio: "112000", periodo: "/mes", color: "#A855F7", features: ["120 videos activos", "Videos hasta 5 minutos", "Analiticas por zona", "API para sincronizar cartera"] },
 ]
 
 export default function LandingPage() {
