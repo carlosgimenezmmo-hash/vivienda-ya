@@ -71,15 +71,15 @@ export default function ViviendaYaFull() {
               const prop = properties[index];
               if (prop) {
                 setActiveProperty({ id: prop.id, title: prop.title, whatsapp_number: prop.whatsapp_number });
+                // Sumar vista
+                supabase.from("properties").update({ views: (prop.views || 0) + 1 }).eq("id", prop.id).then(() => {
+                  setProperties(prev => prev.map(p => p.id === prop.id ? { ...p, views: (p.views || 0) + 1 } : p))
+                })
               }
             }
           } else {
             video.pause();
           }
-        });
-      },
-      { threshold: 0.7 }
-    );
     videoRefs.current.forEach((v) => { if (v) observer.observe(v); });
     return () => observer.disconnect();
   }, [properties]);
