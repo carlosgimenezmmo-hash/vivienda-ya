@@ -300,8 +300,8 @@ export default function ViviendaYaFull() {
                   }, "contactar")} style={{ width: "100%", padding: "16px", borderRadius: 14, border: "none", background: "#25D366", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
                     Contactar por WhatsApp
                   </button>
-
-
+                </div>
+              )}
               {showComments === p.id && (
                 <div style={{ position: 'absolute', bottom: 80, right: 0, width: '80%', maxHeight: '55vh', background: 'rgba(10,10,10,0.95)', borderRadius: '20px 0 0 20px', padding: 18, zIndex: 30, overflowY: 'auto', boxSizing: 'border-box', backdropFilter: 'blur(20px)', display: 'flex', flexDirection: 'column' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14 }}>
