@@ -290,11 +290,17 @@ export default function ViviendaYaFull() {
                       <iframe src={`https://www.openstreetmap.org/export/embed.html?bbox=${p.lng - 0.005},${p.lat - 0.005},${p.lng + 0.005},${p.lat + 0.005}&layer=mapnik&marker=${p.lat},${p.lng}`} style={{ width: '100%', height: 180, border: 'none' }} />
                     </div>
                   )}
-                  <button onClick={() => requireLogin(() => { const clean = p.whatsapp_number?.replace(/\D/g, ''); const msg = 'Hola! Vi tu propiedad en ViviendaYa y me interesa. Podes darme mas info?'; window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`, '_blank'); }, 'contactar')} style={{ width: '100%', padding: '16px', borderRadius: 14, border: 'none', background: '#25D366', color: '#fff', fontSize: 16, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-                    Contactar por WhatsApp
-                  </button>
-                </div>
-              )}
+                 button onClick={() => requireLogin(() => {
+  const clean = p.whatsapp_number?.replace(/\D/g, '');
+  const msg = 'Hola! Vi tu propiedad en ViviendaYa y me interesa. Podes darme mas info?';
+  window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`, '_blank');
+  // Sumar contacto
+  supabase.from("properties").update({ contacts: (p.contacts || 0) + 1 }).eq("id", p.id).then(() => {
+    setProperties(prev => prev.map(prop => prop.id === p.id ? { ...prop, contacts: (prop.contacts || 0) + 1 } : prop))
+  })
+}, 'contactar')} style={{ width: '100%', padding: '16px', borderRadius: 14, border: 'none', background: '#25D366', color: '#fff', fontSize: 16, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+  Contactar por WhatsApp
+</button>
 
               {showComments === p.id && (
                 <div style={{ position: 'absolute', bottom: 80, right: 0, width: '80%', maxHeight: '55vh', background: 'rgba(10,10,10,0.95)', borderRadius: '20px 0 0 20px', padding: 18, zIndex: 30, overflowY: 'auto', boxSizing: 'border-box', backdropFilter: 'blur(20px)', display: 'flex', flexDirection: 'column' }}>
