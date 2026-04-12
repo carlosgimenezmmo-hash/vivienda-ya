@@ -1,20 +1,16 @@
 ﻿"use client"
 
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react"
-import type { User, Transaction } from "./types"
-import { addRevenue } from "./revenue"
+import type { User } from "./types"
 import { supabase } from "./supabaseClient"
 
 interface AuthContextType {
   user: User | null
   isLoggedIn: boolean
   plan: string
-  transactions: Transaction[]
   login: () => void
   logout: () => void
   toggleAuth: () => void
-  addCredits: (amount: number, description: string, priceUSD?: number) => void
-  spendCredits: (amount: number, description: string) => boolean
   likedProperties: Set<string>
   savedProperties: Set<string>
   toggleLike: (propertyId: string) => void
@@ -26,7 +22,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [plan, setPlan] = useState<string>("gratis")
-  const [transactions, setTransactions] = useState<Transaction[]>([])
   const [likedProperties, setLikedProperties] = useState<Set<string>>(new Set())
   const [savedProperties, setSavedProperties] = useState<Set<string>>(new Set())
 
@@ -35,9 +30,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const buildUser = async (supabaseUser: any): Promise<User> => {
     const meta = supabaseUser.user_metadata
     const { data: userData } = await supabase
-      .from('users')
-      .select('avatar_url, credits, full_name, phone')
-      .eq('id', supabaseUser.id)
+      .from("users")
+      .select("avatar_url, full_name, phone, city, province")
+      .eq("id", supabaseUser.id)
       .single()
     const { data: subData } = await supabase
       .from("subscriptions")
@@ -52,13 +47,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     return {
       id: supabaseUser.id,
-      name: userData?.full_name || `${meta.nombre || ''} ${meta.apellido || ''}`.trim() || supabaseUser.email || 'Usuario',
-      email: supabaseUser.email || '',
+      name: userData?.full_name || `${meta.nombre || ""} ${meta.apellido || ""}`.trim() || supabaseUser.email || "Usuario",
+      email: supabaseUser.email || "",
       isLoggedIn: true,
       avatar_url: userData?.avatar_url || meta.avatar_url || null,
-      credits: userData?.credits ?? 0,
-      phone: userData?.phone || meta.telefono || '',
-      level: 'basico',
+      phone: userData?.phone || meta.telefono || "",
+      city: userData?.city || "",
+      province: userData?.province || "",
+      level: "basico",
       verified: false,
     }
   }
@@ -96,46 +92,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [isLoggedIn])
 
-  const addCredits = useCallback((amount: number, description: string, priceUSD?: number) => {
-    if (priceUSD && !description.toLowerCase().includes("recompensa")) {
-      addRevenue(priceUSD)
-    }
-    setUser((prev) => {
-      if (!prev) return prev
-      const newBalance = prev.credits + amount
-      const newTransaction: Transaction = {
-        id: `t${Date.now()}`,
-        type: "recompensa",
-        description,
-        amount,
-        date: new Date().toISOString().split("T")[0],
-        balanceAfter: newBalance,
-      }
-      setTransactions((prevT) => [newTransaction, ...prevT])
-      return { ...prev, credits: newBalance }
-    })
-  }, [])
-
-  const spendCredits = useCallback((amount: number, description: string): boolean => {
-    let success = false
-    setUser((prev) => {
-      if (!prev || prev.credits < amount) return prev
-      success = true
-      const newBalance = prev.credits - amount
-      const newTransaction: Transaction = {
-        id: `t${Date.now()}`,
-        type: "gasto",
-        description,
-        amount: -amount,
-        date: new Date().toISOString().split("T")[0],
-        balanceAfter: newBalance,
-      }
-      setTransactions((prevT) => [newTransaction, ...prevT])
-      return { ...prev, credits: newBalance }
-    })
-    return success
-  }, [])
-
   const toggleLike = useCallback((propertyId: string) => {
     setLikedProperties((prev) => {
       const next = new Set(prev)
@@ -154,9 +110,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider value={{
-      user, isLoggedIn, plan, transactions,
+      user, isLoggedIn, plan,
       login, logout, toggleAuth,
-      addCredits, spendCredits,
       likedProperties, savedProperties,
       toggleLike, toggleSave,
     }}>
