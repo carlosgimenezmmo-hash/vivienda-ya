@@ -41,7 +41,13 @@ const priceRangesAlquiler = [
   { label: "USD 300 - 600/mes", min: 300, max: 600 },
   { label: "USD 600 - 1.000/mes", min: 600, max: 1000 },
   { label: "USD 1.000 - 2.000/mes", min: 1000, max: 2000 },
-  { label: "Mas de USD 2.000/mes", min: 2000, max: 999999 },
+]
+const priceRangesTemporario = [
+  { label: "Hasta ARS 50.000/noche", min: 0, max: 50000 },
+  { label: "ARS 50.000 - 100.000/noche", min: 50000, max: 100000 },
+  { label: "ARS 100.000 - 200.000/noche", min: 100000, max: 200000 },
+  { label: "ARS 200.000 - 500.000/noche", min: 200000, max: 500000 },
+  { label: "Mas de ARS 500.000/noche", min: 500000, max: 999999999 },
 ]
 
 const provinces = ["Buenos Aires", "CABA", "Cordoba", "Santa Fe", "Mendoza", "Tucuman", "Salta", "Misiones", "Entre Rios", "Chubut", "Rio Negro", "Neuquen", "San Juan", "San Luis", "La Rioja", "Catamarca", "Jujuy", "Formosa", "Chaco", "Santiago del Estero", "La Pampa", "Santa Cruz", "Tierra del Fuego", "Corrientes"]
