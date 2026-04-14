@@ -260,9 +260,9 @@ export function SearchWizard() {
         {step === 4 && (
           <div>
             <h2 style={title}>Cual es tu presupuesto?</h2>
-            <p style={subtitle}>{filters.operation === "alquiler" ? "Precio mensual" : "Precio total"}</p>
+            <p style={subtitle}>{filters.operation === "alquiler" ? "Precio mensual" : filters.operation === "temporario" ? "Precio por noche" : "Precio total"}</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {(filters.operation === "alquiler" ? priceRangesAlquiler : priceRangesVenta).map((range) => {
+              {(filters.operation === "alquiler" ? priceRangesAlquiler : filters.operation === "temporario" ? priceRangesTemporario : priceRangesVenta).map((range) => {
                 const active = filters.priceMin === range.min && filters.priceMax === range.max
                 return (
                   <button key={range.label} onClick={() => setFilters({ ...filters, priceMin: range.min, priceMax: range.max })}
