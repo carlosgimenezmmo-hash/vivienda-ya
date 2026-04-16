@@ -123,7 +123,7 @@ export default function ViviendaYaFull() {
 
 
 
-  };
+
 
   const handleShare = (title: string) => {
     if (navigator.share) {
