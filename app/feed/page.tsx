@@ -178,9 +178,9 @@ export default function ViviendaYaFull() {
                 ref={(el) => { if (el) videoRefs.current[i] = el; }}
                 src={p.video_url}
                 autoPlay loop muted playsInline
-                onClick={() => togglePause(i, p.id)}
-                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer' }}
+                style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", objectFit: "cover" }}
               />
+              <div onTouchEnd={(e) => { e.preventDefault(); togglePause(i, p.id); }} onClick={() => togglePause(i, p.id)} style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", zIndex: 10, cursor: "pointer" }} />
 
               {paused[p.id] && (
                 <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: 'rgba(0,0,0,0.45)', borderRadius: '50%', width: 72, height: 72, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 15, pointerEvents: 'none' }}>
