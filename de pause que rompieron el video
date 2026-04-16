@@ -1,0 +1,10 @@
+[33m90523bd[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m fix: tap video con onTouchStart en zona superior
+[33mdda86fa[m fix: restaurar logica togglePause con sonido
+[33mbf5693f[m fix: tap en video usa onTouchEnd para mobile
+[33ma41e6c9[m fix: pausar y reproducir video con tap en feed
+[33m36d46c7[m fix: pausar video con tap en feed
+[33mb8a55f1[m fix: supabase client con keys directas
+[33m1dabbbc[m feat: RLS activado y supabaseClient usa env vars
+[33m4d7e3aa[m feat: perfil muestra plan real y estadisticas
+[33mc1c8d43[m fix: rangos de precio para temporario
+[33m7c659a1[m fix: priceRangesTemporario separado correctamente
