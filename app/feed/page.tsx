@@ -115,14 +115,14 @@ export default function ViviendaYaFull() {
       video.play();
       setPaused(prev => ({ ...prev, [id]: false }));
     } else {
-      if (video.muted) {
-        video.muted = false;
-        videoRefs.current.forEach((v, idx) => { if (idx !== i && v) v.muted = true; });
-      } else {
-        video.pause();
-        setPaused(prev => ({ ...prev, [id]: true }));
-      }
+      video.pause();
+      setPaused(prev => ({ ...prev, [id]: true }));
     }
+  };
+
+
+
+
   };
 
   const handleShare = (title: string) => {
