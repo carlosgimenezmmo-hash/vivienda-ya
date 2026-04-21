@@ -19,8 +19,9 @@ export const metadata: Metadata = {
     ],
     apple: "/apple-icon.png",
   },
-  ,manifest: "/manifest.webmanifest",
-}
+    },
+  manifest: "/manifest.webmanifest",
+  }
 
 export const viewport: Viewport = {
   themeColor: "#000000",
