@@ -1,4 +1,5 @@
 ﻿import type { Metadata, Viewport } from "next"
+import Script from "next/script"
 import { Analytics } from "@vercel/analytics/next"
 import { AuthProvider } from "@/lib/auth-context"
 import { ActivePropertyProvider } from "@/lib/active-property-context"
@@ -20,6 +21,7 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.json",
 }
+
 export const viewport: Viewport = {
   themeColor: "#000000",
   width: "device-width",
@@ -36,19 +38,27 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body style={{ margin: 0, padding: 0, background: '#000', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' }}>
-         <AuthProvider>
-           <ActivePropertyProvider>
-             <ProtectedActionProvider>
-               <div style={{ width: "100%", position: "relative" }}>
-                 <main>{children}</main>
-                 <BottomNav />
-               </div>
-             </ProtectedActionProvider>
-           </ActivePropertyProvider>
-         </AuthProvider>
+        <AuthProvider>
+          <ActivePropertyProvider>
+            <ProtectedActionProvider>
+              <div style={{ width: "100%", position: "relative" }}>
+                <main>{children}</main>
+                <BottomNav />
+              </div>
+            </ProtectedActionProvider>
+          </ActivePropertyProvider>
+        </AuthProvider>
         <Analytics />
+        <Script id="sw-register" strategy="afterInteractive">
+          {`
+            if ('serviceWorker' in navigator) {
+              window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+              });
+            }
+          `}
+        </Script>
       </body>
     </html>
   )
 }
-
