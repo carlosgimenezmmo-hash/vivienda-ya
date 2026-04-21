@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     ],
     apple: "/apple-icon.png",
   },
-  manifest: "/manifest.json",
+  ,manifest: "/manifest.webmanifest",
 }
 
 export const viewport: Viewport = {

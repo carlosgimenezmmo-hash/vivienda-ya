@@ -1,0 +1,29 @@
+{
+  "name": "ViviendaYa",
+  "short_name": "ViviendaYa",
+  "description": "El primer marketplace inmobiliario en video",
+  "start_url": "/feed",
+  "display": "standalone",
+  "background_color": "#22C55E",
+  "theme_color": "#000000",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-icon.png",
+      "type": "image/png",
+      "sizes": "180x180"
+    }
+  ]
+}
