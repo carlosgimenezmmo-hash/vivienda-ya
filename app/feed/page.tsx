@@ -182,11 +182,35 @@ export default function ViviendaYaFull() {
                 style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer' }}
               />
 
-              {paused[p.id] && (
-                <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: 'rgba(0,0,0,0.45)', borderRadius: '50%', width: 72, height: 72, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 15, pointerEvents: 'none' }}>
-                  <svg width="26" height="26" viewBox="0 0 24 24" fill="white"><rect x="5" y="3" width="4" height="18" rx="1.5"/><rect x="15" y="3" width="4" height="18" rx="1.5"/></svg>
-                </div>
-              )}
+              <button
+  onClick={() => togglePause(i, p.id)}
+  style={{
+    position: 'absolute',
+    bottom: 100,
+    right: 16,
+    width: 48,
+    height: 48,
+    borderRadius: '50%',
+    background: 'rgba(0,0,0,0.6)',
+    border: '1px solid rgba(255,255,255,0.2)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 20,
+    cursor: 'pointer'
+  }}
+>
+  {paused[p.id] ? (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+      <path d="M8 5v14l11-7z"/>
+    </svg>
+  ) : (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+      <rect x="6" y="4" width="4" height="16" rx="1.5"/>
+      <rect x="14" y="4" width="4" height="16" rx="1.5"/>
+    </svg>
+  )}
+</button>
 
               <div style={{ position: 'absolute', bottom: 0, width: '100%', height: '75%', background: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.75) 100%)', pointerEvents: 'none', zIndex: 5 }} />
 
