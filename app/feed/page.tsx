@@ -183,7 +183,7 @@ export default function ViviendaYaFull() {
               />
 
               <button
-  onTouchEnd={(e) => { e.preventDefault(); togglePause(i, p.id); }}
+  onClick={() => togglePause(i, p.id)} onTouchEnd={(e) => { e.preventDefault(); togglePause(i, p.id); }} onTouchStart={() => togglePause(i, p.id)}
   style={{
     position: 'absolute',
     top: '50%',
