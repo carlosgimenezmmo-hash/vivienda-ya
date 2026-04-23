@@ -1,11 +1,13 @@
 ﻿{
+  "id": "/",
   "name": "ViviendaYa",
   "short_name": "ViviendaYa",
   "description": "El primer marketplace inmobiliario en video",
-  "start_url": "/feed",
+  "start_url": "/feed?utm_source=pwa",
   "display": "standalone",
   "background_color": "#22C55E",
   "theme_color": "#000000",
+  "categories": ["real-estate", "shopping", "lifestyle"],
   "orientation": "portrait",
   "icons": [
     {
@@ -27,6 +29,29 @@
       "src": "/icon.svg",
       "type": "image/svg+xml",
       "sizes": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/home.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Pantalla de inicio"
+    },
+    {
+      "src": "/screenshots/feed.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Feed de propiedades"
+    },
+    {
+      "src": "/screenshots/detalle.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Detalle de propiedad"
     }
   ]
 }
