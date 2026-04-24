@@ -122,19 +122,29 @@ export default function ViviendaYaFull() {
   };
 
   // ✅ CORREGIDA: Función togglePause simplificada y sin conflicto con muted
-  const togglePause = (i: number, id: number) => {
-    const video = videoRefs.current[i];
-    if (!video) return;
-    
-    if (video.paused) {
-      video.play();
-      setPaused(prev => ({ ...prev, [id]: false }));
-    } else {
-      video.pause();
-      setPaused(prev => ({ ...prev, [id]: true }));
-    }
-  };
-
+ const togglePause = (i: number, id: number) => {
+  console.log("togglePause llamado", { i, id });
+  const video = videoRefs.current[i];
+  console.log("video encontrado:", video);
+  if (!video) {
+    console.log("❌ No se encontró el video");
+    return;
+  }
+  
+  console.log("video.paused:", video.paused);
+  
+  if (video.paused) {
+    console.log("▶️ Reproduciendo...");
+    video.play();
+    setPaused(prev => ({ ...prev, [id]: false }));
+    console.log("paused actualizado a false para id:", id);
+  } else {
+    console.log("⏸️ Pausando...");
+    video.pause();
+    setPaused(prev => ({ ...prev, [id]: true }));
+    console.log("paused actualizado a true para id:", id);
+  }
+};
   const handleShare = (title: string) => {
     if (navigator.share) {
       navigator.share({ title, url: window.location.href });
