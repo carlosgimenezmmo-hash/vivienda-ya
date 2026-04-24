@@ -58,6 +58,7 @@ export default function ViviendaYaFull() {
     fetchChannels();
   }, []);
 
+  // ✅ CORREGIDO: Manejo de play/pausa automática al scrollear
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -79,6 +80,14 @@ export default function ViviendaYaFull() {
             }
           } else {
             video.pause();
+            // ✅ NUEVO: Actualizar el estado paused cuando se pausa automáticamente
+            const index = videoRefs.current.indexOf(video);
+            if (index !== -1) {
+              const prop = properties[index];
+              if (prop) {
+                setPaused(prev => ({ ...prev, [prop.id]: true }));
+              }
+            }
           }
         });
       },
@@ -86,8 +95,12 @@ export default function ViviendaYaFull() {
     );
     videoRefs.current.forEach((v) => { if (v) observer.observe(v); });
     return () => observer.disconnect();
-  }, [properties]);
+  }, [properties, setActiveProperty]);
 
+  const fetchComments = async (propertyId: number) => {
+    const { data } = await supabase.from("comments").select("*").eq("property_id", propertyId).order("created_at", { ascending: true });
+    if (data) setComments(prev => ({ ...prev, [propertyId]: data }));
+  };
 
   const sendComment = async (propertyId: number) => {
     if (!commentText.trim()) return;
@@ -108,20 +121,17 @@ export default function ViviendaYaFull() {
     setSendingComment(false);
   };
 
+  // ✅ CORREGIDA: Función togglePause simplificada y sin conflicto con muted
   const togglePause = (i: number, id: number) => {
     const video = videoRefs.current[i];
     if (!video) return;
+    
     if (video.paused) {
       video.play();
       setPaused(prev => ({ ...prev, [id]: false }));
     } else {
-      if (video.muted) {
-        video.muted = false;
-        videoRefs.current.forEach((v, idx) => { if (idx !== i && v) v.muted = true; });
-      } else {
-        video.pause();
-        setPaused(prev => ({ ...prev, [id]: true }));
-      }
+      video.pause();
+      setPaused(prev => ({ ...prev, [id]: true }));
     }
   };
 
@@ -177,41 +187,46 @@ export default function ViviendaYaFull() {
               <video
                 ref={(el) => { if (el) videoRefs.current[i] = el; }}
                 src={p.video_url}
-                autoPlay loop muted playsInline
+                autoPlay
+                loop
+                muted
+                playsInline
                 onClick={() => togglePause(i, p.id)}
                 style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer' }}
               />
 
+              {/* Botón central Play/Pause */}
               <button
-  onClick={() => togglePause(i, p.id)} onTouchEnd={(e) => { e.preventDefault(); togglePause(i, p.id); }} onTouchStart={() => togglePause(i, p.id)}
-  style={{
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 48,
-    height: 48,
-    borderRadius: '50%',
-    background: 'rgba(0,0,0,0.6)',
-    border: '1px solid rgba(255,255,255,0.2)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 20,
-    cursor: 'pointer'
-  }}
->
-  {paused[p.id] ? (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-      <path d="M8 5v14l11-7z"/>
-    </svg>
-  ) : (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-      <rect x="6" y="4" width="4" height="16" rx="1.5"/>
-      <rect x="14" y="4" width="4" height="16" rx="1.5"/>
-    </svg>
-  )}
-</button>
+                onClick={() => togglePause(i, p.id)}
+                onTouchEnd={(e) => { e.preventDefault(); togglePause(i, p.id); }}
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: 48,
+                  height: 48,
+                  borderRadius: '50%',
+                  background: 'rgba(0,0,0,0.6)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  zIndex: 20,
+                  cursor: 'pointer'
+                }}
+              >
+                {paused[p.id] ? (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                ) : (
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                    <rect x="6" y="4" width="4" height="16" rx="1.5"/>
+                    <rect x="14" y="4" width="4" height="16" rx="1.5"/>
+                  </svg>
+                )}
+              </button>
 
               <div style={{ position: 'absolute', bottom: 0, width: '100%', height: '75%', background: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.75) 100%)', pointerEvents: 'none', zIndex: 5 }} />
 
