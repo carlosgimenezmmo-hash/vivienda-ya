@@ -508,10 +508,10 @@ export default function ViviendaYaFull() {
       </button>
 
     </div>
-  </div>
-)}
-                </div>
+              </div>
               )}
+
+
               {showComments === p.id && (
                 <div style={{ position: 'absolute', bottom: 80, right: 0, width: '80%', maxHeight: '55vh', background: 'rgba(10,10,10,0.95)', borderRadius: '20px 0 0 20px', padding: 18, zIndex: 30, overflowY: 'auto', boxSizing: 'border-box', backdropFilter: 'blur(20px)', display: 'flex', flexDirection: 'column' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 14 }}>
