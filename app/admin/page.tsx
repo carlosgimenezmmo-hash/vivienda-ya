@@ -194,20 +194,20 @@ export default function AdminPage() {
                   <p style={label}>{stat.label}</p>
                   <p style={{ fontSize: 28, fontWeight: 900, margin: 0, color: stat.color }}>{stat.valor}</p>
                 </div>
+              ))} 
+            </div>
+            <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 12, padding: 4 }}>
+              {([
+                { id: "resumen", label: "Resumen" },
+                { id: "usuarios", label: "Usuarios" },
+                { id: "suscripciones", label: "Suscripciones" },
+                { id: "moderacion", label: "Moderacion" },
+              ] as const).map(t => (
+                <button key={t.id} onClick={() => setTab(t.id)} style={tabStyle(tab === t.id)}>
+                  {t.label}
+                </button>
               ))}
-            { id: "suscripciones", label: "Suscripciones" },
-            { id: "moderacion", label: "Moderacion" },
-          ] as const).map(t => (
-            <button key={t.id} onClick={() => setTab(t.id)} style={tabStyle(tab === t.id)}>
-              {t.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "24px" }}>
-
-        {/* ===== RESUMEN ===== */}
+            </div>
         {tab === "resumen" && (
           <div>
             {/* KPIs PRINCIPALES */}
