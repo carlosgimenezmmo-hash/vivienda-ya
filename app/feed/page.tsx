@@ -349,38 +349,167 @@ export default function ViviendaYaFull() {
               </div>
 
               {showDetails === p.id && (
-                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 40, background: 'rgba(10,10,10,0.97)', borderRadius: '24px 24px 0 0', padding: '20px 20px 100px', maxHeight: '70vh', overflowY: 'auto', backdropFilter: 'blur(20px)' }}>
-                  <div style={{ width: 40, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.2)', margin: '0 auto 20px' }} />
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
-                    <div>
-                      <h2 style={{ margin: '0 0 4px', fontSize: 20, fontWeight: 800, color: '#fff' }}>{p.title || 'Propiedad'}</h2>
-                      <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>{[p.neighborhood, p.city].filter(Boolean).join(", ")}</p>
-                    </div>
-                    <button onClick={() => setShowDetails(null)} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '50%', width: 32, height: 32, color: '#fff', cursor: 'pointer', fontSize: 18, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>x</button>
-                  </div>
-                  <p style={{ margin: '0 0 16px', fontSize: 28, fontWeight: 800, color: '#fff' }}>USD {Number(p.price)?.toLocaleString()}</p>
-                  <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' as const }}>
-                    {p.rooms && <span style={{ background: 'rgba(255,255,255,0.08)', borderRadius: 10, padding: '8px 14px', color: '#fff', fontSize: 13 }}>{p.rooms} ambientes</span>}
-                    {p.bedrooms && <span style={{ background: 'rgba(255,255,255,0.08)', borderRadius: 10, padding: '8px 14px', color: '#fff', fontSize: 13 }}>{p.bedrooms} dorm.</span>}
-                    {p.bathrooms && <span style={{ background: 'rgba(255,255,255,0.08)', borderRadius: 10, padding: '8px 14px', color: '#fff', fontSize: 13 }}>{p.bathrooms} banos</span>}
-                    {p.surface && <span style={{ background: 'rgba(255,255,255,0.08)', borderRadius: 10, padding: '8px 14px', color: '#fff', fontSize: 13 }}>{p.surface} m2</span>}
-                  </div>
-                  {p.description && <p style={{ margin: '0 0 16px', fontSize: 14, color: 'rgba(255,255,255,0.6)', lineHeight: 1.5 }}>{p.description}</p>}
-                  {p.lat && p.lng && (
-                    <div style={{ marginBottom: 16, borderRadius: 14, overflow: 'hidden' }}>
-                      <iframe src={`https://www.openstreetmap.org/export/embed.html?bbox=${p.lng - 0.005},${p.lat - 0.005},${p.lng + 0.005},${p.lat + 0.005}&layer=mapnik&marker=${p.lat},${p.lng}`} style={{ width: '100%', height: 180, border: 'none' }} />
-                    </div>
-                  )}
-                  <button onClick={() => requireLogin(() => {
-                    const clean = p.whatsapp_number?.replace(/\D/g, "");
-                    const msg = "Hola! Vi tu propiedad en ViviendaYa y me interesa. Podes darme mas info?";
-                    window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`, "_blank");
-                    supabase.from("properties").update({ contacts: (p.contacts || 0) + 1 }).eq("id", p.id).then(() => {
-                      setProperties(prev => prev.map(prop => prop.id === p.id ? { ...prop, contacts: (prop.contacts || 0) + 1 } : prop))
-                    })
-                  }, "contactar")} style={{ width: "100%", padding: "16px", borderRadius: 14, border: "none", background: "#25D366", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-                    Contactar por WhatsApp
-                  </button>
+  <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 40, background: 'rgba(10,10,10,0.97)', borderRadius: '24px 24px 0 0', maxHeight: '80vh', overflowY: 'auto', backdropFilter: 'blur(20px)' }}>
+    
+    {/* HANDLE */}
+    <div style={{ padding: '16px 20px 0', position: 'sticky', top: 0, background: 'rgba(10,10,10,0.97)', zIndex: 1 }}>
+      <div style={{ width: 40, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.2)', margin: '0 auto 16px' }} />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>Detalles de la propiedad</span>
+        <button onClick={() => setShowDetails(null)} style={{ background: 'rgba(255,255,255,0.1)', border: 'none', borderRadius: '50%', width: 32, height: 32, color: '#fff', cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+      </div>
+    </div>
+
+    <div style={{ padding: '0 20px 100px' }}>
+
+      {/* PROPIETARIO */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20, padding: '14px', background: 'rgba(255,255,255,0.04)', borderRadius: 14 }}>
+        <div style={{ width: 46, height: 46, borderRadius: '50%', background: '#333', border: '2px solid rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
+          {p.owner_avatar ? <img src={p.owner_avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 20 }}>👤</span>}
+        </div>
+        <div style={{ flex: 1 }}>
+          <p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: '#fff' }}>{p.owner_name || 'Propietario'}</p>
+          <p style={{ margin: '2px 0 0', fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
+            Publicado el {new Date(p.created_at).toLocaleDateString('es-AR')}
+          </p>
+        </div>
+        {channels[p.user_id] && (
+          <button onClick={() => router.push(`/canal/${channels[p.user_id]}`)} style={{ background: '#2563EB', border: 'none', borderRadius: 20, padding: '6px 12px', color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' }}>
+            Ver canal
+          </button>
+        )}
+      </div>
+
+      {/* BADGES */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+        <span style={{ background: getBadgeColor(p.operation_type), color: '#fff', padding: '5px 14px', borderRadius: 8, fontSize: 13, fontWeight: 700 }}>
+          {p.operation_type?.toUpperCase() || 'VENTA'}
+        </span>
+        {p.property_type && (
+          <span style={{ background: 'rgba(255,255,255,0.1)', color: '#fff', padding: '5px 14px', borderRadius: 8, fontSize: 13, fontWeight: 600 }}>
+            {p.property_type}
+          </span>
+        )}
+        {p.verified ? (
+          <span style={{ background: 'rgba(16,185,129,0.2)', border: '1px solid rgba(16,185,129,0.4)', color: '#10B981', padding: '5px 14px', borderRadius: 8, fontSize: 13, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 4 }}>
+            🛡️ GPS Verificado
+          </span>
+        ) : (
+          <span style={{ background: 'rgba(245,158,11,0.2)', border: '1px solid rgba(245,158,11,0.4)', color: '#F59E0B', padding: '5px 14px', borderRadius: 8, fontSize: 13, fontWeight: 700 }}>
+            Sin verificar
+          </span>
+        )}
+      </div>
+
+      {/* TITULO Y UBICACION */}
+      <h2 style={{ margin: '0 0 6px', fontSize: 22, fontWeight: 900, color: '#fff', lineHeight: 1.2 }}>
+        {p.title || 'Propiedad'}
+      </h2>
+      <p style={{ margin: '0 0 16px', fontSize: 14, color: 'rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center', gap: 4 }}>
+        📍 {[p.neighborhood, p.city, p.province].filter(Boolean).join(', ') || 'Ubicacion no disponible'}
+      </p>
+
+      {/* PRECIO */}
+      <div style={{ marginBottom: 20 }}>
+        <p style={{ margin: '0 0 4px', fontSize: 32, fontWeight: 900, color: '#fff' }}>
+          USD {Number(p.price)?.toLocaleString()}
+        </p>
+        {p.surface && p.price && (
+          <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>
+            USD {Math.round(Number(p.price) / Number(p.surface)).toLocaleString()} por m²
+          </p>
+        )}
+      </div>
+
+      {/* CARACTERISTICAS */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(90px, 1fr))', gap: 8, marginBottom: 20 }}>
+        {[
+          { label: 'Ambientes', valor: p.rooms, icono: '🏠' },
+          { label: 'Dormitorios', valor: p.bedrooms, icono: '🛏' },
+          { label: 'Banos', valor: p.bathrooms, icono: '🚿' },
+          { label: 'Superficie', valor: p.surface ? `${p.surface} m²` : null, icono: '📐' },
+        ].filter(c => c.valor).map((c) => (
+          <div key={c.label} style={{ background: 'rgba(255,255,255,0.06)', borderRadius: 12, padding: '12px 10px', textAlign: 'center' }}>
+            <p style={{ margin: '0 0 4px', fontSize: 20 }}>{c.icono}</p>
+            <p style={{ margin: '0 0 2px', fontSize: 16, fontWeight: 800, color: '#fff' }}>{c.valor}</p>
+            <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>{c.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* DESCRIPCION */}
+      {p.description && (
+        <div style={{ marginBottom: 20, padding: '14px', background: 'rgba(255,255,255,0.04)', borderRadius: 14 }}>
+          <p style={{ margin: '0 0 8px', fontSize: 12, color: 'rgba(255,255,255,0.4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>Descripcion</p>
+          <p style={{ margin: 0, fontSize: 14, color: 'rgba(255,255,255,0.75)', lineHeight: 1.6 }}>{p.description}</p>
+        </div>
+      )}
+
+      {/* ESTADISTICAS */}
+      <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
+        {[
+          { label: 'Vistas', valor: p.views || 0, color: '#2563EB', icono: '👁' },
+          { label: 'Likes', valor: p.likes || 0, color: '#EF4444', icono: '❤️' },
+          { label: 'Guardados', valor: p.saves || 0, color: '#F59E0B', icono: '🔖' },
+        ].map((s) => (
+          <div key={s.label} style={{ flex: 1, background: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: '12px', textAlign: 'center' }}>
+            <p style={{ margin: '0 0 2px', fontSize: 11 }}>{s.icono}</p>
+            <p style={{ margin: '0 0 2px', fontSize: 20, fontWeight: 800, color: s.color }}>{s.valor}</p>
+            <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>{s.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* MAPA */}
+      {p.lat && p.lng && (
+        <div style={{ marginBottom: 20, borderRadius: 14, overflow: 'hidden' }}>
+          <p style={{ margin: '0 0 8px', fontSize: 12, color: 'rgba(255,255,255,0.4)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>Ubicacion en el mapa</p>
+          <iframe
+            src={`https://www.openstreetmap.org/export/embed.html?bbox=${p.lng - 0.005},${p.lat - 0.005},${p.lng + 0.005},${p.lat + 0.005}&layer=mapnik&marker=${p.lat},${p.lng}`}
+            style={{ width: '100%', height: 200, border: 'none', borderRadius: 14 }}
+          />
+        </div>
+      )}
+
+      {/* ACCIONES */}
+      <div style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
+        <button onClick={() => requireLogin(() => toggleLike(String(p.id)), 'dar like')} style={{
+          flex: 1, padding: '14px', borderRadius: 14, border: `2px solid ${likedProperties.has(String(p.id)) ? '#EF4444' : 'rgba(255,255,255,0.1)'}`,
+          background: likedProperties.has(String(p.id)) ? 'rgba(239,68,68,0.15)' : 'transparent',
+          color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+        }}>
+          ❤️ {likedProperties.has(String(p.id)) ? 'Gustado' : 'Me gusta'}
+        </button>
+        <button onClick={() => handleShare(p.title)} style={{
+          flex: 1, padding: '14px', borderRadius: 14, border: '2px solid rgba(255,255,255,0.1)',
+          background: 'transparent', color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+        }}>
+          🔗 Compartir
+        </button>
+      </div>
+
+      {/* WHATSAPP */}
+      <button onClick={() => requireLogin(() => {
+        const clean = p.whatsapp_number?.replace(/\D/g, "");
+        const msg = `Hola! Vi tu propiedad "${p.title}" en ViviendaYa y me interesa. Podes darme mas info?`;
+        window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`, "_blank");
+        supabase.from("properties").update({ contacts: (p.contacts || 0) + 1 }).eq("id", p.id).then(() => {
+          setProperties(prev => prev.map(prop => prop.id === p.id ? { ...prop, contacts: (prop.contacts || 0) + 1 } : prop))
+        })
+      }, "contactar")} style={{
+        width: "100%", padding: "16px", borderRadius: 14, border: "none",
+        background: "#25D366", color: "#fff", fontSize: 16, fontWeight: 700,
+        cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+        fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+      }}>
+        📞 Contactar por WhatsApp
+      </button>
+
+    </div>
+  </div>
+)}
                 </div>
               )}
               {showComments === p.id && (
