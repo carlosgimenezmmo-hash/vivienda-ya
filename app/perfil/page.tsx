@@ -67,8 +67,8 @@ export default function PerfilPage() {
   const planNombre = PLAN_NOMBRES[planActual] || "Gratis"
 
   const menuItems = [
-    { emoji: "📊", label: "Mi Dashboard", sub: "Estadisticas y analiticas", href: "/dashboard" },
-    { emoji: "🏠", label: "Mis Propiedades", sub: "Gestiona tus publicaciones", href: "/dashboard" },
+    { emoji: "📊", label: "Estadisticas", sub: "Metricas y analiticas de tus videos", href: "/dashboard" },
+    { emoji: "📋", label: "Mis Publicaciones", sub: "Gestioná tus videos activos", href: "/mis-publicaciones" },
     { emoji: "🔖", label: "Guardados", sub: "Propiedades que te gustaron", href: "/guardados" },
     { emoji: "📺", label: "Mi Canal", sub: "Gestiona tu canal", href: "/mi-canal" },
     { emoji: "💎", label: "Mis Planes", sub: "Ver y cambiar tu plan actual", href: "/planes" },
