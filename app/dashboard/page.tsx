@@ -273,17 +273,17 @@ export default function DashboardPage() {
                     {stat.libre ? stat.valor.toLocaleString() : "—"}
                   </p>
                 </div>
-                {[
-                  { label: "Vistas totales", valor: totalVistas, color: "#2563EB", libre: true },
-                  { label: "Likes", valor: totalLikes, color: "#EF4444", libre: true },
-                  { label: "Contactos WhatsApp", valor: totalContactos, color: "#25D366", libre: puedeVerContactos },
-                ].map(stat => (
-                  <div key={stat.label} style={s.card}>
-                    <p style={s.label}>{stat.label}</p>
-                    <p style={{ fontSize: 28, fontWeight: 900, margin: 0, color: stat.color }}>{stat.valor}</p>
-                  </div>
-                ))}
-                  )}
+              ))}
+            </div>
+
+
+
+
+
+
+
+
+
                   <div style={{ flex: 1, minWidth: 200 }}>
                     <p style={{ margin: "0 0 4px", fontWeight: 700, fontSize: 16 }}>{mejorPropiedad.title || "Sin titulo"}</p>
                     <p style={{ margin: "0 0 12px", fontSize: 13, color: "rgba(255,255,255,0.5)" }}>
