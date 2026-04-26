@@ -37,7 +37,7 @@ export default function DashboardPage() {
   const [properties, setProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<"resumen" | "propiedades" | "zonas">("resumen")
-  // âœ… Estados para eliminar
+  // Estados para eliminar
   const [confirmarId, setConfirmarId] = useState<number | null>(null)
   const [deleting, setDeleting] = useState<number | null>(null)
 
@@ -70,7 +70,7 @@ export default function DashboardPage() {
     }
   }
 
-  // âœ… Handler de eliminaciÃ³n conectado a Supabase
+  // Handler de eliminacion conectado a Supabase
   const handleDelete = async (id: number) => {
     setConfirmarId(null)
     setDeleting(id)
@@ -138,7 +138,7 @@ export default function DashboardPage() {
 
   const LockedSection = ({ mensaje, planRequerido }: { mensaje: string; planRequerido: string }) => (
     <div style={s.locked}>
-      <p style={{ fontSize: 28, margin: "0 0 12px" }}>ðŸ”’</p>
+      <p style={{ fontSize: 28, margin: "0 0 12px" }}>🔒</p>
       <p style={{ margin: "0 0 6px", fontWeight: 700, fontSize: 15 }}>{mensaje}</p>
       <p style={{ margin: "0 0 20px", fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
         Disponible desde el plan {planRequerido}
@@ -150,7 +150,7 @@ export default function DashboardPage() {
       }}>
         Ver planes
       </button>
-      {/* âœ… Acceso directo a Mis Publicaciones para eliminar desde cualquier plan */}
+
       <p style={{ margin: "16px 0 0", fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
         Para eliminar publicaciones,{" "}
         <span
@@ -226,8 +226,8 @@ export default function DashboardPage() {
               fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
             }}>
               {t === "resumen" ? "Resumen" : t === "propiedades" ? "Mis publicaciones" : "Por zona"}
-              {t === "propiedades" && !puedeVerPropiedades && " 🔒"}
-              {t === "zonas" && !puedeVerZonas && " ðŸ”’"}
+              {t === "propiedades" && !puedeVerPropiedades && " (Plan Plata)"}
+              {t === "zonas" && !puedeVerZonas && " (Plan Oro)"}
             </button>
           ))}
         </div>
@@ -245,10 +245,10 @@ export default function DashboardPage() {
               gap: 12, marginBottom: 24,
             }}>
               {[
-                { label: "Vistas totales", valor: totalVistas, color: "#2563EB", icono: "ðŸ‘", libre: true },
-                { label: "Likes", valor: totalLikes, color: "#EF4444", icono: "â¤ï¸", libre: true },
-                { label: "Contactos WhatsApp", valor: totalContactos, color: "#25D366", icono: "ðŸ“ž", libre: puedeVerContactos },
-                { label: "Guardados", valor: totalGuardados, color: "#F59E0B", icono: "ðŸ”–", libre: puedeVerContactos },
+                { label: "Vistas totales", valor: totalVistas, color: "#2563EB", icono: "Vistas", libre: true },
+                { label: "Likes", valor: totalLikes, color: "#EF4444", icono: "Likes", libre: true },
+                { label: "Contactos WhatsApp", valor: totalContactos, color: "#25D366", icono: "Contactos", libre: puedeVerContactos },
+                { label: "Guardados", valor: totalGuardados, color: "#F59E0B", icono: "Guardados", libre: puedeVerContactos },
               ].map((stat) => (
                 <div key={stat.label} style={{
                   ...s.card,
@@ -264,25 +264,25 @@ export default function DashboardPage() {
                       alignItems: "center", justifyContent: "center",
                       borderRadius: 16,
                     }}>
-                      <span style={{ fontSize: 20 }}>ðŸ”’</span>
+                      <span style={{ fontSize: 20 }}>🔒</span>
                       <p style={{ margin: "6px 0 0", fontSize: 11, color: "rgba(255,255,255,0.5)" }}>Plan Plata</p>
                     </div>
                   )}
-                  <p style={s.label}>{stat.icono} {stat.label}</p>
+                  <p style={s.label}>{stat.label}</p>
                   <p style={{ fontSize: 36, fontWeight: 900, margin: 0, color: stat.color }}>
-                    {stat.libre ? stat.valor.toLocaleString() : "â€”"}
+                    {stat.libre ? stat.valor.toLocaleString() : "—"}
                   </p>
                 </div>
-              ))}
-            </div>
-
-            {/* MEJOR PROPIEDAD */}
-            {mejorPropiedad && puedeVerContactos && (
-              <div style={{ ...s.card, marginBottom: 24 }}>
-                <p style={{ ...s.label, marginBottom: 16 }}>â­ Propiedad con mas vistas</p>
-                <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-                  {mejorPropiedad.video_url && (
-                    <video src={mejorPropiedad.video_url} style={{ width: 80, height: 80, borderRadius: 12, objectFit: "cover", flexShrink: 0 }} muted />
+                {[
+                  { label: "Vistas totales", valor: totalVistas, color: "#2563EB", libre: true },
+                  { label: "Likes", valor: totalLikes, color: "#EF4444", libre: true },
+                  { label: "Contactos WhatsApp", valor: totalContactos, color: "#25D366", libre: puedeVerContactos },
+                ].map(stat => (
+                  <div key={stat.label} style={s.card}>
+                    <p style={s.label}>{stat.label}</p>
+                    <p style={{ fontSize: 28, fontWeight: 900, margin: 0, color: stat.color }}>{stat.valor}</p>
+                  </div>
+                ))}
                   )}
                   <div style={{ flex: 1, minWidth: 200 }}>
                     <p style={{ margin: "0 0 4px", fontWeight: 700, fontSize: 16 }}>{mejorPropiedad.title || "Sin titulo"}</p>
@@ -308,7 +308,7 @@ export default function DashboardPage() {
 
             {/* TIPS */}
             <div style={{ ...s.card, background: "rgba(37,99,235,0.08)", border: "1px solid rgba(37,99,235,0.2)" }}>
-              <p style={{ ...s.label, color: "#60A5FA" }}>ðŸ’¡ Tips para mejorar tu rendimiento</p>
+              <p style={{ ...s.label, color: "#60A5FA" }}>Tips para mejorar tu rendimiento</p>
               {[
                 propActivas < 3 ? "Publica mas propiedades para aumentar tu visibilidad en el feed" : null,
                 !puedeVerContactos ? "Mejora al plan Plata para ver cuantas consultas recibis por WhatsApp" : null,
@@ -316,7 +316,7 @@ export default function DashboardPage() {
                 "Compartir tus propiedades en redes sociales multiplica las vistas",
               ].filter(Boolean).slice(0, 3).map((tip, i) => (
                 <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 10 }}>
-                  <span style={{ color: "#2563EB", flexShrink: 0 }}>â†’</span>
+                  <span style={{ color: "#2563EB", flexShrink: 0 }}>-</span>
                   <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,0.6)", lineHeight: 1.5 }}>{tip}</p>
                 </div>
               ))}
@@ -332,7 +332,7 @@ export default function DashboardPage() {
             <div>
               {properties.length === 0 ? (
                 <div style={{ textAlign: "center", padding: "60px 0" }}>
-                  <p style={{ fontSize: 40, marginBottom: 12 }}>ðŸ </p>
+                  <p style={{ fontSize: 40, marginBottom: 12 }}>🏠</p>
                   <p style={{ fontSize: 18, fontWeight: 700, margin: "0 0 8px" }}>No tenes publicaciones</p>
                   <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 24px" }}>
                     Publica tu primera propiedad y empeza a recibir consultas
@@ -363,7 +363,7 @@ export default function DashboardPage() {
                           )}
                         </div>
                         <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
-                          {p.operation_type?.toUpperCase()} Â· {p.property_type} Â· USD {Number(p.price).toLocaleString()}
+                          {p.operation_type?.toUpperCase()} · {p.property_type} · USD {Number(p.price).toLocaleString()}
                         </p>
                       </div>
                       <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
@@ -380,7 +380,7 @@ export default function DashboardPage() {
                         ))}
                       </div>
 
-                      {/* âœ… BotÃ³n eliminar en cada card */}
+
                       <button
                         onClick={() => setConfirmarId(p.id)}
                         disabled={deleting === p.id}
@@ -428,7 +428,7 @@ export default function DashboardPage() {
                         <div key={zona} style={s.card}>
                           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
                             <div>
-                              <p style={{ margin: 0, fontWeight: 700, fontSize: 16 }}>ðŸ“ {zona}</p>
+                              <p style={{ margin: 0, fontWeight: 700, fontSize: 16 }}>📍 {zona}</p>
                               <p style={{ margin: "2px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
                                 {data.propiedades} {data.propiedades === 1 ? "propiedad" : "propiedades"}
                               </p>
@@ -462,7 +462,7 @@ export default function DashboardPage() {
 
       </div>
 
-      {/* âœ… Modal de confirmaciÃ³n para eliminar */}
+
       {confirmarId !== null && (
         <div
           style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}

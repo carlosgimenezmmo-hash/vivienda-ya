@@ -182,19 +182,19 @@ export default function AdminPage() {
             </div>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, margin: 0 }}>
               ViviendaYa — {new Date().toLocaleDateString("es-AR", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
-            </p>
-          </div>
-          <button onClick={fetchAll} style={{ padding: "10px 20px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.1)", background: "transparent", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
-            🔄 Actualizar
-          </button>
-        </div>
-
-        {/* TABS */}
-        <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 12, padding: 4, overflowX: "auto" }}>
-          {([
-            { id: "resumen", label: "📊 Resumen" },
-            { id: "usuarios", label: "👥 Usuarios" },
-            { id: "propiedades", label: "🏠 Propiedades" },
+              {[
+                { label: "Usuarios totales", valor: users.length, color: "#2563EB" },
+                { label: "Propiedades activas", valor: propActivas, color: "#22C55E" },
+                { label: "Suscripciones activas", valor: subsActivas.length, color: "#A855F7" },
+                { label: "MRR estimado", valor: `$${mrr.toLocaleString("es-AR")}", color: "#F59E0B" },
+                { label: "Vistas totales", valor: totalVistas, color: "#60A5FA" },
+                { label: "Contactos WhatsApp", valor: totalContactos, color: "#25D366" },
+              ].map(stat => (
+                <div key={stat.label} style={card({ borderLeft: `3px solid ${stat.color}` })}>
+                  <p style={label}>{stat.label}</p>
+                  <p style={{ fontSize: 28, fontWeight: 900, margin: 0, color: stat.color }}>{stat.valor}</p>
+                </div>
+              ))}
             { id: "suscripciones", label: "💎 Suscripciones" },
             { id: "moderacion", label: "🛡 Moderación" },
           ] as const).map(t => (

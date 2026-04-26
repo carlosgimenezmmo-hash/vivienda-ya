@@ -445,15 +445,14 @@ export default function ViviendaYaFull() {
         </div>
       )}
 
-      {/* ESTADISTICAS */}
+      {/* ESTADISTICAS (sin símbolos) */}
       <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
         {[
-          { label: 'Vistas', valor: p.views || 0, color: '#2563EB', icono: '👁' },
-          { label: 'Likes', valor: p.likes || 0, color: '#EF4444', icono: '❤️' },
-          { label: 'Guardados', valor: p.saves || 0, color: '#F59E0B', icono: '🔖' },
+          { label: 'Vistas', valor: p.views || 0, color: '#2563EB' },
+          { label: 'Likes', valor: p.likes || 0, color: '#EF4444' },
+          { label: 'Guardados', valor: p.saves || 0, color: '#F59E0B' },
         ].map((s) => (
           <div key={s.label} style={{ flex: 1, background: 'rgba(255,255,255,0.04)', borderRadius: 12, padding: '12px', textAlign: 'center' }}>
-            <p style={{ margin: '0 0 2px', fontSize: 11 }}>{s.icono}</p>
             <p style={{ margin: '0 0 2px', fontSize: 20, fontWeight: 800, color: s.color }}>{s.valor}</p>
             <p style={{ margin: 0, fontSize: 11, color: 'rgba(255,255,255,0.4)' }}>{s.label}</p>
           </div>
