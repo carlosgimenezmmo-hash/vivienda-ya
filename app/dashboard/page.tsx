@@ -275,13 +275,13 @@ export default function DashboardPage() {
                 </div>
               ))}
             </div>
-
-
-
-
-
-
-
+            {mejorPropiedad && puedeVerContactos && (
+              <div style={{ ...s.card, marginBottom: 24 }}>
+                <p style={{ ...s.label, marginBottom: 16 }}>Propiedad con mas vistas</p>
+                <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+                  {mejorPropiedad.video_url && (
+                    <video src={mejorPropiedad.video_url} style={{ width: 80, height: 80, borderRadius: 12, objectFit: "cover", flexShrink: 0 }} muted />
+                  )}
 
 
                   <div style={{ flex: 1, minWidth: 200 }}>
