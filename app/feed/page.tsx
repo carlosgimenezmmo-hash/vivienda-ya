@@ -16,6 +16,8 @@ export default function ViviendaYaFull() {
   const [commentText, setCommentText] = useState("");
   const [sendingComment, setSendingComment] = useState(false);
   const [paused, setPaused] = useState<{ [key: number]: boolean }>({});
+  // ✅ TAREA 1: Set para rastrear qué videos están pausados manualmente (por índice)
+  const [pausedVideos, setPausedVideos] = useState<Set<number>>(new Set());
   const [activeIndex, setActiveIndex] = useState(0);
   const [channels, setChannels] = useState<{ [key: string]: string }>({});
   const [showAuthSheet, setShowAuthSheet] = useState(false);
@@ -58,36 +60,36 @@ export default function ViviendaYaFull() {
     fetchChannels();
   }, []);
 
-  // ✅ CORREGIDO: Manejo de play/pausa automática al scrollear
+  // ✅ TAREA 1: IntersectionObserver actualizado
+  // - Al entrar: solo hace play si el video NO fue pausado manualmente
+  // - Al salir: pausa el video y elimina la pausa manual (reset) → al volver arranca solo
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           const video = entry.target as HTMLVideoElement;
+          const index = videoRefs.current.indexOf(video);
+          const prop = properties[index];
+          if (!prop) return;
           if (entry.isIntersecting) {
-            video.play().catch(() => {});
-            const index = videoRefs.current.indexOf(video);
-            if (index !== -1) {
-              setActiveIndex(index);
-              const prop = properties[index];
-              if (prop) {
-                setActiveProperty({ id: prop.id, title: prop.title, whatsapp_number: prop.whatsapp_number });
-                // Sumar vista
-                supabase.from("properties").update({ views: (prop.views || 0) + 1 }).eq("id", prop.id).then(() => {
-                  setProperties(prev => prev.map(p => p.id === prop.id ? { ...p, views: (p.views || 0) + 1 } : p))
-                })
-              }
+            // Solo hace play si el usuario no pausó este video manualmente
+            if (!pausedVideos.has(index)) {
+              video.play().catch(() => {});
             }
+            setActiveIndex(index);
+            setActiveProperty({ id: prop.id, title: prop.title, whatsapp_number: prop.whatsapp_number });
+            // Sumar vista
+            supabase.from("properties").update({ views: (prop.views || 0) + 1 }).eq("id", prop.id).then(() => {
+              setProperties(prev => prev.map(p => p.id === prop.id ? { ...p, views: (p.views || 0) + 1 } : p))
+            })
           } else {
             video.pause();
-            // ✅ NUEVO: Actualizar el estado paused cuando se pausa automáticamente
-            const index = videoRefs.current.indexOf(video);
-            if (index !== -1) {
-              const prop = properties[index];
-              if (prop) {
-                setPaused(prev => ({ ...prev, [prop.id]: true }));
-              }
-            }
+            // Al salir de pantalla se limpia la pausa manual → al volver el video arranca solo
+            setPausedVideos(prev => {
+              const next = new Set(prev);
+              next.delete(index);
+              return next;
+            });
           }
         });
       },
@@ -95,7 +97,29 @@ export default function ViviendaYaFull() {
     );
     videoRefs.current.forEach((v) => { if (v) observer.observe(v); });
     return () => observer.disconnect();
-  }, [properties, setActiveProperty]);
+  }, [properties, setActiveProperty, pausedVideos]);
+
+  // ✅ TAREA 1: Handler de tap manual
+  // - Si está pausado manualmente → hace play y elimina del Set
+  // - Si está reproduciendo → pausa y agrega al Set
+  const handleVideoTap = (index: number, id: number) => {
+    const video = videoRefs.current[index];
+    if (!video) return;
+
+    if (pausedVideos.has(index)) {
+      video.play().catch(() => {});
+      setPausedVideos(prev => {
+        const next = new Set(prev);
+        next.delete(index);
+        return next;
+      });
+      setPaused(prev => ({ ...prev, [id]: false }));
+    } else {
+      video.pause();
+      setPausedVideos(prev => new Set(prev).add(index));
+      setPaused(prev => ({ ...prev, [id]: true }));
+    }
+  };
 
   const fetchComments = async (propertyId: number) => {
     const { data } = await supabase.from("comments").select("*").eq("property_id", propertyId).order("created_at", { ascending: true });
@@ -121,30 +145,29 @@ export default function ViviendaYaFull() {
     setSendingComment(false);
   };
 
-  // ✅ CORREGIDA: Función togglePause simplificada y sin conflicto con muted
- const togglePause = (i: number, id: number) => {
-  console.log("togglePause llamado", { i, id });
-  const video = videoRefs.current[i];
-  console.log("video encontrado:", video);
-  if (!video) {
-    console.log("❌ No se encontró el video");
-    return;
-  }
-  
-  console.log("video.paused:", video.paused);
-  
-  if (video.paused) {
-    console.log("▶️ Reproduciendo...");
-    video.play();
-    setPaused(prev => ({ ...prev, [id]: false }));
-    console.log("paused actualizado a false para id:", id);
-  } else {
-    console.log("⏸️ Pausando...");
-    video.pause();
-    setPaused(prev => ({ ...prev, [id]: true }));
-    console.log("paused actualizado a true para id:", id);
-  }
-};
+  // Función togglePause original conservada (sin cambios)
+  const togglePause = (i: number, id: number) => {
+    console.log("togglePause llamado", { i, id });
+    const video = videoRefs.current[i];
+    console.log("video encontrado:", video);
+    if (!video) {
+      console.log("❌ No se encontró el video");
+      return;
+    }
+    console.log("video.paused:", video.paused);
+    if (video.paused) {
+      console.log("▶️ Reproduciendo...");
+      video.play();
+      setPaused(prev => ({ ...prev, [id]: false }));
+      console.log("paused actualizado a false para id:", id);
+    } else {
+      console.log("⏸️ Pausando...");
+      video.pause();
+      setPaused(prev => ({ ...prev, [id]: true }));
+      console.log("paused actualizado a true para id:", id);
+    }
+  };
+
   const handleShare = (title: string) => {
     if (navigator.share) {
       navigator.share({ title, url: window.location.href });
@@ -193,61 +216,68 @@ export default function ViviendaYaFull() {
         ) : (
           properties.map((p, i) => (
             <section key={p.id} style={{ height: '100dvh', scrollSnapAlign: 'start', position: 'relative', overflow: 'hidden', background: '#000' }}>
+              <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10 }}>
+                <video
+                  ref={(el) => { if (el) videoRefs.current[i] = el; }}
+                  src={p.video_url}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  onPlay={() => setPaused((prev: any) => ({ ...prev, [p.id]: false }))}
+                  onPause={() => setPaused((prev: any) => ({ ...prev, [p.id]: true }))}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
 
-              <video
-                ref={(el) => { if (el) videoRefs.current[i] = el; }}
-                src={p.video_url}
-                autoPlay
-                loop
-                muted
-                playsInline
-                onClick={() => togglePause(i, p.id)}
-                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', cursor: 'pointer' }}
-              />
+                {/* ✅ TAREA 1: Área transparente de tap sobre el video para pausar/reanudar */}
+                <div
+                  onClick={() => handleVideoTap(i, p.id)}
+                  onTouchEnd={(e) => { e.preventDefault(); handleVideoTap(i, p.id); }}
+                  style={{
+                    position: 'absolute',
+                    top: 0, left: 0,
+                    width: '100%', height: '100%',
+                    zIndex: 15,
+                    cursor: 'pointer',
+                  }}
+                />
 
-              {/* Botón central Play/Pause */}
-              <button
-                onClick={() => togglePause(i, p.id)}
-                onTouchEnd={(e) => { e.preventDefault(); togglePause(i, p.id); }}
-                style={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  transform: 'translate(-50%, -50%)',
-                  width: 48,
-                  height: 48,
-                  borderRadius: '50%',
-                  background: 'rgba(0,0,0,0.6)',
-                  border: '1px solid rgba(255,255,255,0.2)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  zIndex: 20,
-                  cursor: 'pointer'
-                }}
-              >
-                {paused[p.id] ? (
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                    <path d="M8 5v14l11-7z"/>
-                  </svg>
-                ) : (
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
-                    <rect x="6" y="4" width="4" height="16" rx="1.5"/>
-                    <rect x="14" y="4" width="4" height="16" rx="1.5"/>
-                  </svg>
+                {/* ✅ TAREA 1: Ícono de pausa — visible solo cuando el usuario pausó manualmente */}
+                {pausedVideos.has(i) && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '50%', left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      width: 72, height: 72,
+                      borderRadius: '50%',
+                      background: 'rgba(0,0,0,0.55)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      zIndex: 20,
+                      pointerEvents: 'none',
+                    }}
+                  >
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="white">
+                      <rect x="6" y="4" width="4" height="16" rx="1.5"/>
+                      <rect x="14" y="4" width="4" height="16" rx="1.5"/>
+                    </svg>
+                  </div>
                 )}
-              </button>
+              </div>
 
               <div style={{ position: 'absolute', bottom: 0, width: '100%', height: '75%', background: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.75) 100%)', pointerEvents: 'none', zIndex: 5 }} />
 
-              <div style={{ position: 'absolute', top: 0, width: '100%', zIndex: 20, padding: '52px 16px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxSizing: 'border-box', background: 'linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, transparent 100%)' }}>
+              <div style={{ position: 'absolute', top: 0, width: '100%', zIndex: 20, padding: '52px 16px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxSizing: 'border-box', background: 'linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, transparent 100%)', pointerEvents: 'none' }}>
                 <span style={{ fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: -0.5 }}>Vivienda<span style={{ color: '#22C55E' }}>Ya</span></span>
                 <div style={{ display: 'flex', gap: 8 }}>
                   {p.highlighted && <span style={{ background: 'rgba(245,158,11,0.9)', color: '#fff', padding: '5px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700 }}>DESTACADO</span>}
                 </div>
               </div>
 
-              <div style={{ position: 'absolute', right: 14, bottom: 100, zIndex: 20, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24 }}>
+              {/* Botones laterales — zIndex 25 para estar por encima del área de tap */}
+              <div style={{ position: 'absolute', right: 14, bottom: 100, zIndex: 25, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24 }}>
                 <button onClick={() => requireLogin(() => toggleLike(String(p.id)), 'dar like')} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: 0 }}>
                   <svg width="32" height="32" viewBox="0 0 24 24" fill={likedProperties.has(String(p.id)) ? '#EF4444' : 'none'} stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
                   <span style={{ color: '#fff', fontSize: 12, fontWeight: 600 }}>{p.likes || 0}</span>
@@ -285,7 +315,8 @@ export default function ViviendaYaFull() {
                 </button>
               </div>
 
-              <div style={{ position: 'absolute', bottom: 90, left: 16, right: 80, zIndex: 10, color: '#fff' }}>
+              {/* Info inferior — zIndex 25 para estar por encima del área de tap */}
+              <div style={{ position: 'absolute', bottom: 90, left: 16, right: 80, zIndex: 25, color: '#fff' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
                   <div style={{ width: 42, height: 42, borderRadius: '50%', background: '#333', border: '2px solid rgba(255,255,255,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, overflow: 'hidden' }}>
                     {p.owner_avatar ? <img src={p.owner_avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 18 }}>U</span>}

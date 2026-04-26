@@ -37,6 +37,9 @@ export default function DashboardPage() {
   const [properties, setProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<"resumen" | "propiedades" | "zonas">("resumen")
+  // ✅ Estados para eliminar
+  const [confirmarId, setConfirmarId] = useState<number | null>(null)
+  const [deleting, setDeleting] = useState<number | null>(null)
 
   const nivel = PLAN_NIVEL[plan] ?? 0
   const puedeVerContactos = nivel >= 1
@@ -65,6 +68,15 @@ export default function DashboardPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  // ✅ Handler de eliminación conectado a Supabase
+  const handleDelete = async (id: number) => {
+    setConfirmarId(null)
+    setDeleting(id)
+    const { error } = await supabase.from("properties").delete().eq("id", id)
+    if (!error) setProperties(prev => prev.filter(p => p.id !== id))
+    setDeleting(null)
   }
 
   const totalVistas = properties.reduce((a, p) => a + (p.views || 0), 0)
@@ -138,6 +150,16 @@ export default function DashboardPage() {
       }}>
         Ver planes
       </button>
+      {/* ✅ Acceso directo a Mis Publicaciones para eliminar desde cualquier plan */}
+      <p style={{ margin: "16px 0 0", fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
+        Para eliminar publicaciones,{" "}
+        <span
+          onClick={() => router.push("/mis-publicaciones")}
+          style={{ color: "#60A5FA", cursor: "pointer", textDecoration: "underline" }}
+        >
+          ir a Mis Publicaciones
+        </span>
+      </p>
     </div>
   )
 
@@ -357,6 +379,22 @@ export default function DashboardPage() {
                           </div>
                         ))}
                       </div>
+
+                      {/* ✅ Botón eliminar en cada card */}
+                      <button
+                        onClick={() => setConfirmarId(p.id)}
+                        disabled={deleting === p.id}
+                        style={{
+                          padding: "8px 16px", borderRadius: 10, flexShrink: 0,
+                          border: "1px solid rgba(239,68,68,0.3)",
+                          background: "rgba(239,68,68,0.1)",
+                          color: "#FCA5A5", fontSize: 13, fontWeight: 600,
+                          cursor: "pointer",
+                          fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+                        }}
+                      >
+                        {deleting === p.id ? "Eliminando..." : "Eliminar"}
+                      </button>
                     </div>
                   ))}
                 </div>
@@ -423,6 +461,35 @@ export default function DashboardPage() {
         )}
 
       </div>
+
+      {/* ✅ Modal de confirmación para eliminar */}
+      {confirmarId !== null && (
+        <div
+          style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}
+          onClick={() => setConfirmarId(null)}
+        >
+          <div
+            style={{ background: "#1a1a1a", borderRadius: "24px 24px 0 0", padding: "28px 24px 48px", width: "100%", maxWidth: 500 }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.1)", margin: "0 auto 24px" }} />
+            <h3 style={{ fontSize: 20, fontWeight: 900, color: "#fff", margin: "0 0 8px", textAlign: "center" }}>Eliminar propiedad</h3>
+            <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 15, textAlign: "center", margin: "0 0 28px" }}>Esta accion no se puede deshacer.</p>
+            <button
+              onClick={() => handleDelete(confirmarId)}
+              style={{ width: "100%", padding: "16px", borderRadius: 14, border: "none", background: "#EF4444", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer", marginBottom: 12, fontFamily: "inherit" }}
+            >
+              {deleting === confirmarId ? "Eliminando..." : "Si, eliminar"}
+            </button>
+            <button
+              onClick={() => setConfirmarId(null)}
+              style={{ width: "100%", padding: "16px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.6)", fontSize: 16, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
