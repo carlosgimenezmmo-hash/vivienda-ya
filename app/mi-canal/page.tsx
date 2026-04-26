@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
@@ -149,7 +149,7 @@ export default function MiCanalPage() {
             <div style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 12, padding: "12px 16px" }}>
               <p style={{ margin: 0, fontSize: 13, color: "#F59E0B" }}>Para activar tu canal necesitas el plan STARTER o superior.</p>
               <button onClick={() => router.push("/planes")} style={{ background: "none", border: "none", color: "#F59E0B", fontSize: 13, fontWeight: 700, cursor: "pointer", padding: 0, marginTop: 6, fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
-                Ver planes →
+                Ver planes â†’
               </button>
             </div>
           )}
