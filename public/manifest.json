@@ -4,7 +4,7 @@
   "short_name": "ViviendaYa",
   "description": "El primer marketplace inmobiliario en video",
   "start_url": "/feed?utm_source=pwa",
-  "display": "standalone",
+  "display": "fullscreen",
   "background_color": "#22C55E",
   "theme_color": "#000000",
   "categories": ["real-estate", "shopping", "lifestyle"],
