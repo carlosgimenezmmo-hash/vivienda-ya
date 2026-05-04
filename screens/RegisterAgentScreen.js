@@ -1,17 +1,10 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  Alert,
-  ActivityIndicator
-} from 'react-native';
+'use client';
+import { useState } from 'react';
 import { registerAgent } from '../services/agentService';
+import { useRouter } from 'next/navigation';
 
-export default function RegisterAgentScreen({ navigation }) {
+export default function RegisterAgentScreen() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     city: '',
     phone: '',
@@ -21,7 +14,7 @@ export default function RegisterAgentScreen({ navigation }) {
 
   const handleRegister = async () => {
     if (!formData.city || !formData.phone || !formData.description) {
-      Alert.alert('Error', 'Por favor complete todos los campos');
+      alert('Por favor complete todos los campos');
       return;
     }
 
@@ -30,133 +23,131 @@ export default function RegisterAgentScreen({ navigation }) {
     setLoading(false);
 
     if (result.success) {
-      Alert.alert(
-        'Registro exitoso',
-        'Su periodo de prueba termina en 30 dias',
-        [{ text: 'OK', onPress: () => navigation.replace('AgentDashboard') }]
-      );
+      alert('Registro exitoso! Su periodo de prueba termina en 30 dias');
+      router.push('/AgentDashboard');
     } else {
-      Alert.alert('Error', result.error || 'No se pudo registrar el agente');
+      alert(result.error || 'No se pudo registrar el agente');
     }
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Registrate como Agente</Text>
-        <Text style={styles.subtitle}>30 dias gratis - $40 USD/mes despues</Text>
-      </View>
+    <div style={styles.container}>
+      <div style={styles.header}>
+        <h1 style={styles.title}>Registrate como Agente</h1>
+        <p style={styles.subtitle}>30 dias gratis - $40 USD/mes despues</p>
+      </div>
 
-      <View style={styles.form}>
-        <Text style={styles.label}>Ciudad donde opera</Text>
-        <TextInput
+      <div style={styles.form}>
+        <label style={styles.label}>Ciudad donde opera</label>
+        <input
           style={styles.input}
           placeholder="Ej: Buenos Aires, Cordoba, Mendoza"
           value={formData.city}
-          onChangeText={(text) => setFormData({ ...formData, city: text })}
+          onChange={(e) => setFormData({ ...formData, city: e.target.value })}
         />
 
-        <Text style={styles.label}>Telefono de contacto</Text>
-        <TextInput
+        <label style={styles.label}>Telefono de contacto</label>
+        <input
           style={styles.input}
           placeholder="+54 9 11 1234-5678"
-          keyboardType="phone-pad"
           value={formData.phone}
-          onChangeText={(text) => setFormData({ ...formData, phone: text })}
+          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
         />
 
-        <Text style={styles.label}>Descripcion profesional</Text>
-        <TextInput
-          style={[styles.input, styles.textArea]}
+        <label style={styles.label}>Descripcion profesional</label>
+        <textarea
+          style={{...styles.input, ...styles.textArea}}
           placeholder="Cuentenos sobre su experiencia, especialidad, etc."
-          multiline
-          numberOfLines={4}
+          rows={4}
           value={formData.description}
-          onChangeText={(text) => setFormData({ ...formData, description: text })}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
         />
 
-        <TouchableOpacity
+        <button
           style={styles.button}
-          onPress={handleRegister}
+          onClick={handleRegister}
           disabled={loading}
         >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Activar cuenta de agente</Text>
-          )}
-        </TouchableOpacity>
+          {loading ? 'Procesando...' : 'Activar cuenta de agente'}
+        </button>
 
-        <TouchableOpacity
+        <button
           style={styles.skipButton}
-          onPress={() => navigation.goBack()}
+          onClick={() => router.back()}
         >
-          <Text style={styles.skipText}>Por ahora no, gracias</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+          Por ahora no, gracias
+        </button>
+      </div>
+    </div>
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5'
+    minHeight: '100vh',
+    backgroundColor: '#f5f5f5',
+    paddingBottom: '80px'
   },
   header: {
     backgroundColor: '#4CAF50',
-    padding: 20,
-    alignItems: 'center'
+    padding: '40px 20px',
+    textAlign: 'center'
   },
   title: {
-    fontSize: 24,
+    fontSize: '24px',
     fontWeight: 'bold',
-    color: '#fff'
+    color: '#fff',
+    margin: 0
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: '14px',
     color: '#fff',
-    marginTop: 5
+    marginTop: '5px'
   },
   form: {
-    padding: 20
+    padding: '20px',
+    maxWidth: '500px',
+    margin: '0 auto'
   },
   label: {
-    fontSize: 16,
+    display: 'block',
+    fontSize: '16px',
     fontWeight: '600',
-    marginBottom: 5,
-    marginTop: 15
+    marginBottom: '5px',
+    marginTop: '15px'
   },
   input: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16
+    width: '100%',
+    padding: '12px',
+    fontSize: '16px',
+    border: '1px solid #ddd',
+    borderRadius: '8px',
+    boxSizing: 'border-box'
   },
   textArea: {
-    height: 100,
-    textAlignVertical: 'top'
+    fontFamily: 'inherit',
+    resize: 'vertical'
   },
   button: {
+    width: '100%',
     backgroundColor: '#4CAF50',
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 30
-  },
-  buttonText: {
     color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold'
+    padding: '15px',
+    fontSize: '18px',
+    fontWeight: 'bold',
+    border: 'none',
+    borderRadius: '8px',
+    marginTop: '30px',
+    cursor: 'pointer'
   },
   skipButton: {
-    marginTop: 15,
-    alignItems: 'center'
-  },
-  skipText: {
+    width: '100%',
+    backgroundColor: 'transparent',
     color: '#999',
-    fontSize: 16
+    padding: '15px',
+    fontSize: '16px',
+    border: 'none',
+    marginTop: '15px',
+    cursor: 'pointer'
   }
-});
+};

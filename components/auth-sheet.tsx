@@ -80,19 +80,49 @@ export function AuthSheet({ visible, onClose, action }: AuthSheetProps) {
         </div>
 
         {/* BOTONES */}
-        <button
-          onClick={() => { onClose(); router.push('/registro'); }}
-          style={{
-            width: '100%', padding: '16px', borderRadius: 14, border: 'none',
-            background: 'linear-gradient(135deg, #2563EB, #1d4ed8)',
-            color: '#fff', fontSize: 16, fontWeight: 700, cursor: 'pointer',
-            boxShadow: '0 4px 20px rgba(37,99,235,0.4)',
-            marginBottom: 12,
-            fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
-          }}
-        >
-          Registrarme gratis →
-        </button>
+        {/* BOTONES */}
+<button
+  onClick={() => { onClose(); router.push('/registro'); }}
+  style={{
+    width: '100%', padding: '16px', borderRadius: 14, border: 'none',
+    background: 'linear-gradient(135deg, #2563EB, #1d4ed8)',
+    color: '#fff', fontSize: 16, fontWeight: 700, cursor: 'pointer',
+    boxShadow: '0 4px 20px rgba(37,99,235,0.4)',
+    marginBottom: 12,
+    fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+  }}
+>
+  Registrarme como Usuario
+</button>
+
+<button
+  onClick={() => { onClose(); router.push('/RegisterAgent'); }}
+  style={{
+    width: '100%', padding: '16px', borderRadius: 14, border: 'none',
+    background: 'linear-gradient(135deg, #22C55E, #16A34A)',
+    color: '#fff', fontSize: 16, fontWeight: 700, cursor: 'pointer',
+    boxShadow: '0 4px 20px rgba(34,197,94,0.4)',
+    marginBottom: 12,
+    fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+  }}
+>
+  Registrarme como Agente
+</button>
+
+<button
+  onClick={() => { onClose(); router.push('/login'); }}
+  style={{
+    width: '100%', padding: '15px', borderRadius: 14,
+    border: '1px solid rgba(255,255,255,0.12)',
+    background: 'rgba(255,255,255,0.05)',
+    color: 'rgba(255,255,255,0.7)', fontSize: 15, fontWeight: 600,
+    cursor: 'pointer',
+    fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
+  }}
+>
+  Ya tengo cuenta
+</button>
+       
 
         <button
           onClick={() => { onClose(); router.push('/login'); }}

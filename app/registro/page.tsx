@@ -382,9 +382,35 @@ export default function RegistroPage() {
               </div>
             </div>
             {error && <p style={{ color: "#EF4444", fontSize: 13, marginTop: 8, textAlign: "left" }}>{error}</p>}
-            <button onClick={handleRegistro} disabled={loading || !aceptaTyC} style={{ ...btn, marginTop: 20, opacity: (loading || !aceptaTyC) ? 0.5 : 1 }}>
-              {loading ? "Creando cuenta..." : "Empezar a explorar"}
-            </button>
+           {/* Botón Registrarme como Usuario */}
+<button 
+  onClick={handleRegistro} 
+  disabled={loading || !aceptaTyC} 
+  style={{ ...btn, marginTop: 20, opacity: (loading || !aceptaTyC) ? 0.5 : 1 }}
+>
+  {loading ? "Creando cuenta..." : "Registrarme como Usuario"}
+</button>
+
+{/* Botón Registrarme como Agente */}
+<button 
+  onClick={() => {
+    if (!aceptaTyC) {
+      setError("Debes aceptar los Terminos y Condiciones");
+      return;
+    }
+    setLoading(true);
+    // Acá va la lógica de registro de agente
+    // Por ahora, simulamos que registra y redirige
+    setTimeout(() => {
+      setLoading(false);
+      router.push('/RegisterAgent');
+    }, 1000);
+  }} 
+  disabled={loading || !aceptaTyC} 
+  style={{ ...btn, marginTop: 12, background: "linear-gradient(135deg, #22C55E, #16A34A)", opacity: (loading || !aceptaTyC) ? 0.5 : 1 }}
+>
+  {loading ? "Creando cuenta..." : "Registrarme como Agente"}
+</button>
           </div>
         )}
       </div>
