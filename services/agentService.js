@@ -1,9 +1,10 @@
-import { supabase } from '../lib/supabaseClient'; // Ajustá la ruta según donde tengas tu supabase client
+import { supabase } from '../lib/supabaseClient';
 
 // Registrar usuario como agente
-export const registerAgent = async (agentData) => {
+export const registerAgent = async (agentData, userId) => {
   try {
     const { data, error } = await supabase.rpc('register_agent', {
+      p_user_id: userId,
       p_city: agentData.city,
       p_phone: agentData.phone,
       p_description: agentData.description,

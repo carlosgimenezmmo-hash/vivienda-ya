@@ -1,10 +1,12 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { registerAgent } from '../services/agentService';
 import { useRouter } from 'next/navigation';
+import { supabase } from '../lib/supabaseClient';
 
 export default function RegisterAgentScreen() {
   const router = useRouter();
+  const [userId, setUserId] = useState(null);
   const [formData, setFormData] = useState({
     city: '',
     phone: '',
@@ -12,21 +14,41 @@ export default function RegisterAgentScreen() {
   });
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        router.push('/login');
+        return;
+      }
+      setUserId(user.id);
+    };
+    getUser();
+  }, [router]);
+
   const handleRegister = async () => {
+    console.log('userId antes de enviar:', userId);
+    
     if (!formData.city || !formData.phone || !formData.description) {
       alert('Por favor complete todos los campos');
       return;
     }
 
+    if (!userId) {
+      alert('Usuario no autenticado. Por favor inicie sesion nuevamente.');
+      return;
+    }
+
     setLoading(true);
-    const result = await registerAgent(formData);
+    const result = await registerAgent(formData, userId);
+    console.log('Resultado completo:', result);
     setLoading(false);
 
     if (result.success) {
       alert('Registro exitoso! Su periodo de prueba termina en 30 dias');
       router.push('/AgentDashboard');
     } else {
-      alert(result.error || 'No se pudo registrar el agente');
+      alert('Error: ' + (result.error || 'No se pudo registrar el agente'));
     }
   };
 
