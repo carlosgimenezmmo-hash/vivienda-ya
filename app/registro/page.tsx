@@ -101,71 +101,103 @@ export default function RegistroPage() {
     }
   }
 
- const handlePaso3 = async () => {
-  setError("")
-  if (!dniFront || !dniBack) return setError("Necesitamos foto del frente y dorso de tu DNI")
-  setScanning(true)
-  try {
-    const res = await fetch("/api/verificar-dni", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ dniFront, dniBack, userId: null }),
-    })
-    const data = await res.json()
-    if (!data.result?.valido) {
-      setError(data.result?.motivo || "DNI no valido. Por favor saca una foto mas clara.")
+  const handlePaso3 = async () => {
+    setError("")
+    if (!dniFront || !dniBack) return setError("Necesitamos foto del frente y dorso de tu DNI")
+    setScanning(true)
+    try {
+      const res = await fetch("/api/verificar-dni", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ dniFront, dniBack, userId: null }),
+      })
+      const data = await res.json()
+      if (!data.result?.valido) {
+        setError(data.result?.motivo || "DNI no valido. Por favor saca una foto mas clara.")
+        setScanning(false)
+        return
+      }
+      setStep(4)
+    } catch {
+      setError("Error al verificar el DNI. Intenta de nuevo.")
+    } finally {
       setScanning(false)
-      return
     }
-    setStep(4)
-  } catch {
-    setError("Error al verificar el DNI. Intenta de nuevo.")
-  } finally {
-    setScanning(false)
   }
-}
 
-  const handleRegistro = async () => {
+  // ✅ Función base: crea la cuenta en Supabase Auth + users + channels
+  // Devuelve el userId si fue exitoso, null si hubo error
+  const crearCuentaBase = async (): Promise<string | null> => {
+    const fecha = getFechaNacimiento()
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      email, password,
+      options: { data: { nombre, apellido, telefono, fecha_nacimiento: fecha, dni_verificado: false } }
+    })
+    if (signUpError) throw signUpError
+    if (!signUpData.user) throw new Error("No se pudo crear el usuario")
+
+    const uid = signUpData.user.id
+
+    await supabase.from("users").insert({
+      id: uid,
+      email,
+      full_name: `${nombre} ${apellido}`,
+      phone: telefono,
+      province: provincia,
+      city: ciudad,
+      credits: 101,
+    })
+
+    const slug = `${nombre}-${apellido}`.toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "")
+
+    await supabase.from("channels").insert({
+      user_id: uid,
+      slug: slug + "-" + uid.slice(0, 6),
+      nombre: `${nombre} ${apellido}`,
+      plan: "gratis",
+      verificado: false,
+    })
+
+    return uid
+  }
+
+  // ✅ Registro como Usuario → va al feed
+  const handleRegistroUsuario = async () => {
     if (!aceptaTyC) return setError("Debes aceptar los Terminos y Condiciones")
     setLoading(true)
     setError("")
     try {
-      const fecha = getFechaNacimiento()
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-        email, password,
-        options: { data: { nombre, apellido, telefono, fecha_nacimiento: fecha, dni_verificado: false } }
-      })
-      if (signUpError) throw signUpError
-      if (signUpData.user) {
-        await supabase.from("users").insert({
-          id: signUpData.user.id,
-          email,
-          full_name: `${nombre} ${apellido}`,
-          phone: telefono,
-          province: provincia,
-          city: ciudad,
-          credits: 101,
-        })
-      }
-      const slug = `${nombre}-${apellido}`.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")
-        await supabase.from("channels").insert({
-          user_id: signUpData.user.id,
-          slug: slug + "-" + signUpData.user.id.slice(0, 6),
-          nombre: `${nombre} ${apellido}`,
-          plan: "gratis",
-          verificado: false,
-        })
-
-
-
-
-
-
-
-
-        router.push("/")
+      await crearCuentaBase()
+      router.push("/")
     } catch (err: any) {
-      setError(err.message === "User already registered" ? "Este email ya tiene una cuenta. Inicia sesion." : err.message || "Error al registrarse")
+      setError(
+        err.message === "User already registered"
+          ? "Este email ya tiene una cuenta. Inicia sesion."
+          : err.message || "Error al registrarse"
+      )
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // ✅ Registro como Agente → crea cuenta y redirige a /RegisterAgent con sesión activa
+  const handleRegistroAgente = async () => {
+    if (!aceptaTyC) return setError("Debes aceptar los Terminos y Condiciones")
+    setLoading(true)
+    setError("")
+    try {
+      await crearCuentaBase()
+      // La sesión ya está activa después del signUp
+      // /RegisterAgent detectará al usuario logueado y mostrará el formulario de agente
+      router.push("/RegisterAgent")
+    } catch (err: any) {
+      setError(
+        err.message === "User already registered"
+          ? "Este email ya tiene una cuenta. Inicia sesion."
+          : err.message || "Error al registrarse"
+      )
     } finally {
       setLoading(false)
     }
@@ -305,7 +337,7 @@ export default function RegistroPage() {
               {(["front", "back"] as const).map(side => (
                 <div key={side}>
                   <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13, margin: "0 0 8px", fontWeight: 600 }}>
-                    {side === "front" ? "Frente" : "Dorso"} {(side === "front" ? dniFront : dniBack) && <span style={{ color: "#22C55E" }}>OK</span>}
+                    {side === "front" ? "Frente" : "Dorso"} {(side === "front" ? dniFront : dniBack) && <span style={{ color: "#22C55E" }}>✓</span>}
                   </p>
                   <div onClick={() => handleScanDNI(side)} style={{
                     height: 110, borderRadius: 14,
@@ -343,8 +375,9 @@ export default function RegistroPage() {
               Tu cuenta fue creada exitosamente.
             </p>
             <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 13, margin: "0 0 28px" }}>
-              Empeza a explorar propiedades ahora.
+              Elegí cómo querés continuar.
             </p>
+
             <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: 16, marginBottom: 24, textAlign: "left" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
                 <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#1d4ed8", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16 }}>U</div>
@@ -362,6 +395,8 @@ export default function RegistroPage() {
                 <p style={{ margin: 0, color: "#22C55E", fontSize: 12, fontWeight: 600 }}>+1 credito de bienvenida</p>
               </div>
             </div>
+
+            {/* TyC */}
             <div style={{ textAlign: "left", marginBottom: 8 }}>
               <div onClick={() => setAceptaTyC(!aceptaTyC)} style={{ display: "flex", alignItems: "flex-start", gap: 12, cursor: "pointer" }}>
                 <div style={{
@@ -381,36 +416,34 @@ export default function RegistroPage() {
                 </p>
               </div>
             </div>
-            {error && <p style={{ color: "#EF4444", fontSize: 13, marginTop: 8, textAlign: "left" }}>{error}</p>}
-           {/* Botón Registrarme como Usuario */}
-<button 
-  onClick={handleRegistro} 
-  disabled={loading || !aceptaTyC} 
-  style={{ ...btn, marginTop: 20, opacity: (loading || !aceptaTyC) ? 0.5 : 1 }}
->
-  {loading ? "Creando cuenta..." : "Registrarme como Usuario"}
-</button>
 
-{/* Botón Registrarme como Agente */}
-<button 
-  onClick={() => {
-    if (!aceptaTyC) {
-      setError("Debes aceptar los Terminos y Condiciones");
-      return;
-    }
-    setLoading(true);
-    // Acá va la lógica de registro de agente
-    // Por ahora, simulamos que registra y redirige
-    setTimeout(() => {
-      setLoading(false);
-      router.push('/RegisterAgent');
-    }, 1000);
-  }} 
-  disabled={loading || !aceptaTyC} 
-  style={{ ...btn, marginTop: 12, background: "linear-gradient(135deg, #22C55E, #16A34A)", opacity: (loading || !aceptaTyC) ? 0.5 : 1 }}
->
-  {loading ? "Creando cuenta..." : "Registrarme como Agente"}
-</button>
+            {error && <p style={{ color: "#EF4444", fontSize: 13, marginTop: 8, textAlign: "left" }}>{error}</p>}
+
+            {/* ✅ Botón Usuario */}
+            <button
+              onClick={handleRegistroUsuario}
+              disabled={loading || !aceptaTyC}
+              style={{ ...btn, marginTop: 20, opacity: (loading || !aceptaTyC) ? 0.5 : 1 }}
+            >
+              {loading ? "Creando cuenta..." : "Continuar como Usuario"}
+            </button>
+
+            {/* ✅ Botón Agente — crea la cuenta Y redirige a /RegisterAgent con sesión activa */}
+            <button
+              onClick={handleRegistroAgente}
+              disabled={loading || !aceptaTyC}
+              style={{
+                ...btn, marginTop: 12,
+                background: "linear-gradient(135deg, #22C55E, #16A34A)",
+                opacity: (loading || !aceptaTyC) ? 0.5 : 1,
+              }}
+            >
+              {loading ? "Creando cuenta..." : "Continuar como Agente →"}
+            </button>
+
+            <p style={{ textAlign: "center", fontSize: 12, color: "rgba(255,255,255,0.25)", marginTop: 16, lineHeight: 1.5 }}>
+              Como agente completarás un paso adicional con tus datos profesionales.
+            </p>
           </div>
         )}
       </div>
