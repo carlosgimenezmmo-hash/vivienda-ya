@@ -21,7 +21,7 @@ export default function RegisterAgentScreen({ navigation }) {
 
   const handleRegister = async () => {
     if (!formData.city || !formData.phone || !formData.description) {
-      Alert.alert('Error', 'Por favor completá todos los campos');
+      Alert.alert('Error', 'Por favor complete todos los campos');
       return;
     }
 
@@ -31,8 +31,8 @@ export default function RegisterAgentScreen({ navigation }) {
 
     if (result.success) {
       Alert.alert(
-        '¡Registro exitoso!',
-        `Tu período de prueba gratis termina el ${new Date(result.trial_end).toLocaleDateString()}`,
+        'Registro exitoso',
+        'Su periodo de prueba termina en 30 dias',
         [{ text: 'OK', onPress: () => navigation.replace('AgentDashboard') }]
       );
     } else {
@@ -43,20 +43,20 @@ export default function RegisterAgentScreen({ navigation }) {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>📱 Registrate como Agente</Text>
-        <Text style={styles.subtitle}>30 días gratis • $40 USD/mes después</Text>
+        <Text style={styles.title}>Registrate como Agente</Text>
+        <Text style={styles.subtitle}>30 dias gratis - $40 USD/mes despues</Text>
       </View>
 
       <View style={styles.form}>
-        <Text style={styles.label}>Ciudad donde operás</Text>
+        <Text style={styles.label}>Ciudad donde opera</Text>
         <TextInput
           style={styles.input}
-          placeholder="Ej: Buenos Aires, Córdoba, Mendoza..."
+          placeholder="Ej: Buenos Aires, Cordoba, Mendoza"
           value={formData.city}
           onChangeText={(text) => setFormData({ ...formData, city: text })}
         />
 
-        <Text style={styles.label}>Teléfono de contacto</Text>
+        <Text style={styles.label}>Telefono de contacto</Text>
         <TextInput
           style={styles.input}
           placeholder="+54 9 11 1234-5678"
@@ -65,10 +65,10 @@ export default function RegisterAgentScreen({ navigation }) {
           onChangeText={(text) => setFormData({ ...formData, phone: text })}
         />
 
-        <Text style={styles.label}>Descripción profesional</Text>
+        <Text style={styles.label}>Descripcion profesional</Text>
         <TextInput
           style={[styles.input, styles.textArea]}
-          placeholder="Contanos sobre tu experiencia, especialidad, etc."
+          placeholder="Cuentenos sobre su experiencia, especialidad, etc."
           multiline
           numberOfLines={4}
           value={formData.description}
