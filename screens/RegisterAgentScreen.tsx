@@ -87,29 +87,45 @@ export default function RegisterAgentScreen() {
     fileRef.current?.click();
   };
 
+  // ✅ Comprime la imagen a máximo 1MB antes de enviar a la API
+  const comprimirImagen = (base64: string, maxWidth = 1200, quality = 0.7): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let { width, height } = img;
+        if (width > maxWidth) {
+          height = (height * maxWidth) / width;
+          width = maxWidth;
+        }
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d')!;
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.src = base64;
+    });
+  };
+
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !scanSide) return;
     setScanning(true);
     const reader = new FileReader();
-    reader.onload = () => {
-      if (scanSide === 'front') setDniFront(reader.result as string);
-      else setDniBack(reader.result as string);
+    reader.onload = async () => {
+      const base64Original = reader.result as string;
+      // Comprimir antes de guardar en estado
+      const base64Comprimida = await comprimirImagen(base64Original);
+      if (scanSide === 'front') setDniFront(base64Comprimida);
+      else setDniBack(base64Comprimida);
     };
     reader.readAsDataURL(file);
-    try {
-      const { createWorker } = await import('tesseract.js');
-      const worker: any = await createWorker();
-      await worker.load();
-      await worker.loadLanguage('spa');
-      await worker.initialize('spa');
-      await worker.terminate();
-    } catch (err) {
-      console.error(err);
-    } finally {
+    // ✅ Tesseract eliminado — la verificación real la hace Gemini en la API
+    setTimeout(() => {
       setScanning(false);
       if (fileRef.current) fileRef.current.value = '';
-    }
+    }, 300);
   };
 
   const handlePaso3 = async () => {
