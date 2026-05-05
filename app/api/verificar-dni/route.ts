@@ -6,6 +6,16 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
+// ✅ Detecta el mime type real desde el header base64
+function getMimeType(base64: string): string {
+  const match = base64.match(/^data:(image\/\w+);base64,/)
+  return match ? match[1] : "image/jpeg"
+}
+
+function stripBase64Header(base64: string): string {
+  return base64.replace(/^data:image\/\w+;base64,/, "")
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { dniFront, dniBack, userId } = await req.json()
@@ -13,6 +23,13 @@ export async function POST(req: NextRequest) {
     if (!dniFront || !dniBack) {
       return NextResponse.json({ error: "Faltan imagenes del DNI" }, { status: 400 })
     }
+
+    const frontMime = getMimeType(dniFront)
+    const backMime = getMimeType(dniBack)
+    const frontBase64 = stripBase64Header(dniFront)
+    const backBase64 = stripBase64Header(dniBack)
+
+    console.log("[verificar-dni] mime types:", { frontMime, backMime })
 
     const prompt = `Sos un sistema de verificacion de identidad para una app inmobiliaria argentina.
 Analiza estas dos imagenes de un DNI argentino (frente y dorso).
@@ -29,9 +46,6 @@ o
 
 Rechaza si: imagen borrosa, DNI de otro pais, fotocopia, pantalla fotografiada, datos ilegibles.`
 
-    const frontBase64 = dniFront.replace(/^data:image\/\w+;base64,/, "")
-    const backBase64 = dniBack.replace(/^data:image\/\w+;base64,/, "")
-
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
       {
@@ -41,24 +55,35 @@ Rechaza si: imagen borrosa, DNI de otro pais, fotocopia, pantalla fotografiada, 
           contents: [{
             parts: [
               { text: prompt },
-              { inline_data: { mime_type: "image/jpeg", data: frontBase64 } },
-              { inline_data: { mime_type: "image/jpeg", data: backBase64 } },
+              { inline_data: { mime_type: frontMime, data: frontBase64 } },
+              { inline_data: { mime_type: backMime, data: backBase64 } },
             ]
           }]
         }),
       }
     )
 
+    if (!response.ok) {
+      const errText = await response.text()
+      console.error("[verificar-dni] Gemini error:", response.status, errText)
+      return NextResponse.json({ error: "Error al contactar Gemini", detail: errText }, { status: 500 })
+    }
+
     const aiData = await response.json()
-    const text = aiData.candidates?.[0]?.content?.parts?.[0]?.text || '{"valido":false,"motivo":"Error al analizar"}'
+    console.log("[verificar-dni] Gemini raw response:", JSON.stringify(aiData).slice(0, 300))
+
+    const text = aiData.candidates?.[0]?.content?.parts?.[0]?.text || '{"valido":false,"motivo":"Sin respuesta de Gemini"}'
+    console.log("[verificar-dni] Texto recibido:", text)
 
     let result
     try {
       result = JSON.parse(text.replace(/```json|```/g, "").trim())
     } catch {
-      result = { valido: false, motivo: "Error al procesar respuesta" }
+      console.error("[verificar-dni] Error parseando JSON:", text)
+      result = { valido: false, motivo: "Error al procesar respuesta de IA" }
     }
 
+    // ✅ Actualizar usuario si es válido y hay userId
     if (result.valido && userId) {
       await supabase.from("users").update({
         dni_verificado: true,
@@ -69,7 +94,7 @@ Rechaza si: imagen borrosa, DNI de otro pais, fotocopia, pantalla fotografiada, 
     return NextResponse.json({ ok: true, result })
 
   } catch (err: any) {
-    console.error("Error verificacion DNI:", err)
+    console.error("[verificar-dni] Excepción:", err)
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
 }
