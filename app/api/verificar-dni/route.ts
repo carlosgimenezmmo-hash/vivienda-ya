@@ -29,17 +29,22 @@ export async function POST(req: NextRequest) {
     const prompt = `Sos un sistema de verificacion de identidad para una app inmobiliaria argentina.
 Analiza estas dos imagenes de un DNI argentino (frente y dorso).
 
-Verificá:
-1. Si es un DNI argentino real y valido (no una fotocopia borrosa, no una pantalla fotografiada, no un DNI extranjero)
-2. Si el frente muestra claramente: nombre, apellido, numero de DNI, fecha de nacimiento
-3. Si el dorso es consistente con el frente
+Tu objetivo es ser PERMISIVO y aprobar DNIs reales aunque la foto no sea perfecta.
 
-Respondé SOLO con un JSON sin markdown:
+Aprobá si:
+- Se puede leer el nombre y apellido aunque sea parcialmente
+- Se ve que es un documento argentino (DNI, LE o LC)
+- La foto fue tomada con celular (es normal que no sea perfecta, con algo de brillo o angulo)
+
+Rechazá SOLO si:
+- Es claramente un DNI de otro pais
+- La imagen esta completamente negra, en blanco o es irreconocible
+- No se ve absolutamente nada del documento
+
+Respondé SOLO con un JSON sin markdown, sin explicaciones adicionales:
 {"valido": true, "nombre": "Juan", "apellido": "Perez", "dni": "12345678", "fecha_nacimiento": "1990-05-15", "motivo": "DNI valido"}
 o
-{"valido": false, "nombre": null, "apellido": null, "dni": null, "fecha_nacimiento": null, "motivo": "Motivo del rechazo"}
-
-Rechaza si: imagen borrosa, DNI de otro pais, fotocopia, pantalla fotografiada, datos ilegibles.`
+{"valido": false, "nombre": null, "apellido": null, "dni": null, "fecha_nacimiento": null, "motivo": "Motivo del rechazo"}`
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
