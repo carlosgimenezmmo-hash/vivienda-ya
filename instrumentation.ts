@@ -1,6 +1,12 @@
 export async function register() {
-  const { Logtail } = await import("@logtail/next")
-  const logtail = new Logtail(process.env.BETTERSTACK_TOKEN!)
-  logtail.info("App iniciada")
-  await logtail.flush()
+  try {
+    if (process.env.BETTERSTACK_TOKEN) {
+      const { Logtail } = await import("@logtail/next")
+      const logtail = new Logtail(process.env.BETTERSTACK_TOKEN)
+      logtail.info("App iniciada")
+      await logtail.flush()
+    }
+  } catch (err) {
+    console.error("Logtail error:", err)
+  }
 }
