@@ -1,7 +1,6 @@
 ﻿"use client"
 
 import { useState, useRef, ChangeEvent } from "react"
-import { createWorker } from "tesseract.js"
 import { useAuth } from "@/lib/auth-context"
 import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabaseClient"
@@ -81,18 +80,33 @@ export default function RegistroPage() {
     if (!file || !scanSide) return
     setScanning(true)
     setError("")
-    const reader = new FileReader()
-    reader.onload = () => {
-      if (scanSide === "front") setDniFront(reader.result as string)
-      else setDniBack(reader.result as string)
+
+    // Comprimir imagen antes de guardar
+    const comprimirImagen = (file: File): Promise<string> => {
+      return new Promise((resolve) => {
+        const reader = new FileReader()
+        reader.onload = (ev) => {
+          const img = new Image()
+          img.onload = () => {
+            const canvas = document.createElement("canvas")
+            const MAX = 1200
+            const ratio = Math.min(MAX / img.width, MAX / img.height, 1)
+            canvas.width = img.width * ratio
+            canvas.height = img.height * ratio
+            const ctx = canvas.getContext("2d")!
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+            resolve(canvas.toDataURL("image/jpeg", 0.7))
+          }
+          img.src = ev.target?.result as string
+        }
+        reader.readAsDataURL(file)
+      })
     }
-    reader.readAsDataURL(file)
+
     try {
-      const worker: any = await createWorker()
-      await worker.load()
-      await worker.loadLanguage("spa")
-      await worker.initialize("spa")
-      await worker.terminate()
+      const compressed = await comprimirImagen(file)
+      if (scanSide === "front") setDniFront(compressed)
+      else setDniBack(compressed)
     } catch (err) {
       console.error(err)
     } finally {
@@ -125,73 +139,44 @@ export default function RegistroPage() {
     }
   }
 
-  // ✅ Función base: crea la cuenta en Supabase Auth + users + channels
-  // Devuelve el userId si fue exitoso, null si hubo error
-  const crearCuentaBase = async (): Promise<string | null> => {
-    const fecha = getFechaNacimiento()
-    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-      email, password,
-      options: { data: { nombre, apellido, telefono, fecha_nacimiento: fecha, dni_verificado: false } }
-    })
-    if (signUpError) throw signUpError
-    if (!signUpData.user) throw new Error("No se pudo crear el usuario")
-
-    const uid = signUpData.user.id
-
-    await supabase.from("users").insert({
-      id: uid,
-      email,
-      full_name: `${nombre} ${apellido}`,
-      phone: telefono,
-      province: provincia,
-      city: ciudad,
-      credits: 101,
-    })
-
-    const slug = `${nombre}-${apellido}`.toLowerCase()
-      .replace(/\s+/g, "-")
-      .replace(/[^a-z0-9-]/g, "")
-
-    await supabase.from("channels").insert({
-      user_id: uid,
-      slug: slug + "-" + uid.slice(0, 6),
-      nombre: `${nombre} ${apellido}`,
-      plan: "gratis",
-      verificado: false,
-    })
-
-    return uid
-  }
-
-  // ✅ Registro como Usuario → va al feed
   const handleRegistroUsuario = async () => {
     if (!aceptaTyC) return setError("Debes aceptar los Terminos y Condiciones")
     setLoading(true)
     setError("")
     try {
-      await crearCuentaBase()
-      router.push("/")
-    } catch (err: any) {
-      setError(
-        err.message === "User already registered"
-          ? "Este email ya tiene una cuenta. Inicia sesion."
-          : err.message || "Error al registrarse"
-      )
-    } finally {
-      setLoading(false)
-    }
-  }
+      const fecha = getFechaNacimiento()
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email, password,
+        options: { data: { nombre, apellido, telefono, fecha_nacimiento: fecha, dni_verificado: false } }
+      })
+      if (signUpError) throw signUpError
+      if (!signUpData.user) throw new Error("No se pudo crear el usuario")
 
-  // ✅ Registro como Agente → crea cuenta y redirige a /RegisterAgent con sesión activa
-  const handleRegistroAgente = async () => {
-    if (!aceptaTyC) return setError("Debes aceptar los Terminos y Condiciones")
-    setLoading(true)
-    setError("")
-    try {
-      await crearCuentaBase()
-      // La sesión ya está activa después del signUp
-      // /RegisterAgent detectará al usuario logueado y mostrará el formulario de agente
-      router.push("/RegisterAgent")
+      const uid = signUpData.user.id
+
+      await supabase.from("users").insert({
+        id: uid,
+        email,
+        full_name: `${nombre} ${apellido}`,
+        phone: telefono,
+        province: provincia,
+        city: ciudad,
+        credits: 101,
+      })
+
+      const slug = `${nombre}-${apellido}`.toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "")
+
+      await supabase.from("channels").insert({
+        user_id: uid,
+        slug: slug + "-" + uid.slice(0, 6),
+        nombre: `${nombre} ${apellido}`,
+        plan: "gratis",
+        verificado: false,
+      })
+
+      router.push("/")
     } catch (err: any) {
       setError(
         err.message === "User already registered"
@@ -346,7 +331,7 @@ export default function RegistroPage() {
                     cursor: "pointer", overflow: "hidden", background: "rgba(255,255,255,0.02)",
                   }}>
                     {scanning && scanSide === side ? (
-                      <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>Escaneando...</p>
+                      <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>Procesando...</p>
                     ) : (side === "front" ? dniFront : dniBack) ? (
                       <img src={(side === "front" ? dniFront : dniBack)!} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                     ) : (
@@ -371,11 +356,8 @@ export default function RegistroPage() {
               </svg>
             </div>
             <h1 style={{ fontSize: 26, fontWeight: 800, margin: "0 0 10px" }}>Todo listo!</h1>
-            <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 15, margin: "0 0 8px", lineHeight: 1.6 }}>
+            <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 15, margin: "0 0 28px", lineHeight: 1.6 }}>
               Tu cuenta fue creada exitosamente.
-            </p>
-            <p style={{ color: "rgba(255,255,255,0.25)", fontSize: 13, margin: "0 0 28px" }}>
-              Elegí cómo querés continuar.
             </p>
 
             <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 14, padding: 16, marginBottom: 24, textAlign: "left" }}>
@@ -396,7 +378,6 @@ export default function RegistroPage() {
               </div>
             </div>
 
-            {/* TyC */}
             <div style={{ textAlign: "left", marginBottom: 8 }}>
               <div onClick={() => setAceptaTyC(!aceptaTyC)} style={{ display: "flex", alignItems: "flex-start", gap: 12, cursor: "pointer" }}>
                 <div style={{
@@ -419,31 +400,13 @@ export default function RegistroPage() {
 
             {error && <p style={{ color: "#EF4444", fontSize: 13, marginTop: 8, textAlign: "left" }}>{error}</p>}
 
-            {/* ✅ Botón Usuario */}
             <button
               onClick={handleRegistroUsuario}
               disabled={loading || !aceptaTyC}
               style={{ ...btn, marginTop: 20, opacity: (loading || !aceptaTyC) ? 0.5 : 1 }}
             >
-              {loading ? "Creando cuenta..." : "Continuar como Usuario"}
+              {loading ? "Creando cuenta..." : "Ingresar a ViviendaYa"}
             </button>
-
-            {/* ✅ Botón Agente — crea la cuenta Y redirige a /RegisterAgent con sesión activa */}
-            <button
-              onClick={handleRegistroAgente}
-              disabled={loading || !aceptaTyC}
-              style={{
-                ...btn, marginTop: 12,
-                background: "linear-gradient(135deg, #22C55E, #16A34A)",
-                opacity: (loading || !aceptaTyC) ? 0.5 : 1,
-              }}
-            >
-              {loading ? "Creando cuenta..." : "Continuar como Agente →"}
-            </button>
-
-            <p style={{ textAlign: "center", fontSize: 12, color: "rgba(255,255,255,0.25)", marginTop: 16, lineHeight: 1.5 }}>
-              Como agente completarás un paso adicional con tus datos profesionales.
-            </p>
           </div>
         )}
       </div>

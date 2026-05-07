@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabaseClient"
@@ -25,10 +25,10 @@ interface Property {
 
 const PLAN_NIVEL: Record<string, number> = {
   gratis: 0,
-  plata: 1,
-  oro: 2,
-  platino: 3,
-  diamante: 4,
+  junior: 1,
+  agente: 2,
+  especializado: 3,
+  senior: 4,
 }
 
 export default function DashboardPage() {
@@ -37,7 +37,6 @@ export default function DashboardPage() {
   const [properties, setProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<"resumen" | "propiedades" | "zonas">("resumen")
-  // Estados para eliminar
   const [confirmarId, setConfirmarId] = useState<number | null>(null)
   const [deleting, setDeleting] = useState<number | null>(null)
 
@@ -70,7 +69,6 @@ export default function DashboardPage() {
     }
   }
 
-  // Handler de eliminacion conectado a Supabase
   const handleDelete = async (id: number) => {
     setConfirmarId(null)
     setDeleting(id)
@@ -99,10 +97,10 @@ export default function DashboardPage() {
 
   const planColor: Record<string, string> = {
     gratis: "#888",
-    plata: "#94A3B8",
-    oro: "#F59E0B",
-    platino: "#2563EB",
-    diamante: "#A855F7",
+    junior: "#94A3B8",
+    agente: "#F59E0B",
+    especializado: "#2563EB",
+    senior: "#A855F7",
   }
 
   const s: Record<string, React.CSSProperties> = {
@@ -150,7 +148,6 @@ export default function DashboardPage() {
       }}>
         Ver planes
       </button>
-
       <p style={{ margin: "16px 0 0", fontSize: 13, color: "rgba(255,255,255,0.4)" }}>
         Para eliminar publicaciones,{" "}
         <span
@@ -226,8 +223,8 @@ export default function DashboardPage() {
               fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
             }}>
               {t === "resumen" ? "Resumen" : t === "propiedades" ? "Mis publicaciones" : "Por zona"}
-              {t === "propiedades" && !puedeVerPropiedades && " (Plan Plata)"}
-              {t === "zonas" && !puedeVerZonas && " (Plan Oro)"}
+              {t === "propiedades" && !puedeVerPropiedades && " (Plan Junior)"}
+              {t === "zonas" && !puedeVerZonas && " (Plan Agente)"}
             </button>
           ))}
         </div>
@@ -238,17 +235,16 @@ export default function DashboardPage() {
         {/* TAB RESUMEN */}
         {tab === "resumen" && (
           <div>
-            {/* STATS */}
             <div style={{
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
               gap: 12, marginBottom: 24,
             }}>
               {[
-                { label: "Vistas totales", valor: totalVistas, color: "#2563EB", icono: "Vistas", libre: true },
-                { label: "Likes", valor: totalLikes, color: "#EF4444", icono: "Likes", libre: true },
-                { label: "Contactos WhatsApp", valor: totalContactos, color: "#25D366", icono: "Contactos", libre: puedeVerContactos },
-                { label: "Guardados", valor: totalGuardados, color: "#F59E0B", icono: "Guardados", libre: puedeVerContactos },
+                { label: "Vistas totales", valor: totalVistas, color: "#2563EB", libre: true },
+                { label: "Likes", valor: totalLikes, color: "#EF4444", libre: true },
+                { label: "Contactos WhatsApp", valor: totalContactos, color: "#25D366", libre: puedeVerContactos },
+                { label: "Guardados", valor: totalGuardados, color: "#F59E0B", libre: puedeVerContactos },
               ].map((stat) => (
                 <div key={stat.label} style={{
                   ...s.card,
@@ -265,7 +261,7 @@ export default function DashboardPage() {
                       borderRadius: 16,
                     }}>
                       <span style={{ fontSize: 20 }}>🔒</span>
-                      <p style={{ margin: "6px 0 0", fontSize: 11, color: "rgba(255,255,255,0.5)" }}>Plan Plata</p>
+                      <p style={{ margin: "6px 0 0", fontSize: 11, color: "rgba(255,255,255,0.5)" }}>Plan Junior</p>
                     </div>
                   )}
                   <p style={s.label}>{stat.label}</p>
@@ -282,8 +278,6 @@ export default function DashboardPage() {
                   {mejorPropiedad.video_url && (
                     <video src={mejorPropiedad.video_url} style={{ width: 80, height: 80, borderRadius: 12, objectFit: "cover", flexShrink: 0 }} muted />
                   )}
-
-
                   <div style={{ flex: 1, minWidth: 200 }}>
                     <p style={{ margin: "0 0 4px", fontWeight: 700, fontSize: 16 }}>{mejorPropiedad.title || "Sin titulo"}</p>
                     <p style={{ margin: "0 0 12px", fontSize: 13, color: "rgba(255,255,255,0.5)" }}>
@@ -311,7 +305,7 @@ export default function DashboardPage() {
               <p style={{ ...s.label, color: "#60A5FA" }}>Tips para mejorar tu rendimiento</p>
               {[
                 propActivas < 3 ? "Publica mas propiedades para aumentar tu visibilidad en el feed" : null,
-                !puedeVerContactos ? "Mejora al plan Plata para ver cuantas consultas recibis por WhatsApp" : null,
+                !puedeVerContactos ? "Mejora al plan Junior para ver cuantas consultas recibis por WhatsApp" : null,
                 totalVistas < 100 ? "Destaca tus propiedades para aparecer primero en el feed" : null,
                 "Compartir tus propiedades en redes sociales multiplica las vistas",
               ].filter(Boolean).slice(0, 3).map((tip, i) => (
@@ -327,7 +321,7 @@ export default function DashboardPage() {
         {/* TAB MIS PUBLICACIONES */}
         {tab === "propiedades" && (
           !puedeVerPropiedades ? (
-            <LockedSection mensaje="Gestion detallada de publicaciones" planRequerido="Plata" />
+            <LockedSection mensaje="Gestion detallada de publicaciones" planRequerido="Junior" />
           ) : (
             <div>
               {properties.length === 0 ? (
@@ -379,8 +373,6 @@ export default function DashboardPage() {
                           </div>
                         ))}
                       </div>
-
-
                       <button
                         onClick={() => setConfirmarId(p.id)}
                         disabled={deleting === p.id}
@@ -406,7 +398,7 @@ export default function DashboardPage() {
         {/* TAB ZONAS */}
         {tab === "zonas" && (
           !puedeVerZonas ? (
-            <LockedSection mensaje="Analiticas por zona y ciudad" planRequerido="Oro" />
+            <LockedSection mensaje="Analiticas por zona y ciudad" planRequerido="Agente" />
           ) : (
             <div>
               {Object.keys(zonas).length === 0 ? (
@@ -461,7 +453,6 @@ export default function DashboardPage() {
         )}
 
       </div>
-
 
       {confirmarId !== null && (
         <div

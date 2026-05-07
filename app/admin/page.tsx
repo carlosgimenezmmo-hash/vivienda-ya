@@ -8,18 +8,18 @@ import { supabase } from "@/lib/supabaseClient"
 const ADMIN_ID = "369cd5ef-e2d3-4e5d-9a1b-aaa432f407e0"
 
 const PLAN_PRECIO: Record<string, number> = {
-  plata: 11200,
-  oro: 28000,
-  platino: 63000,
-  diamante: 112000,
+  junior: 25000,
+  agente: 50000,
+  especializado: 80000,
+  senior: 150000,
 }
 
 const PLAN_COLOR: Record<string, string> = {
   gratis: "#888",
-  plata: "#94A3B8",
-  oro: "#F59E0B",
-  platino: "#2563EB",
-  diamante: "#A855F7",
+  junior: "#94A3B8",
+  agente: "#F59E0B",
+  especializado: "#2563EB",
+  senior: "#A855F7",
 }
 
 export default function AdminPage() {
@@ -385,7 +385,7 @@ export default function AdminPage() {
                     <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
                       {u.dni_verificado && <span style={{ background: "rgba(34,197,94,0.15)", border: "1px solid rgba(34,197,94,0.3)", borderRadius: 20, padding: "2px 8px", fontSize: 10, fontWeight: 700, color: "#22C55E" }}>DNI</span>}
                       {sub ? (
-                        <span style={{ background: `${PLAN_COLOR[sub.plan]}22`, border: `1px solid ${PLAN_COLOR[sub.plan]}44`, borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 700, color: PLAN_COLOR[sub.plan], textTransform: "capitalize" }}>
+                        <span style={{ background: `${PLAN_COLOR[sub.plan] || "#888"}22`, border: `1px solid ${PLAN_COLOR[sub.plan] || "#888"}44`, borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 700, color: PLAN_COLOR[sub.plan] || "#888", textTransform: "capitalize" }}>
                           {sub.plan}
                         </span>
                       ) : (

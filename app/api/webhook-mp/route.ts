@@ -7,10 +7,10 @@ const supabase = createClient(
 )
 
 const PLANES_VENCIMIENTO: Record<string, number> = {
-  plata: 30,
-  oro: 30,
-  platino: 30,
-  diamante: 30,
+  junior: 30,
+  agente: 30,
+  especializado: 30,
+  senior: 30,
 }
 
 const SERVICIOS_VIDEOS: Record<string, number> = {
@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true })
     }
 
-    // Otros servicios (destacar, live, etc)
+    // Otros servicios
     await supabase.from("pagos_servicios").insert({
       user_id: userId,
       servicio: planId,

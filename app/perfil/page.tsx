@@ -7,18 +7,18 @@ import { supabase } from "@/lib/supabaseClient"
 
 const PLAN_COLORS: Record<string, string> = {
   gratis: "#888",
-  plata: "#94A3B8",
-  oro: "#F59E0B",
-  platino: "#2563EB",
-  diamante: "#A855F7",
+  junior: "#94A3B8",
+  agente: "#F59E0B",
+  especializado: "#2563EB",
+  senior: "#A855F7",
 }
 
 const PLAN_NOMBRES: Record<string, string> = {
   gratis: "Gratis",
-  plata: "Plata",
-  oro: "Oro",
-  platino: "Platino",
-  diamante: "Diamante",
+  junior: "Junior",
+  agente: "Agente",
+  especializado: "Especializado",
+  senior: "Senior",
 }
 
 export default function PerfilPage() {
@@ -74,6 +74,7 @@ export default function PerfilPage() {
     { emoji: "💎", label: "Mis Planes", sub: "Ver y cambiar tu plan actual", href: "/planes" },
     { emoji: "⚙️", label: "Configuracion", sub: "Cuenta y privacidad", href: "/configuracion" },
   ]
+
   return (
     <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", overflowY: "scroll" }}>
 
@@ -133,7 +134,7 @@ export default function PerfilPage() {
           <div onClick={() => router.push("/planes")} style={{ background: "linear-gradient(135deg, rgba(37,99,235,0.3), rgba(124,58,237,0.3))", border: "1px solid rgba(37,99,235,0.4)", borderRadius: 16, padding: "16px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div>
               <p style={{ margin: 0, fontWeight: 800, fontSize: 15, color: "#fff" }}>Mejora tu plan</p>
-              <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(255,255,255,0.6)" }}>Plata desde $11.200/mes</p>
+              <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(255,255,255,0.6)" }}>Junior desde $25.000/mes</p>
             </div>
             <div style={{ background: "linear-gradient(135deg, #2563EB, #7C3AED)", borderRadius: 20, padding: "8px 16px" }}>
               <span style={{ color: "#fff", fontSize: 13, fontWeight: 700 }}>Ver planes</span>
