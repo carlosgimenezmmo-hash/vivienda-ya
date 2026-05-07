@@ -14,7 +14,6 @@ export function AuthSheet({ visible, onClose, action }: AuthSheetProps) {
 
   return (
     <>
-      {/* OVERLAY */}
       <div
         onClick={onClose}
         style={{
@@ -24,7 +23,6 @@ export function AuthSheet({ visible, onClose, action }: AuthSheetProps) {
         }}
       />
 
-      {/* SHEET */}
       <div style={{
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 91,
         background: '#141414',
@@ -32,10 +30,8 @@ export function AuthSheet({ visible, onClose, action }: AuthSheetProps) {
         padding: '12px 24px 48px',
         boxShadow: '0 -8px 40px rgba(0,0,0,0.6)',
       }}>
-        {/* HANDLE */}
         <div style={{ width: 40, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.15)', margin: '0 auto 28px' }} />
 
-        {/* ICONO */}
         <div style={{
           width: 64, height: 64, borderRadius: '50%',
           background: 'rgba(37,99,235,0.15)', border: '2px solid rgba(37,99,235,0.3)',
@@ -64,7 +60,6 @@ export function AuthSheet({ visible, onClose, action }: AuthSheetProps) {
           {' '}Es gratis y rápido.
         </p>
 
-        {/* BENEFICIOS */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 28 }}>
           {[
             { icon: '❤️', text: 'Guardá y likeá propiedades' },
@@ -79,7 +74,6 @@ export function AuthSheet({ visible, onClose, action }: AuthSheetProps) {
           ))}
         </div>
 
-        {/* ✅ Botón Usuario */}
         <button
           onClick={() => { onClose(); router.push('/registro'); }}
           style={{
@@ -91,25 +85,9 @@ export function AuthSheet({ visible, onClose, action }: AuthSheetProps) {
             fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
           }}
         >
-          Registrarme como Usuario
+          Registrarme
         </button>
 
-        {/* ✅ Botón Agente — mismo flujo de registro, bifurca al final */}
-        <button
-          onClick={() => { onClose(); router.push('/registro'); }}
-          style={{
-            width: '100%', padding: '16px', borderRadius: 14, border: 'none',
-            background: 'linear-gradient(135deg, #22C55E, #16A34A)',
-            color: '#fff', fontSize: 16, fontWeight: 700, cursor: 'pointer',
-            boxShadow: '0 4px 20px rgba(34,197,94,0.4)',
-            marginBottom: 12,
-            fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
-          }}
-        >
-          Registrarme como Agente
-        </button>
-
-        {/* ✅ Ya tengo cuenta — una sola vez */}
         <button
           onClick={() => { onClose(); router.push('/login'); }}
           style={{
