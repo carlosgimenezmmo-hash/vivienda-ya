@@ -4,6 +4,27 @@ import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabaseClient"
 import { useAuth } from "@/lib/auth-context"
 
+// ✅ Sanitización de strings: elimina HTML/scripts y recorta espacios
+function sanitizeText(value: string, maxLength = 200): string {
+  return value
+    .replace(/<[^>]*>/g, "")        // elimina tags HTML
+    .replace(/[<>'"]/g, "")         // elimina caracteres peligrosos
+    .trim()
+    .slice(0, maxLength)
+}
+
+// ✅ Sanitización de números: solo positivos
+function sanitizeNumber(value: string, max = 999999999): number {
+  const num = parseFloat(value.replace(/[^0-9.]/g, ""))
+  if (isNaN(num) || num < 0) return 0
+  return Math.min(num, max)
+}
+
+// ✅ Sanitización de teléfono: solo números y +
+function sanitizePhone(value: string): string {
+  return value.replace(/[^0-9+]/g, "").slice(0, 20)
+}
+
 export default function PublicarPage() {
   const { user, isLoggedIn } = useAuth()
   const router = useRouter()
@@ -62,30 +83,48 @@ export default function PublicarPage() {
     setLoading(true)
     setError("")
     try {
+      // ✅ Validaciones antes de publicar
+      const tituloClean = sanitizeText(titulo, 100)
+      const descripcionClean = sanitizeText(descripcion, 150)
+      const barrioClean = sanitizeText(barrio, 80)
+      const ciudadClean = sanitizeText(ciudad, 80)
+      const whatsappClean = sanitizePhone(whatsapp)
+      const precioClean = sanitizeNumber(precio, 99999999)
+      const ambientesClean = sanitizeNumber(ambientes, 50)
+      const superficieClean = sanitizeNumber(superficie, 99999)
+
+      if (!tituloClean) throw new Error("El título no puede estar vacío")
+      if (!ciudadClean) throw new Error("La ciudad no puede estar vacía")
+      if (whatsappClean && whatsappClean.length < 8) throw new Error("El número de WhatsApp no es válido")
+
       const { data: sessionData } = await supabase.auth.getSession()
       const uid = sessionData?.session?.user?.id
+      if (!uid) throw new Error("Sesión expirada. Volvé a iniciar sesión.")
       if (!video) throw new Error("Debes seleccionar un video")
+
       const ext = video.name.split(".").pop()
       const path = `${Date.now()}.${ext}`
       const { error: uploadError } = await supabase.storage.from("videos-app").upload(path, video, { contentType: video.type })
       if (uploadError) throw uploadError
+
       const { data } = supabase.storage.from("videos-app").getPublicUrl(path)
       const videoUrl = data.publicUrl
+
       const { error: insertError } = await supabase.from("properties").insert({
         user_id: uid,
         owner_name: user?.name || "Propietario",
         owner_avatar: user?.avatar_url || null,
         operation_type: operacion,
         property_type: tipoPropiedad,
-        price: parseFloat(precio) || 0,
-        rooms: parseInt(ambientes) || null,
-        surface: parseInt(superficie) || null,
-        neighborhood: barrio,
-        city: ciudad,
-        location: `${barrio}, ${ciudad}`,
-        title: titulo,
-        description: descripcion,
-        whatsapp_number: whatsapp,
+        price: precioClean,
+        rooms: ambientesClean || null,
+        surface: superficieClean || null,
+        neighborhood: barrioClean,
+        city: ciudadClean,
+        location: `${barrioClean}, ${ciudadClean}`,
+        title: tituloClean,
+        description: descripcionClean,
+        whatsapp_number: whatsappClean,
         video_url: videoUrl,
         verified: gpsOk && !videoDesdeGaleria,
         lat: gpsLat,
@@ -266,7 +305,14 @@ export default function PublicarPage() {
             <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 4px" }}>Datos de la propiedad</h1>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 20px" }}>Se veran sobre el video en el feed</p>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Titulo de la propiedad</p>
-            <input value={titulo} onChange={e => setTitulo(e.target.value)} placeholder="Ej: Hermoso depto en Palermo" style={{ ...inp, marginBottom: 16 }} />
+            <input
+              value={titulo}
+              onChange={e => setTitulo(e.target.value)}
+              onBlur={e => setTitulo(sanitizeText(e.target.value, 100))}
+              placeholder="Ej: Hermoso depto en Palermo"
+              maxLength={100}
+              style={{ ...inp, marginBottom: 16 }}
+            />
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Tipo de operacion</p>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
               {[["venta", "Venta"], ["alquiler", "Alquiler"], ["temporario", "Temporario"], ["permuta", "Permuta"]].map(([val, label]) => (
@@ -283,28 +329,83 @@ export default function PublicarPage() {
             <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
               <button onClick={() => setMoneda("USD")} style={{ ...chip(moneda === "USD"), flexShrink: 0 }}>USD</button>
               <button onClick={() => setMoneda("ARS")} style={{ ...chip(moneda === "ARS"), flexShrink: 0 }}>ARS</button>
-              <input value={precio} onChange={e => setPrecio(e.target.value)} placeholder="Precio" type="number" inputMode="numeric" style={{ ...inp, flex: 1 }} />
+              <input
+                value={precio}
+                onChange={e => setPrecio(e.target.value.replace(/[^0-9.]/g, ""))}
+                placeholder="Precio"
+                type="number"
+                inputMode="numeric"
+                min="0"
+                max="99999999"
+                style={{ ...inp, flex: 1 }}
+              />
             </div>
             <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
               <div style={{ flex: 1 }}>
                 <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Ambientes</p>
-                <input value={ambientes} onChange={e => setAmbientes(e.target.value)} placeholder="Ej: 3" type="number" inputMode="numeric" style={inp} />
+                <input
+                  value={ambientes}
+                  onChange={e => setAmbientes(e.target.value.replace(/[^0-9]/g, ""))}
+                  placeholder="Ej: 3"
+                  type="number"
+                  inputMode="numeric"
+                  min="0"
+                  max="50"
+                  style={inp}
+                />
               </div>
               <div style={{ flex: 1 }}>
                 <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Superficie m2</p>
-                <input value={superficie} onChange={e => setSuperficie(e.target.value)} placeholder="Ej: 75" type="number" inputMode="numeric" style={inp} />
+                <input
+                  value={superficie}
+                  onChange={e => setSuperficie(e.target.value.replace(/[^0-9]/g, ""))}
+                  placeholder="Ej: 75"
+                  type="number"
+                  inputMode="numeric"
+                  min="0"
+                  max="99999"
+                  style={inp}
+                />
               </div>
             </div>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Ubicacion</p>
             <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
-              <input value={barrio} onChange={e => setBarrio(e.target.value)} placeholder="Barrio" style={{ ...inp, flex: 1 }} />
-              <input value={ciudad} onChange={e => setCiudad(e.target.value)} placeholder="Ciudad" style={{ ...inp, flex: 1 }} />
+              <input
+                value={barrio}
+                onChange={e => setBarrio(e.target.value)}
+                onBlur={e => setBarrio(sanitizeText(e.target.value, 80))}
+                placeholder="Barrio"
+                maxLength={80}
+                style={{ ...inp, flex: 1 }}
+              />
+              <input
+                value={ciudad}
+                onChange={e => setCiudad(e.target.value)}
+                onBlur={e => setCiudad(sanitizeText(e.target.value, 80))}
+                placeholder="Ciudad"
+                maxLength={80}
+                style={{ ...inp, flex: 1 }}
+              />
             </div>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Descripcion corta</p>
-            <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} placeholder="Describe brevemente la propiedad..." maxLength={150} style={{ ...inp, height: 80, resize: "none", marginBottom: 4 }} />
+            <textarea
+              value={descripcion}
+              onChange={e => setDescripcion(e.target.value)}
+              onBlur={e => setDescripcion(sanitizeText(e.target.value, 150))}
+              placeholder="Describe brevemente la propiedad..."
+              maxLength={150}
+              style={{ ...inp, height: 80, resize: "none", marginBottom: 4 }}
+            />
             <p style={{ textAlign: "right", color: "rgba(255,255,255,0.3)", fontSize: 12, margin: "0 0 16px" }}>{descripcion.length}/150</p>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>WhatsApp de contacto</p>
-            <input value={whatsapp} onChange={e => setWhatsapp(e.target.value)} placeholder="Ej: 5491112345678" type="tel" style={{ ...inp, marginBottom: 20 }} />
+            <input
+              value={whatsapp}
+              onChange={e => setWhatsapp(sanitizePhone(e.target.value))}
+              placeholder="Ej: 5491112345678"
+              type="tel"
+              maxLength={20}
+              style={{ ...inp, marginBottom: 20 }}
+            />
             <button onClick={() => setStep(4)} style={btn}>Continuar</button>
           </div>
         )}
