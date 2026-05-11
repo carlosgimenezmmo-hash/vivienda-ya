@@ -81,7 +81,6 @@ export default function RegistroPage() {
     setScanning(true)
     setError("")
 
-    // Comprimir imagen antes de guardar
     const comprimirImagen = (file: File): Promise<string> => {
       return new Promise((resolve) => {
         const reader = new FileReader()
@@ -174,6 +173,20 @@ export default function RegistroPage() {
         nombre: `${nombre} ${apellido}`,
         plan: "gratis",
         verificado: false,
+      })
+
+      // ✅ Suscripción Senior gratis por 30 días para todos los nuevos usuarios
+      const ahora = new Date()
+      const vencimiento = new Date()
+      vencimiento.setDate(vencimiento.getDate() + 30)
+
+      await supabase.from("subscriptions").insert({
+        user_id: uid,
+        plan: "senior",
+        estado: "activo",
+        fecha_inicio: ahora.toISOString(),
+        fecha_vencimiento: vencimiento.toISOString(),
+        precio_usd: 0,
       })
 
       router.push("/")
@@ -373,8 +386,9 @@ export default function RegistroPage() {
                   📍 {ciudad}, {provincia}
                 </p>
               )}
+              {/* ✅ Badge mes gratis */}
               <div style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)", borderRadius: 8, padding: "8px 12px" }}>
-                <p style={{ margin: 0, color: "#22C55E", fontSize: 12, fontWeight: 600 }}>+1 credito de bienvenida</p>
+                <p style={{ margin: 0, color: "#22C55E", fontSize: 12, fontWeight: 600 }}>🎉 Plan Senior gratis por 30 días activado</p>
               </div>
             </div>
 
