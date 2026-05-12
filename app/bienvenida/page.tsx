@@ -18,6 +18,7 @@ export default function BienvenidaPage() {
   const [nombre, setNombre] = useState("")
   const [apellido, setApellido] = useState("")
   const [telefono, setTelefono] = useState("")
+  const [edad, setEdad] = useState("")
   const [provincia, setProvincia] = useState("")
   const [ciudad, setCiudad] = useState("")
   const [avatarUrl, setAvatarUrl] = useState("")
@@ -40,6 +41,9 @@ export default function BienvenidaPage() {
     if (!nombre.trim()) return setError("Ingresá tu nombre")
     if (!apellido.trim()) return setError("Ingresá tu apellido")
     if (!telefono.trim()) return setError("Ingresá tu teléfono")
+    if (!edad.trim()) return setError("Ingresá tu edad")
+    const edadNum = parseInt(edad)
+    if (isNaN(edadNum) || edadNum < 18 || edadNum > 99) return setError("Ingresá una edad válida (18-99)")
     if (!provincia) return setError("Seleccioná tu provincia")
     if (!ciudad.trim()) return setError("Ingresá tu ciudad")
 
@@ -53,6 +57,7 @@ export default function BienvenidaPage() {
       await supabase.from("users").update({
         full_name: fullName,
         phone: telefono.trim(),
+        age: edadNum,
         province: provincia,
         city: ciudad.trim(),
       }).eq("id", user.id)
@@ -117,9 +122,15 @@ export default function BienvenidaPage() {
             </div>
           </div>
 
-          <div>
-            <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", margin: "0 0 6px", fontWeight: 600 }}>Teléfono</p>
-            <input value={telefono} onChange={e => setTelefono(e.target.value)} placeholder="Ej: 5491112345678" type="tel" style={inp} />
+          <div style={{ display: "flex", gap: 10 }}>
+            <div style={{ flex: 2 }}>
+              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", margin: "0 0 6px", fontWeight: 600 }}>Teléfono</p>
+              <input value={telefono} onChange={e => setTelefono(e.target.value)} placeholder="Ej: 5491112345678" type="tel" style={inp} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", margin: "0 0 6px", fontWeight: 600 }}>Edad</p>
+              <input value={edad} onChange={e => setEdad(e.target.value)} placeholder="Ej: 30" type="number" min="18" max="99" style={inp} />
+            </div>
           </div>
 
           <div>
