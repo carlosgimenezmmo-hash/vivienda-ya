@@ -16,7 +16,7 @@ export default function RegistroPage() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: "https://vivienda-ya.vercel.app/auth/callback",
+          redirectTo: "https://vivienda-ya.vercel.app/auth/handler",
         },
       })
       if (error) throw error
