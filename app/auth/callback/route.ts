@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server"
 export async function GET(req: NextRequest) {
   const requestUrl = new URL(req.url)
   const code = requestUrl.searchParams.get("code")
+  let isNewUser = false
 
   if (code) {
     const supabase = createClient(
@@ -23,6 +24,7 @@ export async function GET(req: NextRequest) {
         .single()
 
       if (!existing) {
+        isNewUser = true
         const nombre = user.user_metadata?.full_name || user.email?.split("@")[0] || "Usuario"
         const slug = nombre.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") + "-" + user.id.slice(0, 6)
 
@@ -58,5 +60,6 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  return NextResponse.redirect(new URL("/feed", req.url))
+  const destination = isNewUser ? "/bienvenida" : "/feed"
+  return NextResponse.redirect(new URL(destination, req.url))
 }
