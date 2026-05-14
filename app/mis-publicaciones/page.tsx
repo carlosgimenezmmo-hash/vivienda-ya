@@ -112,10 +112,19 @@ export default function MisPublicacionesPage() {
                   {[p.neighborhood, p.city].filter(Boolean).join(", ") || p.location || "Sin ubicacion"}
                 </p>
                 <p style={{ margin: "0 0 12px", fontSize: 18, fontWeight: 800 }}>USD {Number(p.price)?.toLocaleString() || "Consultar"}</p>
-                <button onClick={() => setConfirmarId(p.id)} disabled={deleting === p.id}
-                  style={{ width: "100%", padding: "10px", borderRadius: 10, border: "1px solid rgba(239,68,68,0.3)", background: "rgba(239,68,68,0.1)", color: "#FCA5A5", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
-                  {deleting === p.id ? "Eliminando..." : "Eliminar"}
-                </button>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {p.operation_type === "venta" && p.status === "approved" && (
+                    <button
+                      onClick={() => router.push(`/intermediacion/solicitar?property_id=${p.id}`)}
+                      style={{ width: "100%", padding: "10px", borderRadius: 10, border: "1px solid rgba(34,197,94,0.3)", background: "rgba(34,197,94,0.1)", color: "#22C55E", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
+                      Solicitar intermediación
+                    </button>
+                  )}
+                  <button onClick={() => setConfirmarId(p.id)} disabled={deleting === p.id}
+                    style={{ width: "100%", padding: "10px", borderRadius: 10, border: "1px solid rgba(239,68,68,0.3)", background: "rgba(239,68,68,0.1)", color: "#FCA5A5", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
+                    {deleting === p.id ? "Eliminando..." : "Eliminar"}
+                  </button>
+                </div>
               </div>
             </div>
           ))}
