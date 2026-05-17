@@ -341,66 +341,90 @@ export default function AdminPage() {
         )}
 
         {tab === "usuarios" && (
-          <div>
-            <div style={grid("repeat(auto-fit, minmax(160px, 1fr))")}>
-              {[
-                { label: "Total usuarios", valor: users.length, color: "#2563EB" },
-                { label: "Verificados DNI", valor: users.filter(u => u.dni_verificado).length, color: "#22C55E" },
-                { label: "Con suscripcion", valor: subsActivas.length, color: "#A855F7" },
-                { label: "Con videos extra", valor: users.filter(u => (u.videos_extra || 0) > 0).length, color: "#F59E0B" },
-              ].map(s => (
-                <div key={s.label} style={card({ borderLeft: `3px solid ${s.color}` })}>
-                  <p style={label}>{s.label}</p>
-                  <p style={{ fontSize: 28, fontWeight: 900, margin: 0, color: s.color }}>{s.valor}</p>
-                </div>
-              ))}
-            </div>
+  <div>
+    <div style={grid("repeat(auto-fit, minmax(160px, 1fr))")}>
+      {[
+        { label: "Total usuarios", valor: users.length, color: "#2563EB" },
+        { label: "Verificados DNI", valor: users.filter(u => u.dni_verificado).length, color: "#22C55E" },
+        { label: "Con suscripcion", valor: subsActivas.length, color: "#A855F7" },
+        { label: "Con videos extra", valor: users.filter(u => (u.videos_extra || 0) > 0).length, color: "#F59E0B" },
+      ].map(s => (
+        <div key={s.label} style={card({ borderLeft: `3px solid ${s.color}` })}>
+          <p style={label}>{s.label}</p>
+          <p style={{ fontSize: 28, fontWeight: 900, margin: 0, color: s.color }}>{s.valor}</p>
+        </div>
+      ))}
+    </div>
 
-            <div style={{ ...card(), marginBottom: 20 }}>
-              <p style={{ ...label, marginBottom: 16 }}>Usuarios por ciudad</p>
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                {Object.entries(usuariosPorCiudad).sort((a, b) => b[1] - a[1]).map(([ciudad, cant]) => (
-                  <div key={ciudad} style={{ background: "rgba(37,99,235,0.1)", border: "1px solid rgba(37,99,235,0.2)", borderRadius: 20, padding: "6px 14px", display: "flex", gap: 8, alignItems: "center" }}>
-                    <span style={{ fontSize: 13, color: "rgba(255,255,255,0.7)" }}>{ciudad}</span>
-                    <span style={{ fontSize: 13, fontWeight: 800, color: "#2563EB" }}>{cant}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div style={card()}>
-              <p style={{ ...label, marginBottom: 16 }}>Todos los usuarios</p>
-              {users.map((u, i) => {
-                const sub = subsActivas.find(s => s.user_id === u.id)
-                return (
-                  <div key={u.id} style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 0", borderBottom: i < users.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", flexWrap: "wrap" }}>
-                    <div style={{ width: 40, height: 40, borderRadius: "50%", background: u.avatar_url ? "transparent" : "linear-gradient(135deg, #2563EB, #7C3AED)", overflow: "hidden", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 800, color: "#fff" }}>
-                      {u.avatar_url ? <img src={u.avatar_url} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : (u.full_name?.[0] || "?")}
-                    </div>
-                    <div style={{ flex: 1, minWidth: 150 }}>
-                      <p style={{ margin: 0, fontWeight: 700, fontSize: 14 }}>{u.full_name || "Sin nombre"}</p>
-                      <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.4)" }}>{u.email}</p>
-                      <p style={{ margin: 0, fontSize: 11, color: "rgba(255,255,255,0.3)" }}>{u.city || ""} {u.province || ""} · {new Date(u.created_at).toLocaleDateString("es-AR")}</p>
-                    </div>
-                    <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-                      {u.dni_verificado && <span style={{ background: "rgba(34,197,94,0.15)", border: "1px solid rgba(34,197,94,0.3)", borderRadius: 20, padding: "2px 8px", fontSize: 10, fontWeight: 700, color: "#22C55E" }}>DNI</span>}
-                      {sub ? (
-                        <span style={{ background: `${PLAN_COLOR[sub.plan] || "#888"}22`, border: `1px solid ${PLAN_COLOR[sub.plan] || "#888"}44`, borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 700, color: PLAN_COLOR[sub.plan] || "#888", textTransform: "capitalize" }}>
-                          {sub.plan}
-                        </span>
-                      ) : (
-                        <span style={{ background: "rgba(255,255,255,0.06)", borderRadius: 20, padding: "2px 10px", fontSize: 11, color: "rgba(255,255,255,0.3)" }}>Gratis</span>
-                      )}
-                      {(u.videos_extra || 0) > 0 && (
-                        <span style={{ fontSize: 11, color: "#F59E0B" }}>+{u.videos_extra} videos</span>
-                      )}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
+    <div style={{ ...card(), marginBottom: 20 }}>
+      <p style={{ ...label, marginBottom: 16 }}>Usuarios por ciudad</p>
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        {Object.entries(usuariosPorCiudad).sort((a, b) => b[1] - a[1]).map(([ciudad, cant]) => (
+          <div key={ciudad} style={{ background: "rgba(37,99,235,0.1)", border: "1px solid rgba(37,99,235,0.2)", borderRadius: 20, padding: "6px 14px", display: "flex", gap: 8, alignItems: "center" }}>
+            <span style={{ fontSize: 13, color: "rgba(255,255,255,0.7)" }}>{ciudad}</span>
+            <span style={{ fontSize: 13, fontWeight: 800, color: "#2563EB" }}>{cant}</span>
           </div>
-        )}
+        ))}
+      </div>
+    </div>
+
+    <div style={card()}>
+      <p style={{ ...label, marginBottom: 16 }}>Todos los usuarios</p>
+      {users.map((u, i) => {
+        const sub = subsActivas.find(s => s.user_id === u.id)
+        return (
+          <div key={u.id} style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 0", borderBottom: i < users.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none", flexWrap: "wrap" }}>
+            <div style={{ width: 40, height: 40, borderRadius: "50%", background: u.avatar_url ? "transparent" : "linear-gradient(135deg, #2563EB, #7C3AED)", overflow: "hidden", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 800, color: "#fff" }}>
+              {u.avatar_url ? <img src={u.avatar_url} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : (u.full_name?.[0] || "?")}
+            </div>
+            <div style={{ flex: 1, minWidth: 150 }}>
+              <p style={{ margin: 0, fontWeight: 700, fontSize: 14 }}>{u.full_name || "Sin nombre"}</p>
+              <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.4)" }}>{u.email}</p>
+              <p style={{ margin: 0, fontSize: 11, color: "rgba(255,255,255,0.3)" }}>{u.city || ""} {u.province || ""} · {new Date(u.created_at).toLocaleDateString("es-AR")}</p>
+            </div>
+            <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+              {u.dni_verificado && <span style={{ background: "rgba(34,197,94,0.15)", border: "1px solid rgba(34,197,94,0.3)", borderRadius: 20, padding: "2px 8px", fontSize: 10, fontWeight: 700, color: "#22C55E" }}>DNI</span>}
+              {sub ? (
+                <span style={{ background: `${PLAN_COLOR[sub.plan] || "#888"}22`, border: `1px solid ${PLAN_COLOR[sub.plan] || "#888"}44`, borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 700, color: PLAN_COLOR[sub.plan] || "#888", textTransform: "capitalize" }}>
+                  {sub.plan}
+                </span>
+              ) : (
+                <span style={{ background: "rgba(255,255,255,0.06)", borderRadius: 20, padding: "2px 10px", fontSize: 11, color: "rgba(255,255,255,0.3)" }}>Gratis</span>
+              )}
+              {(u.videos_extra || 0) > 0 && (
+                <span style={{ fontSize: 11, color: "#F59E0B" }}>+{u.videos_extra} videos</span>
+              )}
+            </div>
+
+            {/* Selector de rol */}
+            <select
+              value={u.rol || "usuario"}
+              onChange={async (e) => {
+                const nuevoRol = e.target.value
+                await supabase.from("users").update({ rol: nuevoRol }).eq("id", u.id)
+                setUsers(prev => prev.map(usr => usr.id === u.id ? { ...usr, rol: nuevoRol } : usr))
+              }}
+              style={{
+                padding: "6px 10px", borderRadius: 8,
+                background: u.rol === "profesional" ? "rgba(168,85,247,0.15)" : u.rol === "admin" ? "rgba(239,68,68,0.15)" : "rgba(255,255,255,0.07)",
+                border: u.rol === "profesional" ? "1px solid rgba(168,85,247,0.4)" : u.rol === "admin" ? "1px solid rgba(239,68,68,0.4)" : "1px solid rgba(255,255,255,0.1)",
+                color: u.rol === "profesional" ? "#A855F7" : u.rol === "admin" ? "#EF4444" : "rgba(255,255,255,0.5)",
+                fontSize: 12, fontWeight: 700, cursor: "pointer",
+                fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+                appearance: "none" as any,
+              }}
+            >
+              <option value="usuario">Usuario</option>
+              <option value="profesional">Profesional</option>
+              <option value="admin">Admin</option>
+            </select>
+
+          </div>
+        )
+      })}
+    </div>
+  </div>
+)}
 
         {tab === "propiedades" && (
           <div>
