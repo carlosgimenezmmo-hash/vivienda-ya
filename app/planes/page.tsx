@@ -7,23 +7,6 @@ import { useAuth } from "@/lib/auth-context"
 
 const planes = [
   {
-    id: "gratis",
-    nombre: "Gratis",
-    precio: 0,
-    color: "#888",
-    colorBg: "rgba(136,136,136,0.1)",
-    videosActivos: 3,
-    duracion: "60 seg",
-    destacados: 0,
-    features: [
-      "3 videos activos simultáneos",
-      "60 segundos por video",
-      "Verificación ARRYSE gratis",
-      "Chat con interesados",
-      "Canal básico",
-    ],
-  },
-  {
     id: "junior",
     nombre: "Junior",
     precio: 25000,
@@ -128,7 +111,6 @@ export default function PlanesPage() {
 
   const handleContratar = async (planId: string) => {
     if (!isLoggedIn) { router.push("/registro"); return }
-    if (planId === "gratis") { router.push("/publicar"); return }
     const planInfo: Record<string, { titulo: string; precio: number }> = {
       junior: { titulo: "Plan Junior - ViviendaYa", precio: 25000 },
       agente: { titulo: "Plan Agente - ViviendaYa", precio: 50000 },
@@ -198,16 +180,12 @@ export default function PlanesPage() {
                 )}
               </div>
 
-              {plan.precio === 0 ? (
-                <p style={{ fontSize: 36, fontWeight: 900, margin: 0 }}>Gratis</p>
-              ) : (
-                <div>
-                  <p style={{ fontSize: 36, fontWeight: 900, margin: 0 }}>
-                    $ {plan.precio.toLocaleString("es-AR")}
-                  </p>
-                  <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", margin: "4px 0 0" }}>por mes</p>
-                </div>
-              )}
+              <div>
+                <p style={{ fontSize: 36, fontWeight: 900, margin: 0 }}>
+                  $ {plan.precio.toLocaleString("es-AR")}
+                </p>
+                <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", margin: "4px 0 0" }}>por mes</p>
+              </div>
 
               {/* STATS */}
               <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
@@ -250,14 +228,13 @@ export default function PlanesPage() {
                 onClick={() => handleContratar(plan.id)}
                 style={{
                   width: "100%", padding: "15px", borderRadius: 14, border: "none",
-                  background: plan.precio === 0 ? "rgba(255,255,255,0.1)" : plan.color,
+                  background: plan.color,
                   color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer",
                   fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
                   opacity: planSeleccionado === plan.id ? 0.7 : 1,
                 }}
               >
-                {planSeleccionado === plan.id ? "Procesando..." :
-                  plan.precio === 0 ? "Empezar gratis" : `Contratar ${plan.nombre}`}
+                {planSeleccionado === plan.id ? "Procesando..." : `Contratar ${plan.nombre}`}
               </button>
             </div>
           </div>
