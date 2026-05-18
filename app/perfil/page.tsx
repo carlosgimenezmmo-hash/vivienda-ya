@@ -26,6 +26,7 @@ export default function PerfilPage() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [planActual, setPlanActual] = useState<string>("gratis")
   const [stats, setStats] = useState({ publicaciones: 0, guardados: 0 })
+  const [rol, setRol] = useState<string>("usuario")
   const router = useRouter()
 
   useEffect(() => {
@@ -39,9 +40,17 @@ export default function PerfilPage() {
         .eq("user_id", uid)
         .eq("estado", "activo")
         .single()
-      if (sub?.plan) setPlanActual(sub.plan)
+        if (sub?.plan) setPlanActual(sub.plan)
+
+      const { data: userData } = await supabase
+        .from("users")
+        .select("rol")
+        .eq("id", uid)
+        .single()
+      if (userData?.rol) setRol(userData.rol)
+
       const { count: pubs } = await supabase
-        .from("properties")
+      .from("properties")
         .select("id", { count: "exact", head: true })
         .eq("user_id", uid)
       setStats({ publicaciones: pubs || 0, guardados: 0 })
@@ -73,6 +82,9 @@ export default function PerfilPage() {
     { emoji: "📺", label: "Mi Canal", sub: "Gestiona tu canal", href: "/mi-canal" },
     { emoji: "💎", label: "Mis Planes", sub: "Ver y cambiar tu plan actual", href: "/planes" },
     { emoji: "⚙️", label: "Configuracion", sub: "Cuenta y privacidad", href: "/configuracion" },
+    ...(rol === "profesional" ? [
+  { emoji: "⚖️", label: "Panel Profesional", sub: "Gestioná tus operaciones de intermediación", href: "/profesional" }
+   ] : []),
   ]
 
   return (
