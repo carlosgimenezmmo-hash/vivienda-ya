@@ -92,7 +92,7 @@ export default function RegistroPage() {
           background: "#fff", color: "#000", fontSize: 16, fontWeight: 700,
           cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 12,
           fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
-          opacity: loading ? 0.7 : 1,
+          opacity: loading || !aceptaTerminos || !aceptaMayorEdad ? 0.7 : 1,
         }}>
           <svg width="20" height="20" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -103,7 +103,7 @@ export default function RegistroPage() {
           {loading ? "Redirigiendo..." : "Continuar con Google"}
         </button>
 
-        <button onClick={handleFacebook} disabled={loading} style={{
+        <button onClick={handleFacebook} disabled={loading || !aceptaTerminos || !aceptaMayorEdad} style={{
           width: "100%", padding: "16px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.15)",
           background: "#1877F2", color: "#fff", fontSize: 16, fontWeight: 700,
           cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 12,

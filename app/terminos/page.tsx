@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 
-export default function PrivacidadPage() {
+export default function TerminosPage() {
   const router = useRouter()
 
   return (
@@ -13,57 +13,57 @@ export default function PrivacidadPage() {
           ← Volver
         </button>
 
-        <h1 style={{ fontSize: 28, fontWeight: 900, margin: "0 0 8px" }}>Política de Privacidad</h1>
+        <h1 style={{ fontSize: 28, fontWeight: 900, margin: "0 0 8px" }}>Términos y Condiciones</h1>
         <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, margin: "0 0 40px" }}>Última actualización: mayo de 2026</p>
 
         {[
           {
-            titulo: "1. Responsable del tratamiento de datos",
-            contenido: `Carlos Alberto Gimenez, operador de ViviendaYa, con domicilio en Tres Arroyos, Provincia de Buenos Aires, República Argentina. Contacto: vivendayatresa@gmail.com.`
+            titulo: "1. Aceptación de los términos",
+            contenido: `Al registrarse, acceder o utilizar ViviendaYa (en adelante "la Plataforma"), el usuario acepta en forma plena e incondicional los presentes Términos y Condiciones. Si no está de acuerdo con alguna de las disposiciones aquí establecidas, deberá abstenerse de utilizar la Plataforma. El uso continuado de la Plataforma implica la aceptación de cualquier modificación que pudiera realizarse a estos términos.`
           },
           {
-            titulo: "2. Datos que recopilamos",
-            contenido: `Al registrarse y utilizar la Plataforma recopilamos: nombre completo, dirección de correo electrónico, número de teléfono, edad, provincia y ciudad de residencia, foto de perfil, videos e imágenes publicados, ubicación GPS al momento de grabar videos, datos de uso de la Plataforma y datos de pago (procesados por terceros, no almacenados por nosotros).`
+            titulo: "2. Titular del servicio",
+            contenido: `La Plataforma es operada por Carlos Alberto Gimenez, con domicilio en la ciudad de Tres Arroyos, Provincia de Buenos Aires, República Argentina. Contacto: viviendayatresa@gmail.com.`
           },
           {
-            titulo: "3. Uso de los datos",
-            contenido: `Los datos recopilados se utilizan para: identificar al usuario dentro de la Plataforma, mostrar publicaciones y perfiles a otros usuarios, verificar la ubicación de las propiedades publicadas, procesar pagos de suscripciones, mejorar el funcionamiento de la Plataforma y cumplir con obligaciones legales.`
+            titulo: "3. Descripción del servicio",
+            contenido: `ViviendaYa es una plataforma digital de anuncios inmobiliarios que permite a los usuarios publicar, buscar y contactar propiedades mediante video. La Plataforma actúa exclusivamente como intermediario tecnológico entre usuarios, sin intervenir en las negociaciones, operaciones, acuerdos o transacciones que pudieran realizarse entre las partes.`
           },
           {
-            titulo: "4. Compartición de datos",
-            contenido: `No vendemos ni cedemos datos personales a terceros con fines comerciales. Los datos pueden ser compartidos con: proveedores de servicios tecnológicos necesarios para el funcionamiento de la Plataforma (Supabase, Vercel, Google), procesadores de pago (MercadoPago) y autoridades competentes cuando sea requerido por ley.`
+            titulo: "4. Exención de responsabilidad por contenidos publicados",
+            contenido: `ViviendaYa no es responsable por la veracidad, exactitud, legalidad, licitud, calidad ni integridad de los contenidos publicados por los usuarios. Cada usuario es el único y exclusivo responsable de las publicaciones que realice, incluyendo pero no limitándose a: descripciones, precios, imágenes, videos, ubicaciones y cualquier otra información asociada a las propiedades anunciadas.\n\nLa Plataforma no garantiza que las propiedades publicadas existan, estén disponibles, correspondan a las descripciones indicadas ni que sus titulares tengan capacidad legal para disponer de ellas. El usuario que contacta una propiedad lo hace bajo su exclusiva responsabilidad.`
           },
           {
-            titulo: "5. Datos de ubicación GPS",
-            contenido: `La Plataforma solicita acceso a la ubicación del dispositivo al momento de grabar o publicar un video, con el único fin de verificar que la propiedad se encuentra donde se indica. Esta información se almacena asociada a la publicación y es visible para otros usuarios de la Plataforma.`
+            titulo: "5. Exención de responsabilidad por operaciones entre usuarios",
+            contenido: `ViviendaYa no es parte de ninguna operación inmobiliaria que se realice entre usuarios de la Plataforma. No garantiza la conclusión de ninguna operación ni se responsabiliza por incumplimientos, fraudes, engaños, vicios ocultos, problemas de titularidad, deudas, gravámenes ni ningún otro inconveniente que pudiera surgir de la relación entre usuarios.\n\nEl usuario libera expresamente a ViviendaYa, sus operadores, empleados y colaboradores de cualquier reclamo, demanda o acción legal derivada de operaciones realizadas a través de la Plataforma.`
           },
           {
-            titulo: "6. Almacenamiento y seguridad",
-            contenido: `Los datos se almacenan en servidores seguros provistos por Supabase. Implementamos medidas de seguridad razonables para proteger la información, incluyendo cifrado y control de acceso. Sin embargo, ningún sistema es completamente infalible y no podemos garantizar la seguridad absoluta de los datos.`
+            titulo: "6. Exención de responsabilidad por contenido audiovisual",
+            contenido: `Los videos publicados en la Plataforma son responsabilidad exclusiva de quien los sube. ViviendaYa no verifica el contenido de los videos más allá de los controles técnicos de ubicación GPS. La Plataforma se reserva el derecho de eliminar cualquier contenido que considere inapropiado, sin necesidad de justificación previa.`
           },
           {
-            titulo: "7. Derechos del usuario",
-            contenido: `De acuerdo con la Ley 25.326 de Protección de Datos Personales de Argentina, el usuario tiene derecho a: acceder a sus datos personales, rectificar datos incorrectos, solicitar la eliminación de sus datos, oponerse al tratamiento de sus datos. Para ejercer estos derechos escribir a: vivendayatresa@gmail.com.`
+            titulo: "7. Requisitos para el uso",
+            contenido: `Para utilizar la Plataforma el usuario debe: (a) ser mayor de 18 años de edad; (b) tener capacidad legal para celebrar contratos; (c) proporcionar información veraz al momento del registro. Al aceptar estos términos, el usuario declara bajo juramento que cumple con todos los requisitos mencionados. ViviendaYa no se responsabiliza por el uso de la Plataforma por parte de menores de edad que hubieran proporcionado información falsa.`
           },
           {
-            titulo: "8. Retención de datos",
-            contenido: `Los datos se conservan mientras la cuenta del usuario esté activa. Al eliminar la cuenta, los datos personales son eliminados en un plazo máximo de 30 días, excepto aquellos que deban conservarse por obligaciones legales.`
+            titulo: "8. Planes y suscripciones",
+            contenido: `La Plataforma ofrece planes de suscripción pagos que otorgan acceso a funcionalidades adicionales. Los precios están expresados en pesos argentinos (ARS) y pueden modificarse sin previo aviso. El pago de un plan no garantiza resultados comerciales ni la concreción de operaciones inmobiliarias. No se realizan reembolsos salvo disposición legal en contrario.`
           },
           {
-            titulo: "9. Cookies y tecnologías similares",
-            contenido: `La Plataforma puede utilizar cookies y tecnologías similares para mantener la sesión del usuario y mejorar la experiencia de uso. El usuario puede configurar su navegador para rechazar cookies, aunque esto podría afectar el funcionamiento de la Plataforma.`
+            titulo: "9. Propiedad intelectual",
+            contenido: `El nombre, logo, diseño y código de ViviendaYa son propiedad de Carlos Alberto Gimenez. Los contenidos publicados por los usuarios (fotos, videos, textos) son propiedad de sus respectivos autores. Al publicar contenido en la Plataforma, el usuario otorga a ViviendaYa una licencia no exclusiva, gratuita y mundial para mostrar dicho contenido dentro de la Plataforma.`
           },
           {
-            titulo: "10. Menores de edad",
-            contenido: `La Plataforma no está dirigida a menores de 18 años. No recopilamos intencionalmente datos de menores. Si detectamos que un usuario es menor de edad, procederemos a eliminar su cuenta y datos asociados.`
+            titulo: "10. Modificaciones y cancelación del servicio",
+            contenido: `ViviendaYa se reserva el derecho de modificar, suspender o interrumpir el servicio en cualquier momento, con o sin previo aviso, sin que ello genere derecho a indemnización alguna a favor del usuario. Asimismo, podrá dar de baja cuentas de usuarios que incumplan estos términos.`
           },
           {
-            titulo: "11. Modificaciones",
-            contenido: `Esta Política de Privacidad puede modificarse en cualquier momento. Las modificaciones entrarán en vigencia desde su publicación en la Plataforma. El uso continuado del servicio implica la aceptación de la política actualizada.`
+            titulo: "11. Ley aplicable y jurisdicción",
+            contenido: `Los presentes Términos y Condiciones se rigen por las leyes de la República Argentina. Ante cualquier controversia, las partes se someten a la jurisdicción de los tribunales ordinarios de la ciudad de Tres Arroyos, Provincia de Buenos Aires, renunciando a cualquier otro fuero que pudiera corresponder.`
           },
           {
             titulo: "12. Contacto",
-            contenido: `Para consultas sobre esta Política de Privacidad escribir a: vivendayatresa@gmail.com`
+            contenido: `Para consultas sobre estos Términos y Condiciones podés escribirnos a: viviendayatresa@gmail.com`
           },
         ].map((seccion, i) => (
           <div key={i} style={{ marginBottom: 32 }}>
@@ -74,7 +74,7 @@ export default function PrivacidadPage() {
 
         <div style={{ marginTop: 40, padding: 20, background: "rgba(255,255,255,0.04)", borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)" }}>
           <p style={{ fontSize: 13, color: "rgba(255,255,255,0.3)", margin: 0, lineHeight: 1.6 }}>
-            Carlos Alberto Gimenez — ViviendaYa — Tres Arroyos, Buenos Aires, Argentina — vivendayatresa@gmail.com
+            Carlos Alberto Gimenez — ViviendaYa — Tres Arroyos, Buenos Aires, Argentina — viviendayatresa@gmail.com
           </p>
         </div>
 
