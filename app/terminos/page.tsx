@@ -25,10 +25,14 @@ export default function TerminosPage() {
             titulo: "2. Titular del servicio",
             contenido: `La Plataforma es operada por Carlos Alberto Gimenez, con domicilio en la ciudad de Tres Arroyos, Provincia de Buenos Aires, República Argentina. Contacto: viviendayatresa@gmail.com.`
           },
-          {
-            titulo: "3. Descripción del servicio",
-            contenido: `ViviendaYa es una plataforma digital de anuncios inmobiliarios que permite a los usuarios publicar, buscar y contactar propiedades mediante video. La Plataforma actúa exclusivamente como intermediario tecnológico entre usuarios, sin intervenir en las negociaciones, operaciones, acuerdos o transacciones que pudieran realizarse entre las partes.`
-          },
+         {
+  titulo: "3. Descripción del servicio",
+  contenido: `ViviendaYa es una plataforma digital de anuncios inmobiliarios que permite a los usuarios publicar, buscar y contactar propiedades mediante video. La Plataforma facilita la conexión entre vendedores, compradores, agentes y profesionales inmobiliarios habilitados, actuando exclusivamente como intermediario tecnológico.\n\nViviendaYa no actúa como parte compradora ni vendedora en ninguna operación inmobiliaria, no ejerce funciones de intermediación inmobiliaria y no asume responsabilidad alguna por el resultado de las negociaciones entre usuarios. Las funciones de intermediación inmobiliaria son ejercidas exclusivamente por los profesionales matriculados que operan de forma independiente a través de la Plataforma.`
+},
+{
+  titulo: "3.1. Fee de plataforma",
+  contenido: `En operaciones donde el usuario solicite el servicio de vinculación profesional a través del módulo de intermediación de ViviendaYa, la Plataforma percibe un fee del 0,6% sobre el valor de la operación en concepto de servicio tecnológico de vinculación entre partes.\n\nEste fee es independiente de las comisiones acordadas entre el agente y el profesional inmobiliario interviniente, y no constituye en ningún caso una comisión por intermediación inmobiliaria en los términos de la Ley 20.266 y sus modificatorias.\n\nEl pago del fee de plataforma es responsabilidad del agente que utilizó el servicio de vinculación y se realiza a través de los medios de pago habilitados en la Plataforma.`
+},
           {
             titulo: "4. Exención de responsabilidad por contenidos publicados",
             contenido: `ViviendaYa no es responsable por la veracidad, exactitud, legalidad, licitud, calidad ni integridad de los contenidos publicados por los usuarios. Cada usuario es el único y exclusivo responsable de las publicaciones que realice, incluyendo pero no limitándose a: descripciones, precios, imágenes, videos, ubicaciones y cualquier otra información asociada a las propiedades anunciadas.\n\nLa Plataforma no garantiza que las propiedades publicadas existan, estén disponibles, correspondan a las descripciones indicadas ni que sus titulares tengan capacidad legal para disponer de ellas. El usuario que contacta una propiedad lo hace bajo su exclusiva responsabilidad.`
