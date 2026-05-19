@@ -19,7 +19,7 @@ export default function PrivacidadPage() {
         {[
           {
             titulo: "1. Responsable del tratamiento de datos",
-            contenido: `Carlos Alberto Gimenez, operador de ViviendaYa, con domicilio en Tres Arroyos, Provincia de Buenos Aires, República Argentina. Contacto: vivendayatresa@gmail.com.`
+            contenido: `Carlos Alberto Gimenez, operador de ViviendaYa, con domicilio en Tres Arroyos, Provincia de Buenos Aires, República Argentina. Contacto: viviendayatresa@gmail.com.`
           },
           {
             titulo: "2. Datos que recopilamos",
@@ -43,7 +43,7 @@ export default function PrivacidadPage() {
           },
           {
             titulo: "7. Derechos del usuario",
-            contenido: `De acuerdo con la Ley 25.326 de Protección de Datos Personales de Argentina, el usuario tiene derecho a: acceder a sus datos personales, rectificar datos incorrectos, solicitar la eliminación de sus datos, oponerse al tratamiento de sus datos. Para ejercer estos derechos escribir a: vivendayatresa@gmail.com.`
+            contenido: `De acuerdo con la Ley 25.326 de Protección de Datos Personales de Argentina, el usuario tiene derecho a: acceder a sus datos personales, rectificar datos incorrectos, solicitar la eliminación de sus datos, oponerse al tratamiento de sus datos. Para ejercer estos derechos escribir a: viviendayatresa@gmail.com.`
           },
           {
             titulo: "8. Retención de datos",
@@ -63,7 +63,7 @@ export default function PrivacidadPage() {
           },
           {
             titulo: "12. Contacto",
-            contenido: `Para consultas sobre esta Política de Privacidad escribir a: vivendayatresa@gmail.com`
+            contenido: `Para consultas sobre esta Política de Privacidad escribir a: viviendayatresa@gmail.com`
           },
         ].map((seccion, i) => (
           <div key={i} style={{ marginBottom: 32 }}>
@@ -74,7 +74,7 @@ export default function PrivacidadPage() {
 
         <div style={{ marginTop: 40, padding: 20, background: "rgba(255,255,255,0.04)", borderRadius: 12, border: "1px solid rgba(255,255,255,0.08)" }}>
           <p style={{ fontSize: 13, color: "rgba(255,255,255,0.3)", margin: 0, lineHeight: 1.6 }}>
-            Carlos Alberto Gimenez — ViviendaYa — Tres Arroyos, Buenos Aires, Argentina — vivendayatresa@gmail.com
+            Carlos Alberto Gimenez — ViviendaYa — Tres Arroyos, Buenos Aires, Argentina — viviendayatresa@gmail.com
           </p>
         </div>
 
