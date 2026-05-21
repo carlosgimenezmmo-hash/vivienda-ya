@@ -103,7 +103,7 @@ export function SearchWizard() {
     border: `2px solid ${active ? "#2563EB" : "rgba(255,255,255,0.1)"}`,
     background: active ? "rgba(37,99,235,0.2)" : "rgba(255,255,255,0.04)",
     color: active ? "#60A5FA" : "rgba(255,255,255,0.7)",
-    fontSize: 16, fontWeight: active ? 700 : 500, cursor: "pointer",
+    fontSize: 18, fontWeight: active ? 700 : 500, cursor: "pointer",
     fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
     display: "flex", alignItems: "center", gap: 8,
   })
@@ -207,8 +207,8 @@ export function SearchWizard() {
         {/* PASO 1 — OPERACION + TIPO */}
         {step === 1 && (
           <div>
-            <h2 style={{ fontSize: 26, fontWeight: 800, color: "#fff", margin: "0 0 4px" }}>Que estas buscando?</h2>
-            <p style={{ fontSize: 16, color: "rgba(255,255,255,0.45)", margin: "0 0 24px" }}>Selecciona el tipo de operacion y propiedad</p>
+            <h2 style={{ fontSize: 28, fontWeight: 800, color: "#fff", margin: "0 0 4px" }}>Que estas buscando?</h2>
+            <p style={{ fontSize: 18, color: "rgba(255,255,255,0.45)", margin: "0 0 24px" }}>Selecciona el tipo de operacion y propiedad</p>
 
             <p style={sectionLabel}>Operacion</p>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 28 }}>
@@ -235,8 +235,8 @@ export function SearchWizard() {
         {/* PASO 2 — UBICACION + PRECIO */}
         {step === 2 && (
           <div>
-            <h2 style={{ fontSize: 24, fontWeight: 800, color: "#fff", margin: "0 0 4px" }}>Donde y cuanto?</h2>
-            <p style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", margin: "0 0 24px" }}>Ubicacion y presupuesto</p>
+            <h2 style={{ fontSize: 28, fontWeight: 800, color: "#fff", margin: "0 0 4px" }}>Donde y cuanto?</h2>
+            <p style={{ fontSize: 16, color: "rgba(255,255,255,0.45)", margin: "0 0 24px" }}>Ubicacion y presupuesto</p>
 
             <p style={sectionLabel}>Provincia</p>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 20 }}>
