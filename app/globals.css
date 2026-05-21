@@ -4,7 +4,6 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Vivienda Ya - Light theme (formularios, busqueda, perfil) */
   --background: oklch(0.985 0.002 247);
   --foreground: oklch(0.145 0.02 250);
   --card: oklch(1 0 0);
@@ -26,21 +25,18 @@
   --ring: oklch(0.42 0.12 255);
   --radius: 0.75rem;
 
-  /* Custom tokens - Vivienda Ya */
   --vy-gold: oklch(0.78 0.15 80);
   --vy-green: oklch(0.65 0.17 160);
   --vy-blue: oklch(0.42 0.12 255);
   --vy-blue-light: oklch(0.55 0.14 255);
   --vy-dark: oklch(0.13 0.01 250);
 
-  /* Charts */
   --chart-1: oklch(0.42 0.12 255);
   --chart-2: oklch(0.65 0.17 160);
   --chart-3: oklch(0.78 0.15 80);
   --chart-4: oklch(0.55 0.14 255);
   --chart-5: oklch(0.7 0.12 160);
 
-  /* Sidebar */
   --sidebar: oklch(0.985 0.002 247);
   --sidebar-foreground: oklch(0.145 0.02 250);
   --sidebar-primary: oklch(0.42 0.12 255);
@@ -52,7 +48,6 @@
 }
 
 .dark {
-  /* Vivienda Ya - Dark theme (feed de videos) */
   --background: oklch(0.1 0.01 250);
   --foreground: oklch(0.97 0.002 250);
   --card: oklch(0.16 0.015 250);
@@ -127,7 +122,6 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 
-  /* Custom Vivienda Ya tokens */
   --color-vy-gold: var(--vy-gold);
   --color-vy-green: var(--vy-green);
   --color-vy-blue: var(--vy-blue);
@@ -139,14 +133,15 @@
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    font-size: 17px;
+  }
   body {
-    background:transparent !important;
+    background: transparent !important;
   }
 }
 
-/* Vivienda Ya - Custom utilities */
 @layer utilities {
-  /* Scroll snap for TikTok-style feed */
   .snap-y-mandatory {
     scroll-snap-type: y mandatory;
   }
@@ -154,7 +149,6 @@
     scroll-snap-align: start;
   }
 
-  /* Glassmorphism overlays */
   .glass {
     background: rgba(0, 0, 0, 0.35);
     backdrop-filter: blur(12px);
@@ -166,7 +160,6 @@
     -webkit-backdrop-filter: blur(12px);
   }
 
-  /* Hide scrollbar */
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
@@ -175,13 +168,11 @@
     scrollbar-width: none;
   }
 
-  /* Safe area for mobile */
   .pb-safe {
     padding-bottom: max(env(safe-area-inset-bottom), 1rem);
   }
 }
 
-/* Animations */
 @keyframes coin-drop {
   0% {
     opacity: 1;
