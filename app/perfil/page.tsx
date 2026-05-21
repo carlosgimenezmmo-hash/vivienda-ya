@@ -85,6 +85,7 @@ export default function PerfilPage() {
     ...(rol === "profesional" ? [
   { emoji: "⚖️", label: "Panel Profesional", sub: "Gestioná tus operaciones de intermediación", href: "/profesional" }
    ] : []),
+   { emoji: "🔍", label: "Buscar usuarios", sub: "Encontrá agentes y canales", href: "/buscar-usuarios" },
   ]
 
   return (
