@@ -85,15 +85,15 @@ export default function PublicarPage() {
       const uid = sessionData?.session?.user?.id
       if (!uid) throw new Error("Sesión expirada. Volvé a iniciar sesión.")
       if (!video) throw new Error("Debes seleccionar un video")
-
-      const ext = video.name.split(".").pop()
-      const path = `${Date.now()}.${ext}`
-      const { error: uploadError } = await supabase.storage.from("videos-app").upload(path, video, { contentType: video.type })
-      if (uploadError) throw uploadError
-
-      const { data } = supabase.storage.from("videos-app").getPublicUrl(path)
-      const videoUrl = data.publicUrl
-
+      let videoUrl = ""
+      if (video) {
+        const cfForm = new FormData()
+        cfForm.append("file", video)
+        const cfRes = await fetch("/api/cloudflare-upload", { method: "POST", body: cfForm })
+        const cfData = await cfRes.json()
+        if (!cfData.videoUrl) throw new Error("Error subiendo video a Cloudflare")
+        videoUrl = cfData.videoUrl
+      }
       const { error: insertError } = await supabase.from("properties").insert({
         user_id: uid,
         owner_name: user?.name || "Propietario",
