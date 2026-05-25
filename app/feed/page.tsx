@@ -486,6 +486,20 @@ export default function ViviendaYaFull() {
         </button>
       </div>
 
+      {/* DISPONIBILIDAD - solo para temporario */}
+      {p.operation_type === "temporario" && (
+        <button onClick={() => router.push(`/reservar?id=${p.id}`)} style={{
+          width: "100%", padding: "16px", borderRadius: 14, border: "none",
+          background: "#F97316", color: "#fff", fontSize: 16, fontWeight: 700,
+          cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+          fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+          marginBottom: 10,
+        }}>
+          📅 Ver disponibilidad y reservar
+        </button>
+      )}
+
+
       {/* WHATSAPP */}
       <button onClick={() => requireLogin(() => {
         const clean = p.whatsapp_number?.replace(/\D/g, "");
