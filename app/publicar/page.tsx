@@ -93,6 +93,7 @@ export default function PublicarPage() {
         if (uploadError) throw uploadError
         const { data } = supabase.storage.from('videos-app').getPublicUrl(path)
         videoUrl = data.publicUrl
+        }
       const { error: insertError } = await supabase.from("properties").insert({
         user_id: uid,
         owner_name: user?.name || "Propietario",
