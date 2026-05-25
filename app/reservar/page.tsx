@@ -1,10 +1,11 @@
 "use client"
+import { Suspense } from "react"
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { supabase } from "@/lib/supabaseClient"
 import { useAuth } from "@/lib/auth-context"
 
-export default function ReservarPage() {
+function ReservarContent() {
   const { isLoggedIn } = useAuth()
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -187,5 +188,13 @@ export default function ReservarPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function ReservarPage() {
+  return (
+    <Suspense fallback={<div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center" }}><p>Cargando...</p></div>}>
+      <ReservarContent />
+    </Suspense>
   )
 }
