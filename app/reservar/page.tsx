@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 import { Suspense } from "react"
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -85,20 +85,25 @@ function ReservarContent() {
     const { data: sessionData } = await supabase.auth.getSession()
     const uid = sessionData?.session?.user?.id
 
-    const { error: insertError } = await supabase.from("reservas").insert({
-      property_id: parseInt(propertyId!),
-      user_id: uid || null,
-      fecha_desde: fechaDesde,
-      fecha_hasta: fechaHasta,
-      noches,
-      precio_total: precioTotal,
-      comision,
-      estado: "pendiente",
+    const res = await fetch("/api/crear-reserva", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        property_id: parseInt(propertyId!),
+        user_id: uid || null,
+        fecha_desde: fechaDesde,
+        fecha_hasta: fechaHasta,
+        noches,
+        precio_total: precioTotal,
+        comision,
+      }),
     })
 
+    const data = await res.json()
     setLoading(false)
-    if (insertError) return setError(insertError.message)
-    router.push("/reservas-confirmadas")
+
+    if (data.error) return setError(data.error)
+    window.location.href = data.init_point
   }
 
   if (!property) {
