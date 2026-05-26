@@ -32,9 +32,9 @@ export async function POST(req: NextRequest) {
           },
         ],
         back_urls: {
-          success: `${process.env.NEXT_PUBLIC_APP_URL}/reservas-confirmadas`,
-          failure: `${process.env.NEXT_PUBLIC_APP_URL}/reservar?id=${property_id}&error=1`,
-          pending: `${process.env.NEXT_PUBLIC_APP_URL}/reservas-confirmadas`,
+          success: `${process.env.APP_URL}/reservas-confirmadas`,
+          failure: `${process.env.APP_URL}/reservar?id=${property_id}&error=1`,
+          pending: `${process.env.APP_URL}/reservas-confirmadas`,
         },
         auto_return: "approved",
         metadata: {
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
           precio_total,
           comision,
         },
-        notification_url: `${process.env.NEXT_PUBLIC_APP_URL}/api/webhook-mp`,
+        notification_url: `${process.env.APP_URL}/api/webhook-mp`,
       }),
     })
 
