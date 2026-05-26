@@ -6,23 +6,18 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 )
 
-// Rate limiting: max 20 requests por IP cada minuto
 const rateLimit = new Map<string, { count: number; reset: number }>()
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now()
-  const windowMs = 60 * 1000 // 1 minuto
+  const windowMs = 60 * 1000
   const maxRequests = 20
-
   const current = rateLimit.get(ip)
-
   if (!current || now > current.reset) {
     rateLimit.set(ip, { count: 1, reset: now + windowMs })
     return true
   }
-
   if (current.count >= maxRequests) return false
-
   current.count++
   return true
 }
@@ -43,12 +38,8 @@ const SERVICIOS_VIDEOS: Record<string, number> = {
 export async function POST(req: NextRequest) {
   try {
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown"
-
     if (!checkRateLimit(ip)) {
-      return NextResponse.json(
-        { error: "Demasiadas peticiones." },
-        { status: 429 }
-      )
+      return NextResponse.json({ error: "Demasiadas peticiones." }, { status: 429 })
     }
 
     const body = await req.json()
@@ -67,6 +58,15 @@ export async function POST(req: NextRequest) {
 
     const planId = payment.metadata?.planId
     const userId = payment.metadata?.userId
+
+    // Si es una reserva
+    const reservaPropertyId = payment.metadata?.property_id
+    if (reservaPropertyId) {
+      await supabase.from("reservas")
+        .update({ estado: "confirmada", mp_payment_id: String(paymentId) })
+        .eq("mp_payment_id", String(payment.order?.id || paymentId))
+      return NextResponse.json({ ok: true })
+    }
 
     if (!userId || !planId) return NextResponse.json({ ok: true })
 
