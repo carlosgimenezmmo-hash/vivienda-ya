@@ -11,6 +11,7 @@ const operationOptions = [
   { value: "alquiler", label: "Alquilar" },
   { value: "permuta", label: "Permuta" },
   { value: "temporario", label: "Temporario" },
+  { value: "hotel", label: "Hotel" },
 ]
 
 const propertyTypes = [
@@ -124,7 +125,13 @@ export function SearchWizard() {
   const handleSearch = async () => {
     setLoading(true)
     let query = supabase.from("properties").select("*").eq("status", "approved").not("video_url", "is", null)
-    if (filters.operation) query = query.ilike("operation_type", filters.operation)
+    if (filters.operation) {
+      if (filters.operation === "temporario" && filters.subtype) {
+        query = query.eq("operation_type", "temporario").eq("property_subtype", filters.subtype)
+      } else {
+        query = query.ilike("operation_type", filters.operation)
+      }
+    }
     if (filters.propertyType) query = query.ilike("property_type", `%${filters.propertyType}%`)
     if (filters.province) query = query.ilike("province", `%${filters.province}%`)
     if (filters.city) query = query.ilike("city", `%${filters.city}%`)
@@ -219,7 +226,24 @@ export function SearchWizard() {
                 </button>
               ))}
             </div>
-
+{filters.operation === "temporario" && (
+              <>
+                <p style={sectionLabel}>Subcategoria</p>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 20 }}>
+                  {[
+                    { value: "casa", label: "🏠 Casa" },
+                    { value: "departamento", label: "🏢 Apart" },
+                    { value: "cabana", label: "🛖 Cabaña" },
+                    { value: "pension", label: "🏩 Pensión" },
+                  ].map((sub) => (
+                    <button key={sub.value} onClick={() => setFilters({ ...filters, subtype: sub.value })}
+                      style={{ ...chip(filters.subtype === sub.value), justifyContent: "center", padding: "16px", fontSize: 15, fontWeight: 700 }}>
+                      {sub.label}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
             <p style={sectionLabel}>Tipo de propiedad</p>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
               {propertyTypes.map((pt) => (
