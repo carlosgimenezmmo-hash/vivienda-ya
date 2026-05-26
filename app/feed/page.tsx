@@ -425,6 +425,8 @@ export default function ViviendaYaFull() {
           { label: 'Dormitorios', valor: p.bedrooms, icono: '🛏' },
           { label: 'Banos', valor: p.bathrooms, icono: '🚿' },
           { label: 'Superficie', valor: p.surface ? `${p.surface} m²` : null, icono: '📐' },
+          { label: 'Habitacion', valor: p.room_type ? p.room_type.charAt(0).toUpperCase() + p.room_type.slice(1) : null, icono: '🛎' },
+          { label: 'Huespedes', valor: p.max_guests ? `${p.max_guests} pers.` : null, icono: '👥' },
         ].filter(c => c.valor).map((c) => (
           <div key={c.label} style={{ background: 'rgba(255,255,255,0.06)', borderRadius: 12, padding: '12px 10px', textAlign: 'center' }}>
             <p style={{ margin: '0 0 4px', fontSize: 20 }}>{c.icono}</p>
