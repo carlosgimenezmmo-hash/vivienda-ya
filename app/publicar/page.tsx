@@ -38,6 +38,8 @@ export default function PublicarPage() {
   const [moneda, setMoneda] = useState("USD")
   const [ambientes, setAmbientes] = useState("")
   const [superficie, setSuperficie] = useState("")
+  const [tipoHabitacion, setTipoHabitacion] = useState("doble")
+  const [huespedes, setHuespedes] = useState("")
   const [barrio, setBarrio] = useState("")
   const [ciudad, setCiudad] = useState("")
   const [titulo, setTitulo] = useState("")
@@ -102,6 +104,8 @@ export default function PublicarPage() {
         property_type: tipoPropiedad,
         price: precioClean,
         rooms: ambientesClean || null,
+        room_type: operacion === "hotel" ? tipoHabitacion : null,
+        max_guests: operacion === "hotel" ? parseInt(huespedes) || null : null,
         surface: superficieClean || null,
         neighborhood: barrioClean,
         city: ciudadClean,
@@ -253,7 +257,7 @@ export default function PublicarPage() {
 
             <p style={sectionLabel}>Tipo de operacion</p>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
-              {[["venta", "Venta"], ["alquiler", "Alquiler"], ["temporario", "Temporario"], ["permuta", "Permuta"]].map(([val, label]) => (
+              {[["venta", "Venta"], ["alquiler", "Alquiler"], ["temporario", "Temporario"], ["permuta", "Permuta"],["hotel", "Hotel"]].map(([val, label]) => (
                 <button key={val} onClick={() => setOperacion(val)} style={chip(operacion === val)}>{label}</button>
               ))}
             </div>
@@ -282,7 +286,24 @@ export default function PublicarPage() {
                 <input value={superficie} onChange={e => setSuperficie(e.target.value.replace(/[^0-9]/g, ""))} placeholder="Ej: 75" type="number" inputMode="numeric" style={inp} />
               </div>
             </div>
-
+{operacion === "hotel" && (
+              <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
+                <div style={{ flex: 1 }}>
+                  <p style={sectionLabel}>Tipo de habitacion</p>
+                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" as const }}>
+                    {[["simple", "Simple"], ["doble", "Doble"], ["suite", "Suite"], ["familiar", "Familiar"]].map(([val, label]) => (
+                      <button key={val} onClick={() => setTipoHabitacion(val)} style={chip(tipoHabitacion === val)}>{label}</button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+            {operacion === "hotel" && (
+              <div style={{ marginBottom: 16 }}>
+                <p style={sectionLabel}>Huespedes maximos</p>
+                <input value={huespedes} onChange={e => setHuespedes(e.target.value.replace(/[^0-9]/g, ""))} placeholder="Ej: 2" type="number" inputMode="numeric" style={inp} />
+              </div>
+            )}
             <p style={sectionLabel}>Ubicacion</p>
             <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
               <input value={barrio} onChange={e => setBarrio(e.target.value)} onBlur={e => setBarrio(sanitizeText(e.target.value, 80))} placeholder="Barrio" maxLength={80} style={{ ...inp, flex: 1 }} />
