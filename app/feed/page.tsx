@@ -489,7 +489,7 @@ export default function ViviendaYaFull() {
       </div>
 
       {/* DISPONIBILIDAD - solo para temporario */}
-      {p.operation_type === "temporario" && (
+      {(p.operation_type === "temporario" || p.operation_type === "hotel") (
         <button onClick={() => router.push(`/reservar?id=${p.id}`)} style={{
           width: "100%", padding: "16px", borderRadius: 14, border: "none",
           background: "#F97316", color: "#fff", fontSize: 16, fontWeight: 700,
