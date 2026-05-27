@@ -39,6 +39,7 @@ export default function PublicarPage() {
   const [ambientes, setAmbientes] = useState("")
   const [superficie, setSuperficie] = useState("")
   const [tipoHabitacion, setTipoHabitacion] = useState("doble")
+  const [subtype, setSubtype] = useState("")
   const [huespedes, setHuespedes] = useState("")
   const [barrio, setBarrio] = useState("")
   const [ciudad, setCiudad] = useState("")
@@ -105,6 +106,7 @@ export default function PublicarPage() {
         price: precioClean,
         rooms: ambientesClean || null,
         room_type: operacion === "hotel" ? tipoHabitacion : null,
+        property_subtype: (operacion === "temporario" || operacion === "hotel") ? subtype || null : null,
         max_guests: operacion === "hotel" ? parseInt(huespedes) || null : null,
         surface: superficieClean || null,
         neighborhood: barrioClean,
@@ -261,7 +263,16 @@ export default function PublicarPage() {
                 <button key={val} onClick={() => setOperacion(val)} style={chip(operacion === val)}>{label}</button>
               ))}
             </div>
-
+{(operacion === "temporario" || operacion === "hotel") && (
+              <div style={{ marginBottom: 16 }}>
+                <p style={sectionLabel}>Subcategoria</p>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" as const }}>
+                  {[["casa", "🏠 Casa"], ["departamento", "🏢 Apart"], ["cabana", "🛖 Cabaña"], ["pension", "🏩 Pensión"], ["hotel", "🏨 Hotel"]].map(([val, label]) => (
+                    <button key={val} onClick={() => setSubtype(val)} style={chip(subtype === val)}>{label}</button>
+                  ))}
+                </div>
+              </div>
+            )}
             <p style={sectionLabel}>Tipo de propiedad</p>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
               {["Departamento", "Casa", "PH", "Local", "Oficina", "Terreno", "Loft", "Monoambiente", "Cabana", "Duplex", "Cochera", "Galpon"].map(t => (
