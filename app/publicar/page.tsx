@@ -289,7 +289,18 @@ export default function PublicarPage() {
 
             <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
               <div style={{ flex: 1 }}>
-                <p style={sectionLabel}>Ambientes</p>
+                {operacion !== "hotel" && (
+  <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
+    <div style={{ flex: 1 }}>
+      <p style={sectionLabel}>Ambientes</p>
+      <input value={ambientes} onChange={e => setAmbientes(e.target.value.replace(/[^0-9]/g, ""))} placeholder="Ej: 3" type="number" inputMode="numeric" style={inp} />
+    </div>
+    <div style={{ flex: 1 }}>
+      <p style={sectionLabel}>Superficie m2</p>
+      <input value={superficie} onChange={e => setSuperficie(e.target.value.replace(/[^0-9]/g, ""))} placeholder="Ej: 75" type="number" inputMode="numeric" style={inp} />
+    </div>
+  </div>
+)}
                 <input value={ambientes} onChange={e => setAmbientes(e.target.value.replace(/[^0-9]/g, ""))} placeholder="Ej: 3" type="number" inputMode="numeric" style={inp} />
               </div>
               <div style={{ flex: 1 }}>
