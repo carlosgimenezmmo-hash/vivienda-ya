@@ -137,8 +137,9 @@ export function SearchWizard() {
     if (filters.city) query = query.ilike("city", `%${filters.city}%`)
     if (filters.priceMin !== undefined) query = query.gte("price", filters.priceMin)
     if (filters.priceMax !== undefined && filters.priceMax < 999999999) query = query.lte("price", filters.priceMax)
-    if (filters.rooms) query = query.gte("rooms", filters.rooms)
-    if (filters.bedrooms) query = query.gte("bedrooms", filters.bedrooms)
+    if (filters.operation === "hotel" && filters.stars) query = query.gte("stars", filters.stars)
+    if (filters.operation !== "hotel" && filters.rooms) query = query.gte("rooms", filters.rooms)
+    if (filters.operation !== "hotel" && filters.bedrooms) query = query.gte("bedrooms", filters.bedrooms)
     const { data } = await query.order("created_at", { ascending: false }).limit(50)
     setResults(data || [])
     setShowResults(true)
@@ -176,11 +177,14 @@ export function SearchWizard() {
                   <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
                     <span style={{ background: "rgba(37,99,235,0.15)", color: "#60A5FA", border: "1px solid rgba(37,99,235,0.3)", borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 700 }}>{p.operation_type?.toUpperCase()}</span>
                     {p.verified && <span style={{ background: "rgba(34,197,94,0.15)", color: "#22C55E", border: "1px solid rgba(34,197,94,0.3)", borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 700 }}>GPS OK</span>}
+                    {p.stars && <span style={{ background: "rgba(245,158,11,0.15)", color: "#F59E0B", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 700 }}>{"⭐".repeat(p.stars)}</span>}
                   </div>
-                  <h3 style={{ margin: "0 0 4px", fontSize: 16, fontWeight: 700 }}>{p.title || "Sin titulo"}</h3>
+                  <h3 style={{ margin: "0 0 4px", fontSize: 16, fontWeight: 700 }}>{p.hotel_name || p.title || "Sin titulo"}</h3>
                   <p style={{ margin: "0 0 4px", fontSize: 13, color: "rgba(255,255,255,0.5)" }}>{[p.neighborhood, p.city].filter(Boolean).join(", ") || p.location}</p>
                   <p style={{ margin: "0 0 8px", fontSize: 20, fontWeight: 800 }}>USD {Number(p.price)?.toLocaleString()}</p>
-                  <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,0.4)" }}>{[p.rooms ? `${p.rooms} amb.` : null, p.surface ? `${p.surface} m2` : null, p.bedrooms ? `${p.bedrooms} dorm.` : null].filter(Boolean).join(" - ")}</p>
+                  {p.operation_type !== "hotel" && (
+                    <p style={{ margin: 0, fontSize: 13, color: "rgba(255,255,255,0.4)" }}>{[p.rooms ? `${p.rooms} amb.` : null, p.surface ? `${p.surface} m2` : null, p.bedrooms ? `${p.bedrooms} dorm.` : null].filter(Boolean).join(" - ")}</p>
+                  )}
                 </div>
               </div>
             ))}
@@ -193,7 +197,6 @@ export function SearchWizard() {
   return (
     <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
 
-      {/* HEADER */}
       <div style={{ padding: "52px 20px 16px", position: "sticky", top: 0, background: "#0a0a0a", zIndex: 10 }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
           <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>Buscar</h1>
@@ -208,10 +211,9 @@ export function SearchWizard() {
         </div>
       </div>
 
-      {/* CONTENIDO CON SCROLL */}
       <div style={{ padding: "8px 20px 200px", overflowY: "auto" }}>
 
-        {/* PASO 1 — OPERACION + TIPO */}
+        {/* PASO 1 */}
         {step === 1 && (
           <div>
             <h2 style={{ fontSize: 28, fontWeight: 800, color: "#fff", margin: "0 0 4px" }}>Que estas buscando?</h2>
@@ -226,7 +228,8 @@ export function SearchWizard() {
                 </button>
               ))}
             </div>
-{filters.operation === "temporario" && (
+
+            {filters.operation === "temporario" && (
               <>
                 <p style={sectionLabel}>Subcategoria</p>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 20 }}>
@@ -244,19 +247,24 @@ export function SearchWizard() {
                 </div>
               </>
             )}
-            <p style={sectionLabel}>Tipo de propiedad</p>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-              {propertyTypes.map((pt) => (
-                <button key={pt.value} onClick={() => setFilters({ ...filters, propertyType: pt.value })}
-                  style={{ ...chip(filters.propertyType === pt.value), justifyContent: "flex-start" }}>
-                  {pt.label}
-                </button>
-              ))}
-            </div>
+
+            {filters.operation !== "hotel" && (
+              <>
+                <p style={sectionLabel}>Tipo de propiedad</p>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                  {propertyTypes.map((pt) => (
+                    <button key={pt.value} onClick={() => setFilters({ ...filters, propertyType: pt.value })}
+                      style={{ ...chip(filters.propertyType === pt.value), justifyContent: "flex-start" }}>
+                      {pt.label}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         )}
 
-        {/* PASO 2 — UBICACION + PRECIO */}
+        {/* PASO 2 */}
         {step === 2 && (
           <div>
             <h2 style={{ fontSize: 28, fontWeight: 800, color: "#fff", margin: "0 0 4px" }}>Donde y cuanto?</h2>
@@ -292,89 +300,107 @@ export function SearchWizard() {
               </div>
             )}
 
-            <p style={{ ...sectionLabel, marginTop: 24 }}>Presupuesto</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {(filters.operation === "alquiler" ? priceRangesAlquiler : filters.operation === "temporario" ? priceRangesTemporario : priceRangesVenta).map((range) => {
-                const active = filters.priceMin === range.min && filters.priceMax === range.max
-                return (
-                  <button key={range.label} onClick={() => setFilters({ ...filters, priceMin: range.min, priceMax: range.max })}
-                    style={{ ...chip(active), justifyContent: "space-between", padding: "14px 18px" }}>
-                    <span>{range.label}</span>
-                    {active && <span style={{ fontSize: 12 }}>✓</span>}
-                  </button>
-                )
-              })}
-            </div>
+            {filters.operation !== "hotel" && (
+              <>
+                <p style={{ ...sectionLabel, marginTop: 24 }}>Presupuesto</p>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {(filters.operation === "alquiler" ? priceRangesAlquiler : filters.operation === "temporario" ? priceRangesTemporario : priceRangesVenta).map((range) => {
+                    const active = filters.priceMin === range.min && filters.priceMax === range.max
+                    return (
+                      <button key={range.label} onClick={() => setFilters({ ...filters, priceMin: range.min, priceMax: range.max })}
+                        style={{ ...chip(active), justifyContent: "space-between", padding: "14px 18px" }}>
+                        <span>{range.label}</span>
+                        {active && <span style={{ fontSize: 12 }}>✓</span>}
+                      </button>
+                    )
+                  })}
+                </div>
+              </>
+            )}
           </div>
         )}
 
-        {/* PASO 3 — FILTROS ADICIONALES */}
+        {/* PASO 3 */}
         {step === 3 && (
           <div>
             <h2 style={{ fontSize: 24, fontWeight: 800, color: "#fff", margin: "0 0 4px" }}>Algo mas?</h2>
             <p style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", margin: "0 0 24px" }}>Filtros opcionales — podes saltear este paso</p>
 
-            <p style={sectionLabel}>Ambientes minimos</p>
-            <div style={{ display: "flex", gap: 8, marginBottom: 24, flexWrap: "wrap" }}>
-              {[0, 1, 2, 3, 4, 5].map(n => (
-                <button key={n} onClick={() => setFilters({ ...filters, rooms: n })}
-                  style={{ ...chip(filters.rooms === n), padding: "10px 18px", fontSize: 15, fontWeight: 700 }}>
-                  {n === 0 ? "Cualquiera" : `${n}+`}
-                </button>
-              ))}
-            </div>
-
-            <p style={sectionLabel}>Dormitorios minimos</p>
-            <div style={{ display: "flex", gap: 8, marginBottom: 24, flexWrap: "wrap" }}>
-              {[0, 1, 2, 3, 4].map(n => (
-                <button key={n} onClick={() => setFilters({ ...filters, bedrooms: n })}
-                  style={{ ...chip(filters.bedrooms === n), padding: "10px 18px", fontSize: 15, fontWeight: 700 }}>
-                  {n === 0 ? "Cualquiera" : `${n}+`}
-                </button>
-              ))}
-            </div>
-
-            <button
-              onClick={() => setMostrarMasFiltros(!mostrarMasFiltros)}
-              style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "12px 18px", color: "rgba(255,255,255,0.6)", fontSize: 16, fontWeight: 600, cursor: "pointer", width: "100%", marginBottom: 20, fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
-              {mostrarMasFiltros ? "▲ Menos filtros" : "▼ Mas filtros (extras y estado)"}
-            </button>
-
-            {mostrarMasFiltros && (
-              <div>
-                <p style={sectionLabel}>Extras</p>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 24 }}>
-                  {featureOptions.map((feat) => {
-                    const active = (filters.features || []).includes(feat)
-                    return (
-                      <button key={feat} onClick={() => {
-                        const current = filters.features || []
-                        setFilters({ ...filters, features: active ? current.filter((f: string) => f !== feat) : [...current, feat] })
-                      }} style={chip(active)}>
-                        {feat}
-                      </button>
-                    )
-                  })}
-                </div>
-
-                <p style={sectionLabel}>Estado</p>
-                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  {conditionOptions.map((cond) => (
-                    <button key={cond.value} onClick={() => setFilters({ ...filters, condition: cond.value })}
-                      style={{ ...chip(filters.condition === cond.value), justifyContent: "space-between", padding: "14px 18px" }}>
-                      <span style={{ fontSize: 15 }}>{cond.label}</span>
-                      {filters.condition === cond.value && <span style={{ fontSize: 12 }}>✓</span>}
+            {filters.operation === "hotel" ? (
+              <>
+                <p style={sectionLabel}>Estrellas minimas</p>
+                <div style={{ display: "flex", gap: 8, marginBottom: 24, flexWrap: "wrap" }}>
+                  {[0, 1, 2, 3, 4, 5].map(n => (
+                    <button key={n} onClick={() => setFilters({ ...filters, stars: n })}
+                      style={{ ...chip(filters.stars === n), padding: "10px 18px", fontSize: 15, fontWeight: 700 }}>
+                      {n === 0 ? "Cualquiera" : "⭐".repeat(n)}
                     </button>
                   ))}
                 </div>
-              </div>
+              </>
+            ) : (
+              <>
+                <p style={sectionLabel}>Ambientes minimos</p>
+                <div style={{ display: "flex", gap: 8, marginBottom: 24, flexWrap: "wrap" }}>
+                  {[0, 1, 2, 3, 4, 5].map(n => (
+                    <button key={n} onClick={() => setFilters({ ...filters, rooms: n })}
+                      style={{ ...chip(filters.rooms === n), padding: "10px 18px", fontSize: 15, fontWeight: 700 }}>
+                      {n === 0 ? "Cualquiera" : `${n}+`}
+                    </button>
+                  ))}
+                </div>
+
+                <p style={sectionLabel}>Dormitorios minimos</p>
+                <div style={{ display: "flex", gap: 8, marginBottom: 24, flexWrap: "wrap" }}>
+                  {[0, 1, 2, 3, 4].map(n => (
+                    <button key={n} onClick={() => setFilters({ ...filters, bedrooms: n })}
+                      style={{ ...chip(filters.bedrooms === n), padding: "10px 18px", fontSize: 15, fontWeight: 700 }}>
+                      {n === 0 ? "Cualquiera" : `${n}+`}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  onClick={() => setMostrarMasFiltros(!mostrarMasFiltros)}
+                  style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 12, padding: "12px 18px", color: "rgba(255,255,255,0.6)", fontSize: 16, fontWeight: 600, cursor: "pointer", width: "100%", marginBottom: 20, fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
+                  {mostrarMasFiltros ? "▲ Menos filtros" : "▼ Mas filtros (extras y estado)"}
+                </button>
+
+                {mostrarMasFiltros && (
+                  <div>
+                    <p style={sectionLabel}>Extras</p>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 24 }}>
+                      {featureOptions.map((feat) => {
+                        const active = (filters.features || []).includes(feat)
+                        return (
+                          <button key={feat} onClick={() => {
+                            const current = filters.features || []
+                            setFilters({ ...filters, features: active ? current.filter((f: string) => f !== feat) : [...current, feat] })
+                          }} style={chip(active)}>
+                            {feat}
+                          </button>
+                        )
+                      })}
+                    </div>
+
+                    <p style={sectionLabel}>Estado</p>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      {conditionOptions.map((cond) => (
+                        <button key={cond.value} onClick={() => setFilters({ ...filters, condition: cond.value })}
+                          style={{ ...chip(filters.condition === cond.value), justifyContent: "space-between", padding: "14px 18px" }}>
+                          <span style={{ fontSize: 15 }}>{cond.label}</span>
+                          {filters.condition === cond.value && <span style={{ fontSize: 12 }}>✓</span>}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}
-
       </div>
 
-      {/* BOTONES FIJOS */}
       <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, padding: "16px 20px 90px", background: "rgba(10,10,10,0.97)", borderTop: "1px solid rgba(255,255,255,0.08)", display: "flex", gap: 10, zIndex: 20 }}>
         {step > 1 && (
           <button onClick={prev} style={{ padding: "14px 20px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.12)", background: "transparent", color: "rgba(255,255,255,0.7)", fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
