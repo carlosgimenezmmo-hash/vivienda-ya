@@ -107,15 +107,15 @@ export default function PublicarPage() {
         owner_name: user?.name || "Propietario",
         owner_avatar: user?.avatar_url || null,
         operation_type: operacion,
-        property_type: tipoPropiedad,
-        price: precioClean,
+        property_type: operacion !== "hotel" ? tipoPropiedad : null,
+        price: operacion !== "hotel" ? precioClean : null,
         rooms: operacion !== "hotel" ? ambientesClean || null : null,
         room_type: operacion === "hotel" ? tipoHabitacion : null,
         property_subtype: operacion === "temporario" ? subtype || null : null,
         max_guests: operacion === "hotel" ? parseInt(huespedes) || null : null,
         hotel_name: operacion === "hotel" ? hotelName || null : null,
-        hotel_services: operacion === "hotel" ? hotelServices : null,
         stars: operacion === "hotel" ? stars || null : null,
+        hotel_services: operacion === "hotel" ? hotelServices : null,
         surface: operacion !== "hotel" ? superficieClean || null : null,
         neighborhood: barrioClean,
         city: ciudadClean,
@@ -270,6 +270,39 @@ export default function PublicarPage() {
               ))}
             </div>
 
+            {/* CAMPOS HOTEL */}
+            {operacion === "hotel" && (
+              <div style={{ marginBottom: 16 }}>
+                <p style={sectionLabel}>Nombre del hotel</p>
+                <input value={hotelName} onChange={e => setHotelName(e.target.value)} placeholder="Ej: Hotel Patagonia" maxLength={100} style={{ ...inp, marginBottom: 12 }} />
+
+                <p style={sectionLabel}>Estrellas</p>
+                <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+                  {[1, 2, 3, 4, 5].map(n => (
+                    <button key={n} onClick={() => setStars(n)} style={{ ...chip(stars === n), padding: "10px 14px" }}>{"⭐".repeat(n)}</button>
+                  ))}
+                </div>
+
+                <p style={sectionLabel}>Tipo de habitacion</p>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" as const, marginBottom: 12 }}>
+                  {[["simple", "🛏 Simple"], ["doble", "🛏🛏 Doble"], ["suite", "👑 Suite"], ["familiar", "👨‍👩‍👧 Familiar"]].map(([val, label]) => (
+                    <button key={val} onClick={() => setTipoHabitacion(val)} style={chip(tipoHabitacion === val)}>{label}</button>
+                  ))}
+                </div>
+
+                <p style={sectionLabel}>Huespedes maximos</p>
+                <input value={huespedes} onChange={e => setHuespedes(e.target.value.replace(/[^0-9]/g, ""))} placeholder="Ej: 2" type="number" inputMode="numeric" style={{ ...inp, marginBottom: 12 }} />
+
+                <p style={sectionLabel}>Servicios del hotel</p>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" as const, marginBottom: 12 }}>
+                  {["🏊 Pileta", "🧖 Sauna", "🏋️ Gym", "🅿️ Estacionamiento", "📶 Wifi", "🍳 Desayuno", "🍽️ Restaurante", "🔑 Recepcion 24hs", "♿ Accesible", "🐾 Pet friendly", "❄️ Aire acondicionado", "🔥 Calefaccion"].map(s => (
+                    <button key={s} onClick={() => setHotelServices(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s])} style={chip(hotelServices.includes(s))}>{s}</button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* CAMPOS TEMPORARIO */}
             {operacion === "temporario" && (
               <div style={{ marginBottom: 16 }}>
                 <p style={sectionLabel}>Subcategoria</p>
@@ -281,62 +314,35 @@ export default function PublicarPage() {
               </div>
             )}
 
-            {operacion === "hotel" && (
-              <div style={{ marginBottom: 16 }}>
-                <p style={sectionLabel}>Nombre del hotel</p>
-                <input value={hotelName} onChange={e => setHotelName(e.target.value)} placeholder="Ej: Hotel Patagonia" maxLength={100} style={{ ...inp, marginBottom: 12 }} />
-                <p style={sectionLabel}>Estrellas</p>
-                <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-                  {[1, 2, 3, 4, 5].map(n => (
-                    <button key={n} onClick={() => setStars(n)} style={{ ...chip(stars === n), padding: "10px 14px" }}>{"⭐".repeat(n)}</button>
-                  ))}
-                </div>
-                <p style={sectionLabel}>Tipo de habitacion</p>
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" as const, marginBottom: 12 }}>
-                  {[["simple", "🛏 Simple"], ["doble", "🛏🛏 Doble"], ["suite", "👑 Suite"], ["familiar", "👨‍👩‍👧 Familiar"]].map(([val, label]) => (
-                    <button key={val} onClick={() => setTipoHabitacion(val)} style={chip(tipoHabitacion === val)}>{label}</button>
-                  ))}
-                </div>
-                <p style={sectionLabel}>Huespedes maximos</p>
-                <p style={sectionLabel}>Servicios del hotel</p>
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" as const, marginBottom: 12 }}>
-                  {["🏊 Pileta", "🧖 Sauna", "🏋️ Gym", "🅿️ Estacionamiento", "📶 Wifi", "🍳 Desayuno", "🍽️ Restaurante", "🔑 Recepcion 24hs", "♿ Accesible", "🐾 Pet friendly", "❄️ Aire acondicionado", "🔥 Calefaccion"].map(s => (
-                    <button key={s} onClick={() => setHotelServices(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s])}
-                      style={chip(hotelServices.includes(s))}>
-                      {s}
-                    </button>
-                  ))}
-                </div>
-                <input value={huespedes} onChange={e => setHuespedes(e.target.value.replace(/[^0-9]/g, ""))} placeholder="Ej: 2" type="number" inputMode="numeric" style={{ ...inp, marginBottom: 12 }} />
-              </div>
-            )}
-
+            {/* CAMPOS SOLO PARA NO HOTEL */}
             {operacion !== "hotel" && (
-              <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
-                <div style={{ flex: 1 }}>
-                  <p style={sectionLabel}>Ambientes</p>
-                  <input value={ambientes} onChange={e => setAmbientes(e.target.value.replace(/[^0-9]/g, ""))} placeholder="Ej: 3" type="number" inputMode="numeric" style={inp} />
+              <>
+                <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
+                  <div style={{ flex: 1 }}>
+                    <p style={sectionLabel}>Ambientes</p>
+                    <input value={ambientes} onChange={e => setAmbientes(e.target.value.replace(/[^0-9]/g, ""))} placeholder="Ej: 3" type="number" inputMode="numeric" style={inp} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <p style={sectionLabel}>Superficie m2</p>
+                    <input value={superficie} onChange={e => setSuperficie(e.target.value.replace(/[^0-9]/g, ""))} placeholder="Ej: 75" type="number" inputMode="numeric" style={inp} />
+                  </div>
                 </div>
-                <div style={{ flex: 1 }}>
-                  <p style={sectionLabel}>Superficie m2</p>
-                  <input value={superficie} onChange={e => setSuperficie(e.target.value.replace(/[^0-9]/g, ""))} placeholder="Ej: 75" type="number" inputMode="numeric" style={inp} />
+
+                <p style={sectionLabel}>Precio</p>
+                <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+                  <button onClick={() => setMoneda("USD")} style={{ ...chip(moneda === "USD"), flexShrink: 0 }}>USD</button>
+                  <button onClick={() => setMoneda("ARS")} style={{ ...chip(moneda === "ARS"), flexShrink: 0 }}>ARS</button>
+                  <input value={precio} onChange={e => setPrecio(e.target.value.replace(/[^0-9.]/g, ""))} placeholder="Precio" type="number" inputMode="numeric" style={{ ...inp, flex: 1 }} />
                 </div>
-              </div>
+
+                <p style={sectionLabel}>Tipo de propiedad</p>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
+                  {["Departamento", "Casa", "PH", "Local", "Oficina", "Terreno", "Loft", "Monoambiente", "Cabana", "Duplex", "Cochera", "Galpon"].map(t => (
+                    <button key={t} onClick={() => setTipoPropiedad(t)} style={chip(tipoPropiedad === t)}>{t}</button>
+                  ))}
+                </div>
+              </>
             )}
-
-            <p style={sectionLabel}>Precio</p>
-            <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-              <button onClick={() => setMoneda("USD")} style={{ ...chip(moneda === "USD"), flexShrink: 0 }}>USD</button>
-              <button onClick={() => setMoneda("ARS")} style={{ ...chip(moneda === "ARS"), flexShrink: 0 }}>ARS</button>
-              <input value={precio} onChange={e => setPrecio(e.target.value.replace(/[^0-9.]/g, ""))} placeholder="Precio" type="number" inputMode="numeric" style={{ ...inp, flex: 1 }} />
-            </div>
-
-            <p style={sectionLabel}>Tipo de propiedad</p>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
-              {["Departamento", "Casa", "PH", "Local", "Oficina", "Terreno", "Loft", "Monoambiente", "Cabana", "Duplex", "Cochera", "Galpon"].map(t => (
-                <button key={t} onClick={() => setTipoPropiedad(t)} style={chip(tipoPropiedad === t)}>{t}</button>
-              ))}
-            </div>
 
             <p style={sectionLabel}>Ubicacion</p>
             <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
@@ -367,7 +373,7 @@ export default function PublicarPage() {
               {[
                 ["Operacion", operacion],
                 ["Tipo", operacion === "hotel" ? (hotelName || "Hotel") : (tipoPropiedad || "No especificado")],
-                ["Precio", precio ? `${moneda} ${parseInt(precio).toLocaleString()}` : "No especificado"],
+                ...(operacion !== "hotel" ? [["Precio", precio ? `${moneda} ${parseInt(precio).toLocaleString()}` : "No especificado"]] : []),
                 ["Ubicacion", [barrio, ciudad].filter(Boolean).join(", ") || "No especificada"],
                 ["GPS", gpsOk && !videoDesdeGaleria ? "Verificado" : "No verificado"],
               ].map(([label, value], i, arr) => (
