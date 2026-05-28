@@ -148,7 +148,23 @@ function HotelReservarContent() {
             </p>
           )}
         </div>
-
+{/* Servicios */}
+        {hotel.hotel_services && hotel.hotel_services.length > 0 && (
+          <div style={{ marginBottom: 24 }}>
+            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 12px", fontWeight: 600 }}>SERVICIOS</p>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+              {hotel.hotel_services.map((s: string) => (
+                <span key={s} style={{
+                  background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: 20, padding: "6px 12px", fontSize: 13, color: "rgba(255,255,255,0.7)",
+                  fontWeight: 600,
+                }}>
+                  {s}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
         {/* Fechas */}
         <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600 }}>Fecha de entrada</p>
         <input type="date" value={fechaDesde} min={new Date().toISOString().split("T")[0]} onChange={e => { setFechaDesde(e.target.value); setHabitacionSeleccionada(null) }} style={{ ...inp, marginBottom: 12 }} />
