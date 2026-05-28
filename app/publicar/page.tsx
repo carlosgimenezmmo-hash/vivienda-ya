@@ -43,6 +43,7 @@ export default function PublicarPage() {
   const [huespedes, setHuespedes] = useState("")
   const [hotelName, setHotelName] = useState("")
   const [stars, setStars] = useState(0)
+  const [hotelServices, setHotelServices] = useState<string[]>([])
   const [barrio, setBarrio] = useState("")
   const [ciudad, setCiudad] = useState("")
   const [titulo, setTitulo] = useState("")
@@ -113,6 +114,7 @@ export default function PublicarPage() {
         property_subtype: operacion === "temporario" ? subtype || null : null,
         max_guests: operacion === "hotel" ? parseInt(huespedes) || null : null,
         hotel_name: operacion === "hotel" ? hotelName || null : null,
+        hotel_services: operacion === "hotel" ? hotelServices : null,
         stars: operacion === "hotel" ? stars || null : null,
         surface: operacion !== "hotel" ? superficieClean || null : null,
         neighborhood: barrioClean,
@@ -296,6 +298,15 @@ export default function PublicarPage() {
                   ))}
                 </div>
                 <p style={sectionLabel}>Huespedes maximos</p>
+                <p style={sectionLabel}>Servicios del hotel</p>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" as const, marginBottom: 12 }}>
+                  {["🏊 Pileta", "🧖 Sauna", "🏋️ Gym", "🅿️ Estacionamiento", "📶 Wifi", "🍳 Desayuno", "🍽️ Restaurante", "🔑 Recepcion 24hs", "♿ Accesible", "🐾 Pet friendly", "❄️ Aire acondicionado", "🔥 Calefaccion"].map(s => (
+                    <button key={s} onClick={() => setHotelServices(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s])}
+                      style={chip(hotelServices.includes(s))}>
+                      {s}
+                    </button>
+                  ))}
+                </div>
                 <input value={huespedes} onChange={e => setHuespedes(e.target.value.replace(/[^0-9]/g, ""))} placeholder="Ej: 2" type="number" inputMode="numeric" style={{ ...inp, marginBottom: 12 }} />
               </div>
             )}
