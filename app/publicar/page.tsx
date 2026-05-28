@@ -38,7 +38,7 @@ export default function PublicarPage() {
   const [moneda, setMoneda] = useState("USD")
   const [ambientes, setAmbientes] = useState("")
   const [superficie, setSuperficie] = useState("")
-  const [tipoHabitacion, setTipoHabitacion] = useState("doble")
+  const [tipoHabitacion, setTipoHabitacion] = useState<string[]>([])
   const [subtype, setSubtype] = useState("")
   const [huespedes, setHuespedes] = useState("")
   const [hotelName, setHotelName] = useState("")
@@ -110,7 +110,7 @@ export default function PublicarPage() {
         property_type: operacion !== "hotel" ? tipoPropiedad : null,
         price: operacion !== "hotel" ? precioClean : null,
         rooms: operacion !== "hotel" ? ambientesClean || null : null,
-        room_type: operacion === "hotel" ? tipoHabitacion : null,
+        room_type: operacion === "hotel" ? tipoHabitacion.join(",") : null,
         property_subtype: operacion === "temporario" ? subtype || null : null,
         max_guests: operacion === "hotel" ? parseInt(huespedes) || null : null,
         hotel_name: operacion === "hotel" ? hotelName || null : null,
@@ -286,8 +286,7 @@ export default function PublicarPage() {
                 <p style={sectionLabel}>Tipo de habitacion</p>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" as const, marginBottom: 12 }}>
                   {[["simple", "🛏 Simple"], ["doble", "🛏🛏 Doble"], ["suite", "👑 Suite"], ["familiar", "👨‍👩‍👧 Familiar"]].map(([val, label]) => (
-                    <button key={val} onClick={() => setTipoHabitacion(val)} style={chip(tipoHabitacion === val)}>{label}</button>
-                  ))}
+                    <button key={val} onClick={() => setTiposHabitacion(prev => prev.includes(val) ? prev.filter(x => x !== val) : [...prev, val])} style={chip(tiposHabitacion.includes(val))}>{label}</button>
                 </div>
 
                 <p style={sectionLabel}>Huespedes maximos</p>
