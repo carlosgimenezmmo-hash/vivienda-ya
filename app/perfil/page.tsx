@@ -79,6 +79,8 @@ export default function PerfilPage() {
     { emoji: "📊", label: "Estadisticas", sub: "Metricas y analiticas de tus videos", href: "/dashboard" },
     { emoji: "📋", label: "Mis Publicaciones", sub: "Gestioná tus videos activos", href: "/mis-publicaciones" },
     { emoji: "🔖", label: "Guardados", sub: "Propiedades que te gustaron", href: "/guardados" },
+    { emoji: "📅", label: "Mis Reservas", sub: "Reservas que hiciste", href: "/mis-reservas" },
+    { emoji: "🏨", label: "Reservas Recibidas", sub: "Reservas en tus propiedades", href: "/reservas-recibidas" },
     { emoji: "📺", label: "Mi Canal", sub: "Gestiona tu canal", href: "/mi-canal" },
     { emoji: "💎", label: "Mis Planes", sub: "Ver y cambiar tu plan actual", href: "/planes" },
     { emoji: "⚙️", label: "Configuracion", sub: "Cuenta y privacidad", href: "/configuracion" },
