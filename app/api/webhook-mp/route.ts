@@ -59,12 +59,24 @@ export async function POST(req: NextRequest) {
     const planId = payment.metadata?.planId
     const userId = payment.metadata?.userId
 
-    // Si es una reserva
+   // Si es una reserva
     const reservaPropertyId = payment.metadata?.property_id
     if (reservaPropertyId) {
-      await supabase.from("reservas")
+      const { data: reservaActualizada } = await supabase.from("reservas")
         .update({ estado: "confirmada", mp_payment_id: String(paymentId) })
         .eq("mp_payment_id", String(payment.order?.id || paymentId))
+        .select()
+        .single()
+
+      // Notificar al dueño
+      if (reservaActualizada?.id) {
+        await fetch(`${process.env.APP_URL}/api/notificar-reserva`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ reserva_id: reservaActualizada.id }),
+        })
+      }
+
       return NextResponse.json({ ok: true })
     }
 
