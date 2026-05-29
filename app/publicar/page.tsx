@@ -46,6 +46,7 @@ export default function PublicarPage() {
   const [hotelServices, setHotelServices] = useState<string[]>([])
   const [barrio, setBarrio] = useState("")
   const [ciudad, setCiudad] = useState("")
+  const [provincia, setProvincia] = useState("")
   const [titulo, setTitulo] = useState("")
   const [descripcion, setDescripcion] = useState("")
   const [whatsapp, setWhatsapp] = useState("")
@@ -119,6 +120,7 @@ export default function PublicarPage() {
         surface: operacion !== "hotel" ? superficieClean || null : null,
         neighborhood: barrioClean,
         city: ciudadClean,
+        province: provincia || null,
         location: `${barrioClean}, ${ciudadClean}`,
         title: tituloClean,
         description: descripcionClean,
@@ -344,11 +346,12 @@ export default function PublicarPage() {
               </>
             )}
 
-            <p style={sectionLabel}>Ubicacion</p>
-            <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
+           <p style={sectionLabel}>Ubicacion</p>
+            <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
               <input value={barrio} onChange={e => setBarrio(e.target.value)} onBlur={e => setBarrio(sanitizeText(e.target.value, 80))} placeholder="Barrio" maxLength={80} style={{ ...inp, flex: 1 }} />
               <input value={ciudad} onChange={e => setCiudad(e.target.value)} onBlur={e => setCiudad(sanitizeText(e.target.value, 80))} placeholder="Ciudad" maxLength={80} style={{ ...inp, flex: 1 }} />
             </div>
+            <input value={provincia} onChange={e => setProvincia(e.target.value)} onBlur={e => setProvincia(sanitizeText(e.target.value, 80))} placeholder="Provincia" maxLength={80} style={{ ...inp, marginBottom: 16 }} />
 
             <p style={sectionLabel}>Descripcion corta</p>
             <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} onBlur={e => setDescripcion(sanitizeText(e.target.value, 150))} placeholder="Describe brevemente la propiedad..." maxLength={150} style={{ ...inp, height: 80, resize: "none", marginBottom: 4 }} />
