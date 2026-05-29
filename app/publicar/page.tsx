@@ -288,7 +288,7 @@ export default function PublicarPage() {
                 <p style={sectionLabel}>Tipo de habitacion</p>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" as const, marginBottom: 12 }}>
                   {[["simple", "🛏 Simple"], ["doble", "🛏🛏 Doble"], ["suite", "👑 Suite"], ["familiar", "👨‍👩‍👧 Familiar"]].map(([val, label]) => (
-                   <button key={val} onClick={() => setTiposHabitacion(prev => prev.includes(val) ? prev.filter(x => x !== val) : [...prev, val])} style={chip(tiposHabitacion.includes(val))}>{label}</button>
+                   <button key={val} onClick={() => setTipoHabitacion(prev => prev.includes(val) ? prev.filter(x => x !== val) : [...prev, val])} style={chip(tipoHabitacion.includes(val))}>{label}</button>
                   ))}
                 </div>
 
@@ -417,3 +417,4 @@ export default function PublicarPage() {
     </div>
   )
 }
+
