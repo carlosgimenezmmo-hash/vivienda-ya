@@ -1,5 +1,4 @@
 "use client"
-
 import { useRouter } from "next/navigation"
 
 export default function PrivacidadPage() {
@@ -19,51 +18,55 @@ export default function PrivacidadPage() {
         {[
           {
             titulo: "1. Responsable del tratamiento de datos",
-            contenido: `Carlos Alberto Gimenez, operador de ViviendaYa, con domicilio en Tres Arroyos, Provincia de Buenos Aires, República Argentina. Contacto: viviendayatresa@gmail.com.`
+            contenido: `El responsable del tratamiento de los datos personales recopilados a través de ViviendaYa es Carlos Alberto Gimenez, con domicilio en la ciudad de Tres Arroyos, Provincia de Buenos Aires, República Argentina. Contacto: viviendayatresa@gmail.com`
           },
           {
             titulo: "2. Datos que recopilamos",
-            contenido: `Al registrarse y utilizar la Plataforma recopilamos: nombre completo, dirección de correo electrónico, número de teléfono, edad, provincia y ciudad de residencia, foto de perfil, videos e imágenes publicados, ubicación GPS al momento de grabar videos, datos de uso de la Plataforma y datos de pago (procesados por terceros, no almacenados por nosotros).`
+            contenido: `Al usar ViviendaYa podemos recopilar los siguientes datos:\n\n• Datos de registro: nombre, dirección de email, foto de perfil (si utilizás Google para registrarte).\n• Datos de publicaciones: videos, imágenes, descripciones, precios y ubicación GPS de las propiedades publicadas.\n• Datos de uso: páginas visitadas, propiedades vistas, interacciones con el contenido.\n• Datos de contacto: número de WhatsApp ingresado voluntariamente para recibir consultas.\n• Datos de pago: procesados exclusivamente por MercadoPago. ViviendaYa no almacena datos de tarjetas de crédito ni débito.`
           },
           {
-            titulo: "3. Uso de los datos",
-            contenido: `Los datos recopilados se utilizan para: identificar al usuario dentro de la Plataforma, mostrar publicaciones y perfiles a otros usuarios, verificar la ubicación de las propiedades publicadas, procesar pagos de suscripciones, mejorar el funcionamiento de la Plataforma y cumplir con obligaciones legales.`
+            titulo: "3. Finalidad del tratamiento",
+            contenido: `Los datos recopilados se utilizan para:\n\n• Proveer y mejorar el servicio de la Plataforma.\n• Permitir la publicación y búsqueda de propiedades.\n• Gestionar reservas y pagos.\n• Enviar notificaciones relacionadas con el uso del servicio.\n• Cumplir con obligaciones legales.\n\nNo vendemos ni cedemos datos personales a terceros con fines comerciales.`
           },
           {
-            titulo: "4. Compartición de datos",
-            contenido: `No vendemos ni cedemos datos personales a terceros con fines comerciales. Los datos pueden ser compartidos con: proveedores de servicios tecnológicos necesarios para el funcionamiento de la Plataforma (Supabase, Vercel, Google), procesadores de pago (MercadoPago) y autoridades competentes cuando sea requerido por ley.`
+            titulo: "4. Ubicación GPS",
+            contenido: `La Plataforma solicita acceso a la ubicación GPS del dispositivo únicamente al momento de grabar un video de una propiedad. Esta información se utiliza exclusivamente para mostrar la ubicación aproximada de la propiedad en el mapa y verificar que el video fue grabado en el lugar indicado. El usuario puede publicar sin GPS, en cuyo caso la propiedad se mostrará como "no verificada".`
           },
           {
-            titulo: "5. Datos de ubicación GPS",
-            contenido: `La Plataforma solicita acceso a la ubicación del dispositivo al momento de grabar o publicar un video, con el único fin de verificar que la propiedad se encuentra donde se indica. Esta información se almacena asociada a la publicación y es visible para otros usuarios de la Plataforma.`
+            titulo: "5. Acceso a la cámara",
+            contenido: `La Plataforma solicita acceso a la cámara del dispositivo únicamente para grabar videos de propiedades. No se graba ni almacena ningún contenido sin la acción explícita del usuario. El usuario puede optar por subir videos desde su galería sin usar la cámara.`
           },
           {
-            titulo: "6. Almacenamiento y seguridad",
-            contenido: `Los datos se almacenan en servidores seguros provistos por Supabase. Implementamos medidas de seguridad razonables para proteger la información, incluyendo cifrado y control de acceso. Sin embargo, ningún sistema es completamente infalible y no podemos garantizar la seguridad absoluta de los datos.`
+            titulo: "6. Almacenamiento de datos",
+            contenido: `Los datos se almacenan en servidores seguros provistos por Supabase (base de datos) y Vercel (infraestructura). Ambos proveedores cumplen con estándares internacionales de seguridad. Los videos se almacenan en Supabase Storage.`
           },
           {
             titulo: "7. Derechos del usuario",
-            contenido: `De acuerdo con la Ley 25.326 de Protección de Datos Personales de Argentina, el usuario tiene derecho a: acceder a sus datos personales, rectificar datos incorrectos, solicitar la eliminación de sus datos, oponerse al tratamiento de sus datos. Para ejercer estos derechos escribir a: viviendayatresa@gmail.com.`
+            contenido: `El usuario tiene derecho a:\n\n• Acceder a sus datos personales almacenados en la Plataforma.\n• Rectificar datos inexactos o incompletos.\n• Solicitar la eliminación de su cuenta y datos asociados.\n• Oponerse al tratamiento de sus datos.\n\nPara ejercer cualquiera de estos derechos, el usuario puede escribir a viviendayatresa@gmail.com indicando su solicitud.`
           },
           {
-            titulo: "8. Retención de datos",
-            contenido: `Los datos se conservan mientras la cuenta del usuario esté activa. Al eliminar la cuenta, los datos personales son eliminados en un plazo máximo de 30 días, excepto aquellos que deban conservarse por obligaciones legales.`
+            titulo: "8. Eliminación de cuenta",
+            contenido: `El usuario puede solicitar la eliminación de su cuenta y todos sus datos personales en cualquier momento escribiendo a viviendayatresa@gmail.com con el asunto "Eliminar cuenta". La solicitud será procesada dentro de los 30 días hábiles.`
           },
           {
-            titulo: "9. Cookies y tecnologías similares",
-            contenido: `La Plataforma puede utilizar cookies y tecnologías similares para mantener la sesión del usuario y mejorar la experiencia de uso. El usuario puede configurar su navegador para rechazar cookies, aunque esto podría afectar el funcionamiento de la Plataforma.`
+            titulo: "9. Cookies y tecnologías de seguimiento",
+            contenido: `La Plataforma puede utilizar cookies y tecnologías similares para mejorar la experiencia del usuario, recordar preferencias y analizar el uso del servicio. El usuario puede configurar su navegador para rechazar cookies, aunque esto podría afectar el funcionamiento de algunas funcionalidades.`
           },
           {
-            titulo: "10. Menores de edad",
-            contenido: `La Plataforma no está dirigida a menores de 18 años. No recopilamos intencionalmente datos de menores. Si detectamos que un usuario es menor de edad, procederemos a eliminar su cuenta y datos asociados.`
+            titulo: "10. Servicios de terceros",
+            contenido: `La Plataforma utiliza los siguientes servicios de terceros que tienen sus propias políticas de privacidad:\n\n• Google (autenticación)\n• MercadoPago (procesamiento de pagos)\n• Supabase (almacenamiento de datos)\n• Vercel (infraestructura)\n• Resend (envío de emails)\n\nRecomendamos leer las políticas de privacidad de cada uno de estos servicios.`
           },
           {
-            titulo: "11. Modificaciones",
-            contenido: `Esta Política de Privacidad puede modificarse en cualquier momento. Las modificaciones entrarán en vigencia desde su publicación en la Plataforma. El uso continuado del servicio implica la aceptación de la política actualizada.`
+            titulo: "11. Menores de edad",
+            contenido: `ViviendaYa no está dirigida a menores de 18 años. No recopilamos intencionalmente datos de menores. Si detectamos que un menor ha proporcionado datos personales, procederemos a eliminarlos de inmediato.`
           },
           {
-            titulo: "12. Contacto",
-            contenido: `Para consultas sobre esta Política de Privacidad escribir a: viviendayatresa@gmail.com`
+            titulo: "12. Cambios en la política",
+            contenido: `ViviendaYa se reserva el derecho de modificar esta Política de Privacidad en cualquier momento. Los cambios serán notificados a través de la Plataforma. El uso continuado del servicio luego de la notificación implica la aceptación de los cambios.`
+          },
+          {
+            titulo: "13. Contacto",
+            contenido: `Para consultas sobre esta Política de Privacidad escribinos a: viviendayatresa@gmail.com`
           },
         ].map((seccion, i) => (
           <div key={i} style={{ marginBottom: 32 }}>
