@@ -347,12 +347,9 @@ export default function PublicarPage() {
             )}
 
            <p style={sectionLabel}>Ubicacion</p>
-            <div style={{ display: "flex", gap: 10, marginBottom: 10 }}>
-              <input value={barrio} onChange={e => setBarrio(e.target.value)} onBlur={e => setBarrio(sanitizeText(e.target.value, 80))} placeholder="Barrio" maxLength={80} style={{ ...inp, flex: 1 }} />
-              <input value={ciudad} onChange={e => setCiudad(e.target.value)} onBlur={e => setCiudad(sanitizeText(e.target.value, 80))} placeholder="Ciudad" maxLength={80} style={{ ...inp, flex: 1 }} />
-            </div>
-            <input value={provincia} onChange={e => setProvincia(e.target.value)} onBlur={e => setProvincia(sanitizeText(e.target.value, 80))} placeholder="Provincia" maxLength={80} style={{ ...inp, marginBottom: 16 }} />
-
+            <input value={provincia} onChange={e => setProvincia(e.target.value)} onBlur={e => setProvincia(sanitizeText(e.target.value, 80))} placeholder="Provincia" maxLength={80} style={{ ...inp, marginBottom: 10 }} />
+            <input value={ciudad} onChange={e => setCiudad(e.target.value)} onBlur={e => setCiudad(sanitizeText(e.target.value, 80))} placeholder="Ciudad" maxLength={80} style={{ ...inp, marginBottom: 10 }} />
+            <input value={barrio} onChange={e => setBarrio(e.target.value)} onBlur={e => setBarrio(sanitizeText(e.target.value, 80))} placeholder="Barrio" maxLength={80} style={{ ...inp, marginBottom: 16 }} />
             <p style={sectionLabel}>Descripcion corta</p>
             <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} onBlur={e => setDescripcion(sanitizeText(e.target.value, 150))} placeholder="Describe brevemente la propiedad..." maxLength={150} style={{ ...inp, height: 80, resize: "none", marginBottom: 4 }} />
             <p style={{ textAlign: "right", color: "rgba(255,255,255,0.3)", fontSize: 12, margin: "0 0 16px" }}>{descripcion.length}/150</p>
