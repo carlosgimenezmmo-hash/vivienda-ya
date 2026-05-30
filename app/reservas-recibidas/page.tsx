@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabaseClient"
@@ -108,8 +108,8 @@ export default function ReservasRecibidasPage() {
           <p style={{ color: "rgba(255,255,255,0.4)", textAlign: "center", marginTop: 40 }}>Cargando...</p>
         ) : reservas.length === 0 ? (
           <div style={{ textAlign: "center", marginTop: 60 }}>
-            <p style={{ fontSize: 40, marginBottom: 16 }}>📭</p>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 15 }}>No tenés reservas recibidas todavía</p>
+            <p style={{ fontSize: 40, marginBottom: 16 }}>ðŸ“­</p>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 15 }}>No tenÃ©s reservas recibidas todavÃ­a</p>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -153,22 +153,20 @@ export default function ReservasRecibidasPage() {
                 {r.estado === "pendiente" && (
                   <div style={{ display: "flex", gap: 10 }}>
                     <button onClick={() => handleConfirmar(r.id)} style={{
-                      flex: 1, padding: "12px", borderRadius: 12, border: "none",
-                      background: "rgba(34,197,94,0.15)", color: "#22C55E",
+                      flex: 1, padding: "12px", borderRadius: 12, background: "rgba(34,197,94,0.15)", color: "#22C55E",
                       fontSize: 14, fontWeight: 700, cursor: "pointer",
                       fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
                       border: "1px solid rgba(34,197,94,0.3)" as any,
                     }}>
-                      ✅ Confirmar
+                      âœ… Confirmar
                     </button>
                     <button onClick={() => handleCancelar(r.id)} style={{
-                      flex: 1, padding: "12px", borderRadius: 12, border: "none",
-                      background: "rgba(239,68,68,0.15)", color: "#EF4444",
+                      flex: 1, padding: "12px", borderRadius: 12, background: "rgba(239,68,68,0.15)", color: "#EF4444",
                       fontSize: 14, fontWeight: 700, cursor: "pointer",
                       fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
                       border: "1px solid rgba(239,68,68,0.3)" as any,
                     }}>
-                      ❌ Cancelar
+                      âŒ Cancelar
                     </button>
                   </div>
                 )}
