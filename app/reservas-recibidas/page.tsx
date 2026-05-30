@@ -19,7 +19,6 @@ export default function ReservasRecibidasPage() {
     const uid = sessionData?.session?.user?.id
     if (!uid) return
 
-    // Traer propiedades del usuario
     const { data: props } = await supabase
       .from("properties")
       .select("id")
@@ -69,14 +68,6 @@ export default function ReservasRecibidasPage() {
     })
     fetchReservas()
   }
-    await supabase.from("reservas").update({ estado: "confirmada" }).eq("id", id)
-    fetchReservas()
-  }
-
-  const handleCancelar = async (id: number) => {
-    await supabase.from("reservas").update({ estado: "cancelada" }).eq("id", id)
-    fetchReservas()
-  }
 
   const btn: React.CSSProperties = {
     width: "100%", padding: "16px", borderRadius: 14, border: "none",
@@ -87,7 +78,7 @@ export default function ReservasRecibidasPage() {
 
   if (!isLoggedIn) {
     return (
-      <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 24px", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
+      <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
         <button onClick={() => router.push("/registro")} style={btn}>Registrarme</button>
       </div>
     )
@@ -108,8 +99,8 @@ export default function ReservasRecibidasPage() {
           <p style={{ color: "rgba(255,255,255,0.4)", textAlign: "center", marginTop: 40 }}>Cargando...</p>
         ) : reservas.length === 0 ? (
           <div style={{ textAlign: "center", marginTop: 60 }}>
-            <p style={{ fontSize: 40, marginBottom: 16 }}>ðŸ“­</p>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 15 }}>No tenÃ©s reservas recibidas todavÃ­a</p>
+            <p style={{ fontSize: 40, marginBottom: 16 }}>📭</p>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 15 }}>No tenés reservas recibidas todavía</p>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -125,7 +116,7 @@ export default function ReservasRecibidasPage() {
                     border: `1px solid ${getEstadoColor(r.estado)}50`,
                     color: getEstadoColor(r.estado),
                     borderRadius: 20, padding: "3px 10px", fontSize: 11, fontWeight: 700,
-                    textTransform: "capitalize" as const
+                    textTransform: "capitalize" as const,
                   }}>
                     {r.estado}
                   </span>
@@ -153,20 +144,22 @@ export default function ReservasRecibidasPage() {
                 {r.estado === "pendiente" && (
                   <div style={{ display: "flex", gap: 10 }}>
                     <button onClick={() => handleConfirmar(r.id)} style={{
-                      flex: 1, padding: "12px", borderRadius: 12, background: "rgba(34,197,94,0.15)", color: "#22C55E",
+                      flex: 1, padding: "12px", borderRadius: 12,
+                      border: "1px solid rgba(34,197,94,0.3)",
+                      background: "rgba(34,197,94,0.15)", color: "#22C55E",
                       fontSize: 14, fontWeight: 700, cursor: "pointer",
                       fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
-                      border: "1px solid rgba(34,197,94,0.3)" as any,
                     }}>
-                      âœ… Confirmar
+                      ✅ Confirmar
                     </button>
                     <button onClick={() => handleCancelar(r.id)} style={{
-                      flex: 1, padding: "12px", borderRadius: 12, background: "rgba(239,68,68,0.15)", color: "#EF4444",
+                      flex: 1, padding: "12px", borderRadius: 12,
+                      border: "1px solid rgba(239,68,68,0.3)",
+                      background: "rgba(239,68,68,0.15)", color: "#EF4444",
                       fontSize: 14, fontWeight: 700, cursor: "pointer",
                       fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
-                      border: "1px solid rgba(239,68,68,0.3)" as any,
                     }}>
-                      âŒ Cancelar
+                      ❌ Cancelar
                     </button>
                   </div>
                 )}
