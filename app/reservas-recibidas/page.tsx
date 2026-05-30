@@ -52,6 +52,24 @@ export default function ReservasRecibidasPage() {
 
   const handleConfirmar = async (id: number) => {
     await supabase.from("reservas").update({ estado: "confirmada" }).eq("id", id)
+    await fetch("/api/notificar-huesped", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reserva_id: id, estado: "confirmada" }),
+    })
+    fetchReservas()
+  }
+
+  const handleCancelar = async (id: number) => {
+    await supabase.from("reservas").update({ estado: "cancelada" }).eq("id", id)
+    await fetch("/api/notificar-huesped", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reserva_id: id, estado: "cancelada" }),
+    })
+    fetchReservas()
+  }
+    await supabase.from("reservas").update({ estado: "confirmada" }).eq("id", id)
     fetchReservas()
   }
 
