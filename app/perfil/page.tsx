@@ -24,6 +24,8 @@ const PLAN_NOMBRES: Record<string, string> = {
 export default function PerfilPage() {
   const { user, isLoggedIn, logout } = useAuth()
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deletingAccount, setDeletingAccount] = useState(false)
   const [planActual, setPlanActual] = useState<string>("gratis")
   const [stats, setStats] = useState({ publicaciones: 0, guardados: 0 })
   const [rol, setRol] = useState<string>("usuario")
@@ -96,6 +98,7 @@ export default function PerfilPage() {
       <div style={{ padding: "52px 20px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <h1 style={{ fontSize: 20, fontWeight: 800, margin: 0 }}>Mi Perfil</h1>
         <button onClick={() => setShowLogoutConfirm(true)} style={{ background: "rgba(239,68,68,0.15)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 20, padding: "6px 14px", color: "#FCA5A5", fontSize: 13, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>Salir</button>
+        <button onClick={() => setShowDeleteConfirm(true)} style={{ background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.2)", borderRadius: 20, padding: "6px 14px", color: "#EF4444", fontSize: 13, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>Eliminar cuenta</button>
       </div>
 
       <div style={{ padding: "0 20px 24px", display: "flex", alignItems: "center", gap: 16 }}>
@@ -182,7 +185,34 @@ export default function PerfilPage() {
           ))}
         </div>
       </div>
-
+{showDeleteConfirm && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 50 }} onClick={() => setShowDeleteConfirm(false)}>
+          <div style={{ background: "#1a1a1a", borderRadius: "20px 20px 0 0", padding: "24px 20px 40px", width: "100%", maxWidth: 430 }} onClick={e => e.stopPropagation()}>
+            <h3 style={{ fontSize: 18, fontWeight: 800, margin: "0 0 8px", textAlign: "center" }}>⚠️ Eliminar cuenta?</h3>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, textAlign: "center", margin: "0 0 24px" }}>Se borrarán todos tus datos, publicaciones y reservas. Esta acción no se puede deshacer.</p>
+            <button onClick={async () => {
+              setDeletingAccount(true)
+              const { data: sessionData } = await supabase.auth.getSession()
+              const uid = sessionData?.session?.user?.id
+              if (!uid) return
+              const res = await fetch("/api/eliminar-cuenta", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user_id: uid }),
+              })
+              const data = await res.json()
+              if (data.ok) {
+                await logout()
+                router.push("/")
+              }
+              setDeletingAccount(false)
+            }} style={{ width: "100%", padding: "16px", borderRadius: 14, border: "none", background: "#EF4444", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer", marginBottom: 12, fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", opacity: deletingAccount ? 0.6 : 1 }}>
+              {deletingAccount ? "Eliminando..." : "Sí, eliminar mi cuenta"}
+            </button>
+            <button onClick={() => setShowDeleteConfirm(false)} style={{ width: "100%", padding: "15px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.12)", background: "transparent", color: "rgba(255,255,255,0.7)", fontSize: 15, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>Cancelar</button>
+          </div>
+        </div>
+      )}
       {showLogoutConfirm && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "flex-end", justifyContent: "center", zIndex: 50 }} onClick={() => setShowLogoutConfirm(false)}>
           <div style={{ background: "#1a1a1a", borderRadius: "20px 20px 0 0", padding: "24px 20px 40px", width: "100%", maxWidth: 430 }} onClick={e => e.stopPropagation()}>
