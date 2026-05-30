@@ -14,7 +14,17 @@ export async function POST(req: NextRequest) {
     if (!property_id || !fecha_desde || !fecha_hasta || !precio_total) {
       return NextResponse.json({ error: "Faltan datos" }, { status: 400 })
     }
+// Verificar que no haya reservas confirmadas que se superpongan
+    const { data: reservasExistentes } = await supabase
+      .from("reservas")
+      .select("id")
+      .eq("property_id", property_id)
+      .in("estado", ["confirmada", "pendiente"])
+      .or(`and(fecha_desde.lte.${fecha_hasta},fecha_hasta.gte.${fecha_desde})`)
 
+    if (reservasExistentes && reservasExistentes.length > 0) {
+      return NextResponse.json({ error: "Las fechas seleccionadas ya están reservadas. Por favor elegí otras fechas." }, { status: 409 })
+    }
     // Crear preferencia en MercadoPago
     const mpRes = await fetch("https://api.mercadopago.com/checkout/preferences", {
       method: "POST",
