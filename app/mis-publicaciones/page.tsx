@@ -13,6 +13,8 @@ export default function MisPublicacionesPage() {
   const [deleting, setDeleting] = useState<number | null>(null)
   const [filtro, setFiltro] = useState("todas")
   const [confirmarId, setConfirmarId] = useState<number | null>(null)
+  const [destacandoId, setDestacandoId] = useState<number | null>(null)
+  const [showDestacarModal, setShowDestacarModal] = useState<number | null>(null)
 
   useEffect(() => {
     if (!isLoggedIn || !user) return
@@ -115,6 +117,13 @@ export default function MisPublicacionesPage() {
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {p.operation_type === "venta" && p.status === "approved" && (
                     <button
+                    {p.status === "approved" && (
+                    <button
+                      onClick={() => setShowDestacarModal(p.id)}
+                      style={{ width: "100%", padding: "10px", borderRadius: 10, border: "1px solid rgba(245,158,11,0.3)", background: "rgba(245,158,11,0.1)", color: "#F59E0B", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
+                      ⭐ {p.highlighted ? "Destacada" : "Destacar propiedad"}
+                    </button>
+                  )}
                       onClick={() => router.push(`/intermediacion/solicitar?property_id=${p.id}`)}
                       style={{ width: "100%", padding: "10px", borderRadius: 10, border: "1px solid rgba(34,197,94,0.3)", background: "rgba(34,197,94,0.1)", color: "#22C55E", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
                       Solicitar intermediación
@@ -130,7 +139,40 @@ export default function MisPublicacionesPage() {
           ))}
         </div>
       )}
-
+{showDestacarModal !== null && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "flex-end", justifyContent: "center" }} onClick={() => setShowDestacarModal(null)}>
+          <div style={{ background: "#1a1a1a", borderRadius: "24px 24px 0 0", padding: "28px 24px 48px", width: "100%", maxWidth: 500 }} onClick={e => e.stopPropagation()}>
+            <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.1)", margin: "0 auto 24px" }} />
+            <h3 style={{ fontSize: 20, fontWeight: 900, color: "#fff", margin: "0 0 8px", textAlign: "center" }}>⭐ Destacar propiedad</h3>
+            <p style={{ color: "rgba(255,255,255,0.5)", fontSize: 14, textAlign: "center", margin: "0 0 24px" }}>Tu propiedad aparecerá primero en el feed</p>
+            {[
+              { label: "24 horas", sub: "Primero en el feed por 1 día", precio: 5000, plan: "24h" },
+              { label: "7 días", sub: "Prioridad toda la semana", precio: 20000, plan: "7d" },
+            ].map(op => (
+              <button key={op.plan} disabled={destacandoId !== null} onClick={async () => {
+                setDestacandoId(showDestacarModal)
+                const res = await fetch("/api/destacar-propiedad", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ property_id: showDestacarModal, plan: op.plan, precio: op.precio }),
+                })
+                const data = await res.json()
+                setDestacandoId(null)
+                if (data.init_point) window.location.href = data.init_point
+              }} style={{ width: "100%", padding: "16px", borderRadius: 14, marginBottom: 12, border: "1px solid rgba(245,158,11,0.3)", background: "rgba(245,158,11,0.1)", color: "#fff", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div style={{ textAlign: "left" }}>
+                  <p style={{ margin: 0, fontWeight: 700 }}>{op.label}</p>
+                  <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.4)" }}>{op.sub}</p>
+                </div>
+                <span style={{ color: "#F59E0B", fontWeight: 800 }}>${op.precio.toLocaleString()}</span>
+              </button>
+            ))}
+            <button onClick={() => setShowDestacarModal(null)} style={{ width: "100%", padding: "16px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.1)", background: "transparent", color: "rgba(255,255,255,0.6)", fontSize: 16, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
       {confirmarId !== null && (
         <div style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "flex-end", justifyContent: "center" }} onClick={() => setConfirmarId(null)}>
           <div style={{ background: "#1a1a1a", borderRadius: "24px 24px 0 0", padding: "28px 24px 48px", width: "100%", maxWidth: 500 }} onClick={e => e.stopPropagation()}>

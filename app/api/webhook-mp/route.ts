@@ -58,6 +58,19 @@ export async function POST(req: NextRequest) {
 
     const planId = payment.metadata?.planId
     const userId = payment.metadata?.userId
+    // Si es un destacado
+    const tipoDestacado = payment.metadata?.type
+    if (tipoDestacado === "destacar") {
+      const propertyId = payment.metadata?.property_id
+      const dias = payment.metadata?.dias || 1
+      const hasta = new Date()
+      hasta.setDate(hasta.getDate() + dias)
+      await supabase.from("properties").update({
+        highlighted: true,
+        highlighted_until: hasta.toISOString(),
+      }).eq("id", propertyId)
+      return NextResponse.json({ ok: true })
+    }
 
    // Si es una reserva
     const reservaPropertyId = payment.metadata?.property_id
