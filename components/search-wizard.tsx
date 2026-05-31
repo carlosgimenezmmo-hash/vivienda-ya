@@ -171,7 +171,7 @@ export function SearchWizard() {
         ) : (
           <div style={{ padding: "0 20px", display: "flex", flexDirection: "column", gap: 16 }}>
             {results.map((p) => (
-              <div key={p.id} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, overflow: "hidden", cursor: "pointer" }} onClick={() => router.push("/")}>
+              <div key={p.id} style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 20, overflow: "hidden", cursor: "pointer" }} onClick={() => router.push(`/propiedad/${p.id}`)}>
                 {p.video_url && <video src={p.video_url} style={{ width: "100%", height: 200, objectFit: "cover" }} muted playsInline />}
                 <div style={{ padding: "14px 16px" }}>
                   <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
