@@ -35,7 +35,7 @@ export default function PublicarPage() {
   const [operacion, setOperacion] = useState("venta")
   const [tipoPropiedad, setTipoPropiedad] = useState("")
   const [precio, setPrecio] = useState("")
-  const [moneda, setMoneda] = useState("USD")
+  const [moneda, setMoneda] = useState("ARS")
   const [ambientes, setAmbientes] = useState("")
   const [superficie, setSuperficie] = useState("")
   const [tipoHabitacion, setTipoHabitacion] = useState<string[]>([])
@@ -50,7 +50,6 @@ export default function PublicarPage() {
   const [titulo, setTitulo] = useState("")
   const [descripcion, setDescripcion] = useState("")
   const [whatsapp, setWhatsapp] = useState("")
-  const [destacar, setDestacar] = useState("sin")
   const [videoDesdeGaleria, setVideoDesdeGaleria] = useState(false)
 
   useEffect(() => {
@@ -94,14 +93,12 @@ export default function PublicarPage() {
       if (!video) throw new Error("Debes seleccionar un video")
 
       let videoUrl = ""
-      if (video) {
-        const ext = video.name.split('.').pop()
-        const path = `${Date.now()}.${ext}`
-        const { error: uploadError } = await supabase.storage.from('videos-app').upload(path, video, { contentType: video.type })
-        if (uploadError) throw uploadError
-        const { data } = supabase.storage.from('videos-app').getPublicUrl(path)
-        videoUrl = data.publicUrl
-      }
+      const ext = video.name.split('.').pop()
+      const path = `${Date.now()}.${ext}`
+      const { error: uploadError } = await supabase.storage.from('videos-app').upload(path, video, { contentType: video.type })
+      if (uploadError) throw uploadError
+      const { data } = supabase.storage.from('videos-app').getPublicUrl(path)
+      videoUrl = data.publicUrl
 
       const { error: insertError } = await supabase.from("properties").insert({
         user_id: uid,
@@ -129,7 +126,7 @@ export default function PublicarPage() {
         verified: gpsOk && !videoDesdeGaleria,
         lat: gpsLat,
         lng: gpsLng,
-        highlighted: destacar !== "sin",
+        highlighted: false,
         likes: 0,
         status: "approved"
       })
@@ -154,13 +151,6 @@ export default function PublicarPage() {
     color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer",
     fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
   }
-  const card = (active: boolean): React.CSSProperties => ({
-    width: "100%", padding: "16px", borderRadius: 14, marginBottom: 12,
-    border: `2px solid ${active ? "#2563EB" : "rgba(255,255,255,0.1)"}`,
-    background: active ? "rgba(37,99,235,0.15)" : "rgba(255,255,255,0.04)",
-    cursor: "pointer", textAlign: "left",
-    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
-  })
   const chip = (active: boolean): React.CSSProperties => ({
     padding: "8px 14px", borderRadius: 20,
     border: `1px solid ${active ? "#2563EB" : "rgba(255,255,255,0.12)"}`,
@@ -272,7 +262,6 @@ export default function PublicarPage() {
               ))}
             </div>
 
-            {/* CAMPOS HOTEL */}
             {operacion === "hotel" && (
               <div style={{ marginBottom: 16 }}>
                 <p style={sectionLabel}>Nombre del hotel</p>
@@ -288,7 +277,7 @@ export default function PublicarPage() {
                 <p style={sectionLabel}>Tipo de habitacion</p>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" as const, marginBottom: 12 }}>
                   {[["simple", "🛏 Simple"], ["doble", "🛏🛏 Doble"], ["suite", "👑 Suite"], ["familiar", "👨‍👩‍👧 Familiar"]].map(([val, label]) => (
-                   <button key={val} onClick={() => setTipoHabitacion(prev => prev.includes(val) ? prev.filter(x => x !== val) : [...prev, val])} style={chip(tipoHabitacion.includes(val))}>{label}</button>
+                    <button key={val} onClick={() => setTipoHabitacion(prev => prev.includes(val) ? prev.filter(x => x !== val) : [...prev, val])} style={chip(tipoHabitacion.includes(val))}>{label}</button>
                   ))}
                 </div>
 
@@ -304,7 +293,6 @@ export default function PublicarPage() {
               </div>
             )}
 
-            {/* CAMPOS TEMPORARIO */}
             {operacion === "temporario" && (
               <div style={{ marginBottom: 16 }}>
                 <p style={sectionLabel}>Subcategoria</p>
@@ -316,7 +304,6 @@ export default function PublicarPage() {
               </div>
             )}
 
-            {/* CAMPOS SOLO PARA NO HOTEL */}
             {operacion !== "hotel" && (
               <>
                 <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
@@ -332,8 +319,8 @@ export default function PublicarPage() {
 
                 <p style={sectionLabel}>Precio</p>
                 <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-                  <button onClick={() => setMoneda("USD")} style={{ ...chip(moneda === "USD"), flexShrink: 0 }}>USD</button>
                   <button onClick={() => setMoneda("ARS")} style={{ ...chip(moneda === "ARS"), flexShrink: 0 }}>ARS</button>
+                  <button onClick={() => setMoneda("USD")} style={{ ...chip(moneda === "USD"), flexShrink: 0 }}>USD</button>
                   <input value={precio} onChange={e => setPrecio(e.target.value.replace(/[^0-9.]/g, ""))} placeholder="Precio" type="number" inputMode="numeric" style={{ ...inp, flex: 1 }} />
                 </div>
 
@@ -346,10 +333,11 @@ export default function PublicarPage() {
               </>
             )}
 
-           <p style={sectionLabel}>Ubicacion</p>
+            <p style={sectionLabel}>Ubicacion</p>
             <input value={provincia} onChange={e => setProvincia(e.target.value)} onBlur={e => setProvincia(sanitizeText(e.target.value, 80))} placeholder="Provincia" maxLength={80} style={{ ...inp, marginBottom: 10 }} />
             <input value={ciudad} onChange={e => setCiudad(e.target.value)} onBlur={e => setCiudad(sanitizeText(e.target.value, 80))} placeholder="Ciudad" maxLength={80} style={{ ...inp, marginBottom: 10 }} />
             <input value={barrio} onChange={e => setBarrio(e.target.value)} onBlur={e => setBarrio(sanitizeText(e.target.value, 80))} placeholder="Barrio" maxLength={80} style={{ ...inp, marginBottom: 16 }} />
+
             <p style={sectionLabel}>Descripcion corta</p>
             <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} onBlur={e => setDescripcion(sanitizeText(e.target.value, 150))} placeholder="Describe brevemente la propiedad..." maxLength={150} style={{ ...inp, height: 80, resize: "none", marginBottom: 4 }} />
             <p style={{ textAlign: "right", color: "rgba(255,255,255,0.3)", fontSize: 12, margin: "0 0 16px" }}>{descripcion.length}/150</p>
@@ -384,26 +372,6 @@ export default function PublicarPage() {
               ))}
             </div>
 
-            <p style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 10px", fontWeight: 600 }}>Destacar tu propiedad?</p>
-            <button onClick={() => setDestacar("sin")} style={card(destacar === "sin")}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div><p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#fff" }}>Sin destacar</p><p style={{ margin: "2px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>Aparece en orden normal</p></div>
-                <p style={{ margin: 0, fontSize: 15, fontWeight: 700, color: "#22C55E" }}>Gratis</p>
-              </div>
-            </button>
-            <button onClick={() => setDestacar("24h")} style={card(destacar === "24h")}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div><p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#fff" }}>Destacar 24 horas</p><p style={{ margin: "2px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>Primero en el feed por 1 dia</p></div>
-                <p style={{ margin: 0, fontSize: 17, fontWeight: 800, color: "#60A5FA" }}>$5.000</p>
-              </div>
-            </button>
-            <button onClick={() => setDestacar("7d")} style={card(destacar === "7d")}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div><p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#fff" }}>Destacar 7 dias</p><p style={{ margin: "2px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>Prioridad toda la semana</p></div>
-                <p style={{ margin: 0, fontSize: 17, fontWeight: 800, color: "#60A5FA" }}>$20.000</p>
-              </div>
-            </button>
-
             {error && <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 10, padding: "10px 14px", marginBottom: 16 }}><p style={{ color: "#EF4444", fontSize: 13, margin: 0 }}>{error}</p></div>}
 
             <button onClick={handlePublicar} disabled={loading} style={{ ...btn, opacity: loading ? 0.6 : 1, marginTop: 8 }}>
@@ -417,4 +385,3 @@ export default function PublicarPage() {
     </div>
   )
 }
-
