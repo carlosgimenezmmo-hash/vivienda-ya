@@ -1,5 +1,4 @@
 ﻿"use client"
-
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth-context"
@@ -40,6 +39,15 @@ export default function MisPublicacionesPage() {
     setDeleting(null)
   }
 
+  const chipStyle = (active: boolean) => ({
+    padding: "8px 16px", borderRadius: 20,
+    border: `1px solid ${active ? "#2563EB" : "rgba(255,255,255,0.2)"}`,
+    background: active ? "rgba(37,99,235,0.2)" : "rgba(255,255,255,0.05)",
+    color: active ? "#60A5FA" : "rgba(255,255,255,0.7)",
+    fontSize: 13, fontWeight: 600, cursor: "pointer",
+    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+  })
+
   if (!isLoggedIn || !user) {
     return (
       <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
@@ -51,15 +59,6 @@ export default function MisPublicacionesPage() {
     )
   }
 
-  const chipStyle = (active: boolean) => ({
-    padding: "8px 16px", borderRadius: 20,
-    border: `1px solid ${active ? "#2563EB" : "rgba(255,255,255,0.2)"}`,
-    background: active ? "rgba(37,99,235,0.2)" : "rgba(255,255,255,0.05)",
-    color: active ? "#60A5FA" : "rgba(255,255,255,0.7)",
-    fontSize: 13, fontWeight: 600, cursor: "pointer",
-    fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
-  })
-
   return (
     <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", paddingBottom: 100 }}>
       <div style={{ padding: "52px 20px 20px", display: "flex", alignItems: "center", gap: 14 }}>
@@ -70,9 +69,9 @@ export default function MisPublicacionesPage() {
       </div>
 
       <div style={{ display: "flex", gap: 8, padding: "0 20px 16px", flexWrap: "wrap" }}>
-        {["todas", "venta", "alquiler", "permuta"].map(f => (
+        {["todas", "venta", "alquiler", "permuta", "temporario", "hotel"].map(f => (
           <button key={f} onClick={() => setFiltro(f)} style={chipStyle(filtro === f) as any}>
-            {f === "todas" ? "Todas" : f === "venta" ? "Ventas" : f === "alquiler" ? "Alquileres" : "Permutas"}
+            {f === "todas" ? "Todas" : f === "venta" ? "Ventas" : f === "alquiler" ? "Alquileres" : f === "permuta" ? "Permutas" : f === "temporario" ? "Temporario" : "Hoteles"}
           </button>
         ))}
       </div>
@@ -108,18 +107,23 @@ export default function MisPublicacionesPage() {
                   <span style={{ background: "rgba(37,99,235,0.15)", color: "#60A5FA", border: "1px solid rgba(37,99,235,0.3)", borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 700 }}>
                     {p.operation_type?.toUpperCase() || "VENTA"}
                   </span>
+                  {p.highlighted && (
+                    <span style={{ background: "rgba(245,158,11,0.15)", color: "#F59E0B", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 20, padding: "2px 10px", fontSize: 11, fontWeight: 700 }}>
+                      ⭐ DESTACADA
+                    </span>
+                  )}
                 </div>
                 <h3 style={{ margin: "0 0 4px", fontSize: 16, fontWeight: 700 }}>{p.title || "Sin titulo"}</h3>
                 <p style={{ margin: "0 0 4px", fontSize: 13, color: "rgba(255,255,255,0.5)" }}>
                   {[p.neighborhood, p.city].filter(Boolean).join(", ") || p.location || "Sin ubicacion"}
                 </p>
-                <p style={{ margin: "0 0 12px", fontSize: 18, fontWeight: 800 }}>USD {Number(p.price)?.toLocaleString() || "Consultar"}</p>
+                {p.price && <p style={{ margin: "0 0 12px", fontSize: 18, fontWeight: 800 }}>{p.price?.toLocaleString()} {p.operation_type === "hotel" ? "USD" : "ARS"}</p>}
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {p.status === "approved" && (
                     <button
                       onClick={() => setShowDestacarModal(p.id)}
                       style={{ width: "100%", padding: "10px", borderRadius: 10, border: "1px solid rgba(245,158,11,0.3)", background: "rgba(245,158,11,0.1)", color: "#F59E0B", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
-                      ⭐ {p.highlighted ? "Destacada" : "Destacar propiedad"}
+                      ⭐ {p.highlighted ? "Renovar destaque" : "Destacar propiedad"}
                     </button>
                   )}
                   {p.operation_type === "venta" && p.status === "approved" && (
@@ -129,11 +133,23 @@ export default function MisPublicacionesPage() {
                       Solicitar intermediación
                     </button>
                   )}
+                  {(p.operation_type === "hotel") && p.status === "approved" && (
+                    <button
+                      onClick={() => router.push(`/hotel-habitaciones`)}
+                      style={{ width: "100%", padding: "10px", borderRadius: 10, border: "1px solid rgba(37,99,235,0.3)", background: "rgba(37,99,235,0.1)", color: "#60A5FA", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
+                      🏨 Gestionar habitaciones
+                    </button>
+                  )}
+                  {(p.operation_type === "temporario" || p.operation_type === "hotel") && p.status === "approved" && (
+                    <button
+                      onClick={() => router.push(`/disponibilidad?id=${p.id}`)}
+                      style={{ width: "100%", padding: "10px", borderRadius: 10, border: "1px solid rgba(37,99,235,0.3)", background: "rgba(37,99,235,0.1)", color: "#60A5FA", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
+                      📅 Gestionar disponibilidad
+                    </button>
+                  )}
                   <button onClick={() => setConfirmarId(p.id)} disabled={deleting === p.id}
                     style={{ width: "100%", padding: "10px", borderRadius: 10, border: "1px solid rgba(239,68,68,0.3)", background: "rgba(239,68,68,0.1)", color: "#FCA5A5", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
                     {deleting === p.id ? "Eliminando..." : "Eliminar"}
-                  </button>
-                </div>
                   </button>
                 </div>
               </div>
@@ -141,7 +157,8 @@ export default function MisPublicacionesPage() {
           ))}
         </div>
       )}
-{showDestacarModal !== null && (
+
+      {showDestacarModal !== null && (
         <div style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "flex-end", justifyContent: "center" }} onClick={() => setShowDestacarModal(null)}>
           <div style={{ background: "#1a1a1a", borderRadius: "24px 24px 0 0", padding: "28px 24px 48px", width: "100%", maxWidth: 500 }} onClick={e => e.stopPropagation()}>
             <div style={{ width: 40, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.1)", margin: "0 auto 24px" }} />
@@ -175,6 +192,7 @@ export default function MisPublicacionesPage() {
           </div>
         </div>
       )}
+
       {confirmarId !== null && (
         <div style={{ position: "fixed", inset: 0, zIndex: 100, background: "rgba(0,0,0,0.7)", display: "flex", alignItems: "flex-end", justifyContent: "center" }} onClick={() => setConfirmarId(null)}>
           <div style={{ background: "#1a1a1a", borderRadius: "24px 24px 0 0", padding: "28px 24px 48px", width: "100%", maxWidth: 500 }} onClick={e => e.stopPropagation()}>
