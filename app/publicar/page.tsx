@@ -105,16 +105,16 @@ export default function PublicarPage() {
         owner_name: user?.name || "Propietario",
         owner_avatar: user?.avatar_url || null,
         operation_type: operacion,
-        property_type: operacion !== "hotel" ? tipoPropiedad : null,
-        price: operacion !== "hotel" ? precioClean : null,
-        rooms: operacion !== "hotel" ? ambientesClean || null : null,
-        room_type: operacion === "hotel" ? tipoHabitacion.join(",") : null,
+        property_type: operacion !== "hotel" && operacion !== "camping" ? tipoPropiedad : null,
+        price: operacion !== "hotel" && operacion !== "camping" ? precioClean : null,
+        rooms: operacion !== "hotel" && operacion !== "camping" ? ambientesClean || null : null,
+        room_type: (operacion === "hotel" || operacion === "camping") ? tipoHabitacion.join(",") : null,
         property_subtype: operacion === "temporario" ? subtype || null : null,
-        max_guests: operacion === "hotel" ? parseInt(huespedes) || null : null,
-        hotel_name: operacion === "hotel" ? hotelName || null : null,
+        max_guests: (operacion === "hotel" || operacion === "camping") ? parseInt(huespedes) || null : null,
+        hotel_name: (operacion === "hotel" || operacion === "camping") ? hotelName || null : null,
         stars: operacion === "hotel" ? stars || null : null,
-        hotel_services: operacion === "hotel" ? hotelServices : null,
-        surface: operacion !== "hotel" ? superficieClean || null : null,
+        hotel_services: (operacion === "hotel" || operacion === "camping") ? hotelServices : null,
+        surface: operacion !== "hotel" && operacion !== "camping" ? superficieClean || null : null,
         neighborhood: barrioClean,
         city: ciudadClean,
         province: provincia || null,
@@ -257,15 +257,15 @@ export default function PublicarPage() {
 
             <p style={sectionLabel}>Tipo de operacion</p>
             <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
-              {[["venta", "Venta"], ["alquiler", "Alquiler"], ["temporario", "Temporario"], ["permuta", "Permuta"], ["hotel", "Hotel"]].map(([val, label]) => (
+              {[["venta", "Venta"], ["alquiler", "Alquiler"], ["temporario", "Temporario"], ["permuta", "Permuta"], ["hotel", "Hotel"], ["camping", "🏕️ Camping"]].map(([val, label]) => (
                 <button key={val} onClick={() => setOperacion(val)} style={chip(operacion === val)}>{label}</button>
               ))}
             </div>
 
-            {operacion === "hotel" && (
+            {operacion === "hotel" || operacion === "camping") && (
               <div style={{ marginBottom: 16 }}>
-                <p style={sectionLabel}>Nombre del hotel</p>
-                <input value={hotelName} onChange={e => setHotelName(e.target.value)} placeholder="Ej: Hotel Patagonia" maxLength={100} style={{ ...inp, marginBottom: 12 }} />
+                <p style={sectionLabel}>{operacion === "camping" ? "Nombre del camping" : "Nombre del hotel"}</p>
+                <input value={hotelName} onChange={e => setHotelName(e.target.value)} placeholder={operacion === "camping" ? "Ej: Camping Los Arrayanes" : "Ej: Hotel Patagonia"} maxLength={100} style={{ ...inp, marginBottom: 12 }} />
 
                 <p style={sectionLabel}>Estrellas</p>
                 <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
@@ -274,9 +274,12 @@ export default function PublicarPage() {
                   ))}
                 </div>
 
-                <p style={sectionLabel}>Tipo de habitacion</p>
+                <p style={sectionLabel}>{operacion === "camping" ? "Tipo de lugar" : "Tipo de habitacion"}</p>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" as const, marginBottom: 12 }}>
-                  {[["simple", "🛏 Simple"], ["doble", "🛏🛏 Doble"], ["suite", "👑 Suite"], ["familiar", "👨‍👩‍👧 Familiar"]].map(([val, label]) => (
+                  {(operacion === "camping"
+                    ? [["parcela", "⛺ Parcela"], ["cabana", "🛖 Cabaña"], ["domo", "🔵 Domo"], ["glamping", "✨ Glamping"], ["motorhome", "🚐 Motorhome"]]
+                    : [["simple", "🛏 Simple"], ["doble", "🛏🛏 Doble"], ["suite", "👑 Suite"], ["familiar", "👨‍👩‍👧 Familiar"]]
+                  ).map(([val, label]) => (
                     <button key={val} onClick={() => setTipoHabitacion(prev => prev.includes(val) ? prev.filter(x => x !== val) : [...prev, val])} style={chip(tipoHabitacion.includes(val))}>{label}</button>
                   ))}
                 </div>
@@ -284,7 +287,7 @@ export default function PublicarPage() {
                 <p style={sectionLabel}>Huespedes maximos</p>
                 <input value={huespedes} onChange={e => setHuespedes(e.target.value.replace(/[^0-9]/g, ""))} placeholder="Ej: 2" type="number" inputMode="numeric" style={{ ...inp, marginBottom: 12 }} />
 
-                <p style={sectionLabel}>Servicios del hotel</p>
+                <p style={sectionLabel}>{operacion === "camping" ? "Servicios del camping" : "Servicios del hotel"}</p>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap" as const, marginBottom: 12 }}>
                   {["🏊 Pileta", "🧖 Sauna", "🏋️ Gym", "🅿️ Estacionamiento", "📶 Wifi", "🍳 Desayuno", "🍽️ Restaurante", "🔑 Recepcion 24hs", "♿ Accesible", "🐾 Pet friendly", "❄️ Aire acondicionado", "🔥 Calefaccion"].map(s => (
                     <button key={s} onClick={() => setHotelServices(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s])} style={chip(hotelServices.includes(s))}>{s}</button>
@@ -304,7 +307,7 @@ export default function PublicarPage() {
               </div>
             )}
 
-            {operacion !== "hotel" && (
+            {operacion !== "hotel" && operacion !== "camping" && (
               <>
                 <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
                   <div style={{ flex: 1 }}>
@@ -360,8 +363,8 @@ export default function PublicarPage() {
             <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: 16, marginBottom: 20 }}>
               {[
                 ["Operacion", operacion],
-                ["Tipo", operacion === "hotel" ? (hotelName || "Hotel") : (tipoPropiedad || "No especificado")],
-                ...(operacion !== "hotel" ? [["Precio", precio ? `${moneda} ${parseInt(precio).toLocaleString()}` : "No especificado"]] : []),
+                ["Tipo", (operacion === "hotel" || operacion === "camping") ? (hotelName || operacion) : (tipoPropiedad || "No especificado")],
+                ...((operacion !== "hotel" && operacion !== "camping") ? [["Precio", precio ? `${moneda} ${parseInt(precio).toLocaleString()}` : "No especificado"]] : []),
                 ["Ubicacion", [barrio, ciudad].filter(Boolean).join(", ") || "No especificada"],
                 ["GPS", gpsOk && !videoDesdeGaleria ? "Verificado" : "No verificado"],
               ].map(([label, value], i, arr) => (
