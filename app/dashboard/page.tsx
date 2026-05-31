@@ -36,7 +36,8 @@ export default function DashboardPage() {
   const router = useRouter()
   const [properties, setProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)
-  const [tab, setTab] = useState<"resumen" | "propiedades" | "zonas">("resumen")
+  const [tab, setTab] = useState<"resumen" | "propiedades" | "zonas" | "reservas">("resumen")
+const [reservas, setReservas] = useState<any[]>([])
   const [confirmarId, setConfirmarId] = useState<number | null>(null)
   const [deleting, setDeleting] = useState<number | null>(null)
 
@@ -66,7 +67,15 @@ export default function DashboardPage() {
       console.error(err)
     } finally {
       setLoading(false)
-    }
+    }const propertyIds = (data || []).map((p: any) => p.id)
+      if (propertyIds.length > 0) {
+        const { data: reservasData } = await supabase
+          .from("reservas")
+          .select("*, properties(title)")
+          .in("property_id", propertyIds)
+          .order("created_at", { ascending: false })
+        setReservas(reservasData || [])
+      }
   }
 
   const handleDelete = async (id: number) => {
@@ -214,7 +223,7 @@ export default function DashboardPage() {
 
         {/* TABS */}
         <div style={{ display: "flex", gap: 4, background: "rgba(255,255,255,0.04)", borderRadius: 12, padding: 4 }}>
-          {(["resumen", "propiedades", "zonas"] as const).map((t) => (
+          {(["resumen", "propiedades", "zonas", "reservas"] as const).map((t) => (
             <button key={t} onClick={() => setTab(t)} style={{
               padding: "10px 20px", borderRadius: 10, border: "none",
               background: tab === t ? "rgba(255,255,255,0.12)" : "transparent",
@@ -222,7 +231,7 @@ export default function DashboardPage() {
               fontSize: 14, fontWeight: 600, cursor: "pointer",
               fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
             }}>
-              {t === "resumen" ? "Resumen" : t === "propiedades" ? "Mis publicaciones" : "Por zona"}
+              {t === "resumen" ? "Resumen" : t === "propiedades" ? "Mis publicaciones" : t === "zonas" ? "Por zona" : "Reservas"}
               {t === "propiedades" && !puedeVerPropiedades && " (Plan Junior)"}
               {t === "zonas" && !puedeVerZonas && " (Plan Agente)"}
             </button>
@@ -394,7 +403,57 @@ export default function DashboardPage() {
             </div>
           )
         )}
-
+{/* TAB RESERVAS */}
+        {tab === "reservas" && (
+          <div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12, marginBottom: 24 }}>
+              {[
+                { label: "Total reservas", valor: reservas.length, color: "#2563EB" },
+                { label: "Confirmadas", valor: reservas.filter(r => r.estado === "confirmada").length, color: "#22C55E" },
+                { label: "Pendientes", valor: reservas.filter(r => r.estado === "pendiente").length, color: "#F59E0B" },
+                { label: "Comisiones cobradas", valor: `$${reservas.filter(r => r.estado === "confirmada").reduce((a, r) => a + Number(r.comision || 0), 0).toLocaleString()}`, color: "#A855F7" },
+              ].map(stat => (
+                <div key={stat.label} style={{ ...s.card, borderLeft: `3px solid ${stat.color}` }}>
+                  <p style={s.label}>{stat.label}</p>
+                  <p style={{ fontSize: 28, fontWeight: 900, margin: 0, color: stat.color }}>{stat.valor}</p>
+                </div>
+              ))}
+            </div>
+            {reservas.length === 0 ? (
+              <div style={{ textAlign: "center", padding: "60px 0" }}>
+                <p style={{ fontSize: 40, marginBottom: 12 }}>📭</p>
+                <p style={{ fontSize: 18, fontWeight: 700, margin: "0 0 8px" }}>Sin reservas todavia</p>
+                <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14 }}>Las reservas de tus propiedades aparecerán acá</p>
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {reservas.map(r => (
+                  <div key={r.id} style={{ ...s.card, display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
+                    <div>
+                      <p style={{ margin: 0, fontWeight: 700, fontSize: 15 }}>{r.properties?.title || "Propiedad"}</p>
+                      <p style={{ margin: "2px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>{r.fecha_desde} → {r.fecha_hasta} · {r.noches} noches</p>
+                    </div>
+                    <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+                      <div style={{ textAlign: "right" }}>
+                        <p style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "#22C55E" }}>${Number(r.precio_total).toLocaleString()}</p>
+                        <p style={{ margin: 0, fontSize: 11, color: "rgba(255,255,255,0.4)" }}>comisión: ${Number(r.comision || 0).toLocaleString()}</p>
+                      </div>
+                      <span style={{
+                        background: r.estado === "confirmada" ? "rgba(34,197,94,0.15)" : r.estado === "cancelada" ? "rgba(239,68,68,0.15)" : "rgba(245,158,11,0.15)",
+                        color: r.estado === "confirmada" ? "#22C55E" : r.estado === "cancelada" ? "#EF4444" : "#F59E0B",
+                        border: `1px solid ${r.estado === "confirmada" ? "rgba(34,197,94,0.3)" : r.estado === "cancelada" ? "rgba(239,68,68,0.3)" : "rgba(245,158,11,0.3)"}`,
+                        borderRadius: 20, padding: "4px 12px", fontSize: 12, fontWeight: 700,
+                        textTransform: "capitalize" as const,
+                      }}>
+                        {r.estado}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
         {/* TAB ZONAS */}
         {tab === "zonas" && (
           !puedeVerZonas ? (
