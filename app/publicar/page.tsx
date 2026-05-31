@@ -262,7 +262,7 @@ export default function PublicarPage() {
               ))}
             </div>
 
-            {operacion === "hotel" || operacion === "camping") && (
+            {(operacion === "hotel" || operacion === "camping") && (
               <div style={{ marginBottom: 16 }}>
                 <p style={sectionLabel}>{operacion === "camping" ? "Nombre del camping" : "Nombre del hotel"}</p>
                 <input value={hotelName} onChange={e => setHotelName(e.target.value)} placeholder={operacion === "camping" ? "Ej: Camping Los Arrayanes" : "Ej: Hotel Patagonia"} maxLength={100} style={{ ...inp, marginBottom: 12 }} />
