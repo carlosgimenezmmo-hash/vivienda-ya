@@ -394,13 +394,13 @@ export default function PublicarPage() {
             <button onClick={() => setDestacar("24h")} style={card(destacar === "24h")}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div><p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#fff" }}>Destacar 24 horas</p><p style={{ margin: "2px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>Primero en el feed por 1 dia</p></div>
-                <p style={{ margin: 0, fontSize: 17, fontWeight: 800, color: "#60A5FA" }}>USD 1</p>
+                <p style={{ margin: 0, fontSize: 17, fontWeight: 800, color: "#60A5FA" }}>$5.000</p>
               </div>
             </button>
             <button onClick={() => setDestacar("7d")} style={card(destacar === "7d")}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <div><p style={{ margin: 0, fontWeight: 700, fontSize: 15, color: "#fff" }}>Destacar 7 dias</p><p style={{ margin: "2px 0 0", fontSize: 12, color: "rgba(255,255,255,0.4)" }}>Prioridad toda la semana</p></div>
-                <p style={{ margin: 0, fontSize: 17, fontWeight: 800, color: "#60A5FA" }}>USD 5</p>
+                <p style={{ margin: 0, fontSize: 17, fontWeight: 800, color: "#60A5FA" }}>$20.000</p>
               </div>
             </button>
 
