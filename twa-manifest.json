@@ -16,11 +16,11 @@
   "iconUrl": "https://vivienda-ya.vercel.app/icon-512.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
-    "path": "C:\\proyectos\\vivienda-ya\\android.keystore",
+    "path": "C:\\proyectos\\vivienda-ya\\viviendaya-new.keystore",
     "alias": "viviendaya"
   },
-  "appVersionName": "1",
-  "appVersionCode": 1,
+  "appVersionName": "3",
+  "appVersionCode": 3,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
   "webManifestUrl": "https://vivienda-ya.vercel.app/manifest.json",
@@ -42,12 +42,14 @@
   "fullScopeUrl": "https://vivienda-ya.vercel.app/",
   "minSdkVersion": 21,
   "orientation": "portrait",
-  "fingerprints": ["56:07:E1:5C:B4:F8:BD:49:1E:9E:08:C1:E1:18:CB:47:D1:9A:E4:AB:F7:1E:4F:3F:CA:28:AC:88:C0:3A:4B:6B"],
+  "fingerprints": [
+    "56:07:E1:5C:B4:F8:BD:49:1E:9E:08:C1:E1:18:CB:47:D1:9A:E4:AB:F7:1E:4F:3F:CA:28:AC:88:C0:3A:4B:6B"
+  ],
   "additionalTrustedOrigins": [],
   "retainedBundles": [],
   "protocolHandlers": [],
   "fileHandlers": [],
   "launchHandlerClientMode": "",
   "displayOverride": [],
-  "appVersion": "1"
+  "appVersion": "3"
 }
