@@ -91,7 +91,7 @@ export default function BienvenidaPage() {
         </p>
       </div>
 
-      <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: 20, paddingBottom: 100 }}>
+      <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: 20, paddingBottom: 140 }}>
         <div style={{ display: "flex", gap: 8 }}>
           {slides.map((_, i) => (
             <div key={i} style={{
