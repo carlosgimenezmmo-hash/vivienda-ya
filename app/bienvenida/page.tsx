@@ -93,7 +93,7 @@ export default function BienvenidaPage() {
       </div>
 
       {/* DOTS + BOTON */}
-      <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: 32 }}>
+      <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: 24, paddingBottom: 80 }}>
         <div style={{ display: "flex", gap: 8 }}>
           {slides.map((_, i) => (
             <div key={i} style={{
