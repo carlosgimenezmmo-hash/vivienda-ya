@@ -59,7 +59,7 @@ export default function BienvenidaPage() {
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "space-between",
-      padding: "60px 32px 48px",
+      padding: "40px 32px 32px",
     }}>
 
       {/* SKIP */}
@@ -80,7 +80,7 @@ export default function BienvenidaPage() {
           background: `${slide.color}20`,
           border: `2px solid ${slide.color}40`,
           display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: 56, marginBottom: 40,
+          fontSize: 56, marginBottom: 24,
         }}>
           {slide.emoji}
         </div>
