@@ -1,92 +1,9 @@
 ﻿"use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabaseClient"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth-context"
-
-const planes = [
-  {
-    id: "junior",
-    nombre: "Junior",
-    precio: 25000,
-    color: "#94A3B8",
-    colorBg: "rgba(148,163,184,0.1)",
-    videosActivos: 10,
-    duracion: "2 min",
-    destacados: 1,
-    features: [
-      "10 videos activos simultáneos",
-      "Videos hasta 2 minutos",
-      "1 destacado por mes",
-      "Canal con logo propio",
-      "Badge Junior visible",
-      "Estadísticas de vistas",
-      "Verificación ARRYSE gratis",
-    ],
-  },
-  {
-    id: "agente",
-    nombre: "Agente",
-    precio: 50000,
-    color: "#F59E0B",
-    colorBg: "rgba(245,158,11,0.1)",
-    videosActivos: 25,
-    duracion: "3 min",
-    destacados: 3,
-    features: [
-      "25 videos activos simultáneos",
-      "Videos hasta 3 minutos",
-      "3 destacados por mes",
-      "Todo lo del plan Junior",
-      "Dashboard con métricas por propiedad",
-      "Prioridad en búsquedas",
-      "Badge Agente visible",
-      "Link externo en perfil",
-    ],
-  },
-  {
-    id: "especializado",
-    nombre: "Especializado",
-    precio: 80000,
-    color: "#2563EB",
-    colorBg: "rgba(37,99,235,0.1)",
-    videosActivos: 60,
-    duracion: "5 min",
-    destacados: 5,
-    features: [
-      "60 videos activos simultáneos",
-      "Videos hasta 5 minutos",
-      "5 destacados por mes",
-      "Todo lo del plan Agente",
-      "Reportes para clientes",
-      "Multi-agente hasta 3 personas",
-      "Soporte por WhatsApp",
-      "Badge Especializado visible",
-    ],
-  },
-  {
-    id: "senior",
-    nombre: "Senior",
-    precio: 150000,
-    color: "#A855F7",
-    colorBg: "rgba(168,85,247,0.1)",
-    videosActivos: 120,
-    duracion: "5 min",
-    destacados: 10,
-    features: [
-      "120 videos activos simultáneos",
-      "Videos hasta 5 minutos",
-      "10 destacados por mes",
-      "Todo lo del plan Especializado",
-      "Analíticas por zona y barrio",
-      "Multi-agente ilimitado",
-      "API para sincronizar cartera",
-      "Aparición destacada permanente",
-      "Badge Senior exclusivo",
-    ],
-  },
-]
 
 const pagarMP = async (titulo: string, precio: number, planId: string) => {
   const res = await fetch("/api/pago", {
@@ -107,20 +24,33 @@ const pagarMP = async (titulo: string, precio: number, planId: string) => {
 export default function PlanesPage() {
   const router = useRouter()
   const { isLoggedIn } = useAuth()
+  const [planes, setPlanes] = useState<any[]>([])
   const [planSeleccionado, setPlanSeleccionado] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  const handleContratar = async (planId: string) => {
-    if (!isLoggedIn) { router.push("/registro"); return }
-    const planInfo: Record<string, { titulo: string; precio: number }> = {
-      junior: { titulo: "Plan Junior - ViviendaYa", precio: 25000 },
-      agente: { titulo: "Plan Agente - ViviendaYa", precio: 50000 },
-      especializado: { titulo: "Plan Especializado - ViviendaYa", precio: 80000 },
-      senior: { titulo: "Plan Senior - ViviendaYa", precio: 150000 },
-    }
-    const plan = planInfo[planId]
-    setPlanSeleccionado(planId)
-    await pagarMP(plan.titulo, plan.precio, planId)
+  useEffect(() => { fetchPlanes() }, [])
+
+  const fetchPlanes = async () => {
+    const { data } = await supabase
+      .from("planes")
+      .select("*")
+      .eq("activo", true)
+      .order("orden", { ascending: true })
+    setPlanes(data || [])
+    setLoading(false)
   }
+
+  const handleContratar = async (planId: string, precio: number, nombre: string) => {
+    if (!isLoggedIn) { router.push("/registro"); return }
+    setPlanSeleccionado(planId)
+    await pagarMP(`Plan ${nombre} - ViviendaYa`, precio, planId)
+  }
+
+  if (loading) return (
+    <div style={{ minHeight: "100dvh", background: "#0a0a0a", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <p style={{ color: "rgba(255,255,255,0.4)", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>Cargando planes...</p>
+    </div>
+  )
 
   return (
     <div style={{
@@ -131,7 +61,6 @@ export default function PlanesPage() {
       paddingBottom: 100,
     }}>
 
-      {/* HEADER */}
       <div style={{ padding: "52px 24px 32px", maxWidth: 700, margin: "0 auto" }}>
         <button onClick={() => router.back()} style={{
           background: "rgba(255,255,255,0.08)", border: "none", borderRadius: "50%",
@@ -148,7 +77,6 @@ export default function PlanesPage() {
         </p>
       </div>
 
-      {/* CARDS */}
       <div style={{
         padding: "0 24px",
         maxWidth: 700,
@@ -159,13 +87,12 @@ export default function PlanesPage() {
       }}>
         {planes.map((plan) => (
           <div key={plan.id} style={{
-            background: planSeleccionado === plan.id ? plan.colorBg : "rgba(255,255,255,0.03)",
+            background: planSeleccionado === plan.id ? plan.color_bg : "rgba(255,255,255,0.03)",
             border: `2px solid ${planSeleccionado === plan.id ? plan.color : "rgba(255,255,255,0.08)"}`,
             borderRadius: 20,
             overflow: "hidden",
           }}>
 
-            {/* CABECERA */}
             <div style={{ padding: "24px 24px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
                 <span style={{
@@ -187,10 +114,9 @@ export default function PlanesPage() {
                 <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", margin: "4px 0 0" }}>por mes</p>
               </div>
 
-              {/* STATS */}
               <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
                 <div style={{ textAlign: "center", flex: 1, background: "rgba(255,255,255,0.05)", borderRadius: 10, padding: "10px 8px" }}>
-                  <p style={{ margin: 0, fontSize: 20, fontWeight: 800, color: plan.color }}>{plan.videosActivos}</p>
+                  <p style={{ margin: 0, fontSize: 20, fontWeight: 800, color: plan.color }}>{plan.videos_activos}</p>
                   <p style={{ margin: 0, fontSize: 10, color: "rgba(255,255,255,0.4)" }}>videos activos</p>
                 </div>
                 <div style={{ textAlign: "center", flex: 1, background: "rgba(255,255,255,0.05)", borderRadius: 10, padding: "10px 8px" }}>
@@ -204,9 +130,8 @@ export default function PlanesPage() {
               </div>
             </div>
 
-            {/* FEATURES */}
             <div style={{ padding: "20px 24px" }}>
-              {plan.features.map((f, i) => (
+              {(plan.features || []).map((f: string, i: number) => (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
                   <div style={{
                     width: 18, height: 18, borderRadius: "50%",
@@ -222,10 +147,9 @@ export default function PlanesPage() {
               ))}
             </div>
 
-            {/* BOTÓN */}
             <div style={{ padding: "0 24px 24px" }}>
               <button
-                onClick={() => handleContratar(plan.id)}
+                onClick={() => handleContratar(plan.id, plan.precio, plan.nombre)}
                 style={{
                   width: "100%", padding: "15px", borderRadius: 14, border: "none",
                   background: plan.color,
