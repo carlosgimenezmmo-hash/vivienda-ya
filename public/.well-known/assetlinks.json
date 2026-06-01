@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "app.vercel.vivienda_ya.twa",
+    "sha256_cert_fingerprints": [
+      "56:07:E1:5C:B4:F8:BD:49:1E:9E:08:C1:E1:18:CB:47:D1:9A:E4:AB:F7:1E:4F:3F:CA:28:AC:88:C0:3A:4B:6B"
+    ]
+  }
+}]

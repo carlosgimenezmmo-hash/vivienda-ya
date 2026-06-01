@@ -17,7 +17,7 @@
   "splashScreenFadeOutDuration": 300,
   "signingKey": {
     "path": "C:\\proyectos\\vivienda-ya\\android.keystore",
-    "alias": "android"
+    "alias": "viviendaya"
   },
   "appVersionName": "1",
   "appVersionCode": 1,
@@ -42,7 +42,7 @@
   "fullScopeUrl": "https://vivienda-ya.vercel.app/",
   "minSdkVersion": 21,
   "orientation": "portrait",
-  "fingerprints": [],
+  "fingerprints": ["56:07:E1:5C:B4:F8:BD:49:1E:9E:08:C1:E1:18:CB:47:D1:9A:E4:AB:F7:1E:4F:3F:CA:28:AC:88:C0:3A:4B:6B"],
   "additionalTrustedOrigins": [],
   "retainedBundles": [],
   "protocolHandlers": [],
