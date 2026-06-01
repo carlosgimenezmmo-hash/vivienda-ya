@@ -26,6 +26,12 @@ export default function ViviendaYaFull() {
   const videoRefs = useRef<HTMLVideoElement[]>([]);
   const { isLoggedIn, user, likedProperties, savedProperties, toggleLike, toggleSave } = useAuth();
   const router = useRouter();
+  useEffect(() => {
+    const done = localStorage.getItem("onboarding_done")
+    if (!done) {
+      router.push("/bienvenida")
+    }
+  }, [])
   const { setActiveProperty } = useActiveProperty();
 
   useEffect(() => {
