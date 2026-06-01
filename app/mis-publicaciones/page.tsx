@@ -69,9 +69,9 @@ export default function MisPublicacionesPage() {
       </div>
 
       <div style={{ display: "flex", gap: 8, padding: "0 20px 16px", flexWrap: "wrap" }}>
-        {["todas", "venta", "alquiler", "permuta", "temporario", "hotel"].map(f => (
+        {["todas", "venta", "alquiler", "permuta", "temporario", "hotel", "camping"].map(f => (
           <button key={f} onClick={() => setFiltro(f)} style={chipStyle(filtro === f) as any}>
-            {f === "todas" ? "Todas" : f === "venta" ? "Ventas" : f === "alquiler" ? "Alquileres" : f === "permuta" ? "Permutas" : f === "temporario" ? "Temporario" : "Hoteles"}
+            {f === "todas" ? "Todas" : f === "venta" ? "Ventas" : f === "alquiler" ? "Alquileres" : f === "permuta" ? "Permutas" : f === "temporario" ? "Temporario" : f === "hotel" ? "Hoteles" : "Campings"}
           </button>
         ))}
       </div>

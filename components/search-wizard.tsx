@@ -12,6 +12,7 @@ const operationOptions = [
   { value: "permuta", label: "Permuta" },
   { value: "temporario", label: "Temporario" },
   { value: "hotel", label: "Hotel" },
+  { value: "camping", label: "🏕️ Camping" },
 ]
 
 const propertyTypes = [
@@ -137,9 +138,9 @@ export function SearchWizard() {
     if (filters.city) query = query.ilike("city", `%${filters.city}%`)
     if (filters.priceMin !== undefined) query = query.gte("price", filters.priceMin)
     if (filters.priceMax !== undefined && filters.priceMax < 999999999) query = query.lte("price", filters.priceMax)
-    if (filters.operation === "hotel" && filters.stars) query = query.gte("stars", filters.stars)
-    if (filters.operation !== "hotel" && filters.rooms) query = query.gte("rooms", filters.rooms)
-    if (filters.operation !== "hotel" && filters.bedrooms) query = query.gte("bedrooms", filters.bedrooms)
+    if ((filters.operation === "hotel" || filters.operation === "camping") && filters.stars) query = query.gte("stars", filters.stars)
+    if (filters.operation !== "hotel" && filters.operation !== "camping" && filters.rooms) query = query.gte("rooms", filters.rooms)
+    if (filters.operation !== "hotel" && filters.operation !== "camping" && filters.bedrooms) query = query.gte("bedrooms", filters.bedrooms)
     const { data } = await query.order("created_at", { ascending: false }).limit(50)
     setResults(data || [])
     setShowResults(true)
@@ -248,7 +249,7 @@ export function SearchWizard() {
               </>
             )}
 
-            {filters.operation !== "hotel" && (
+            {filters.operation !== "hotel" && filters.operation !== "camping" && (
               <>
                 <p style={sectionLabel}>Tipo de propiedad</p>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
@@ -300,7 +301,7 @@ export function SearchWizard() {
               </div>
             )}
 
-            {filters.operation !== "hotel" && (
+            {filters.operation !== "hotel" && filters.operation !== "camping" && (
               <>
                 <p style={{ ...sectionLabel, marginTop: 24 }}>Presupuesto</p>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -326,7 +327,7 @@ export function SearchWizard() {
             <h2 style={{ fontSize: 24, fontWeight: 800, color: "#fff", margin: "0 0 4px" }}>Algo mas?</h2>
             <p style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", margin: "0 0 24px" }}>Filtros opcionales — podes saltear este paso</p>
 
-            {filters.operation === "hotel" ? (
+            {(filters.operation === "hotel" || filters.operation === "camping") ? (
               <>
                 <p style={sectionLabel}>Estrellas minimas</p>
                 <div style={{ display: "flex", gap: 8, marginBottom: 24, flexWrap: "wrap" }}>
@@ -414,3 +415,5 @@ export function SearchWizard() {
     </div>
   )
 }
+
+
