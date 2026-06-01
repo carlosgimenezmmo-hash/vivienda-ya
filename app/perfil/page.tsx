@@ -171,6 +171,20 @@ export default function PerfilPage() {
         )}
       </div>
 
+      {rol !== "agente" && (
+        <div style={{ padding: "0 20px 20px" }}>
+          <div onClick={() => router.push("/ser-agente")} style={{ background: "linear-gradient(135deg, rgba(168,85,247,0.2), rgba(245,158,11,0.2))", border: "1px solid rgba(168,85,247,0.4)", borderRadius: 16, padding: "16px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div>
+              <p style={{ margin: 0, fontWeight: 800, fontSize: 15, color: "#fff" }}>Quiero ser agente</p>
+              <p style={{ margin: "4px 0 0", fontSize: 12, color: "rgba(255,255,255,0.6)" }}>Publicá, reclutá y ganá comisiones</p>
+            </div>
+            <div style={{ background: "linear-gradient(135deg, #A855F7, #F59E0B)", borderRadius: 20, padding: "8px 16px" }}>
+              <span style={{ color: "#fff", fontSize: 13, fontWeight: 700 }}>Unirme</span>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div style={{ padding: "0 20px 100px" }}>
         <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 16, overflow: "hidden" }}>
           {menuItems.map((item, i) => (
