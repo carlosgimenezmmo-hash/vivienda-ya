@@ -1,12 +1,53 @@
-import { NextRequest, NextResponse } from "next/server"
+﻿import { NextRequest, NextResponse } from "next/server"
+import { createClient } from "@supabase/supabase-js"
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+)
+
+const rateLimit = new Map<string, { count: number; reset: number }>()
+function checkRateLimit(userId: string): boolean {
+  const now = Date.now()
+  const windowMs = 60 * 60 * 1000
+  const maxRequests = 10
+  const current = rateLimit.get(userId)
+  if (!current || now > current.reset) {
+    rateLimit.set(userId, { count: 1, reset: now + windowMs })
+    return true
+  }
+  if (current.count >= maxRequests) return false
+  current.count++
+  return true
+}
 
 export async function POST(req: NextRequest) {
   try {
-    const { videoUrl, modo } = await req.json()
+    const authHeader = req.headers.get("authorization")
+    if (!authHeader?.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+    }
+    const token = authHeader.split(" ")[1]
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+    if (authError || !user) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+    }
+    const { data: sub } = await supabase
+      .from("subscriptions")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("estado", "activo")
+      .maybeSingle()
+    if (!sub) {
+      return NextResponse.json({ error: "Necesitas un plan activo para procesar videos" }, { status: 403 })
+    }
+    if (!checkRateLimit(user.id)) {
+      return NextResponse.json({ error: "Limite de procesamiento alcanzado. Intenta en 1 hora." }, { status: 429 })
+    }
 
+    const { videoUrl, modo } = await req.json()
     if (!videoUrl) return NextResponse.json({ error: "Video requerido" }, { status: 400 })
 
-    // 1. SUBTITULOS con AssemblyAI
     const transcriptRes = await fetch("https://api.assemblyai.com/v2/transcript", {
       method: "POST",
       headers: {
@@ -22,7 +63,6 @@ export async function POST(req: NextRequest) {
     const transcript = await transcriptRes.json()
     const transcriptId = transcript.id
 
-    // 2. Esperar resultado
     let subtitulos = ""
     let intentos = 0
     while (intentos < 30) {
@@ -39,18 +79,17 @@ export async function POST(req: NextRequest) {
       intentos++
     }
 
-    // 3. DESCRIPCION con Gemini
     let descripcionIA = ""
     if (modo === "completo" && subtitulos) {
       const geminiRes = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${process.env.NEXT_PUBLIC_GEMINI_API_KEY}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${process.env.GEMINI_API_KEY}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             contents: [{
               parts: [{
-                text: `Sos un experto inmobiliario argentino. Basándote en esta transcripción de un video de propiedad, escribí una descripción profesional y atractiva de máximo 150 caracteres para publicar en un marketplace inmobiliario: "${subtitulos}"`
+                text: `Sos un experto inmobiliario argentino. Basandote en esta transcripcion de un video de propiedad, escribi una descripcion profesional y atractiva de maximo 150 caracteres para publicar en un marketplace inmobiliario: "${subtitulos}"`
               }]
             }]
           })
@@ -60,17 +99,10 @@ export async function POST(req: NextRequest) {
       descripcionIA = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || ""
     }
 
-    return NextResponse.json({
-      ok: true,
-      subtitulos,
-      descripcionIA,
-      transcriptId,
-    })
-
+    return NextResponse.json({ ok: true, subtitulos, descripcionIA, transcriptId })
   } catch (err: any) {
     console.error("Error procesando video:", err)
     return NextResponse.json({ error: err.message }, { status: 500 })
   }
 }
-
 export const maxDuration = 60
