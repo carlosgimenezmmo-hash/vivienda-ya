@@ -41,7 +41,35 @@ export async function POST(req: NextRequest) {
     if (!checkRateLimit(ip)) {
       return NextResponse.json({ error: "Demasiadas peticiones." }, { status: 429 })
     }
-
+// Verificar firma de MercadoPago
+    const secret = process.env.MP_WEBHOOK_SECRET
+    if (secret) {
+      const xSignature = req.headers.get("x-signature")
+      const xRequestId = req.headers.get("x-request-id")
+      const url = new URL(req.url)
+      const dataId = url.searchParams.get("data.id") || ""
+      if (xSignature) {
+        const parts = xSignature.split(",")
+        let ts = ""
+        let v1 = ""
+        for (const part of parts) {
+          const [key, val] = part.trim().split("=")
+          if (key === "ts") ts = val
+          if (key === "v1") v1 = val
+        }
+        const manifest = `id:${dataId};request-id:${xRequestId};ts:${ts};`
+        const encoder = new TextEncoder()
+        const keyData = encoder.encode(secret)
+        const msgData = encoder.encode(manifest)
+        const cryptoKey = await crypto.subtle.importKey("raw", keyData, { name: "HMAC", hash: "SHA-256" }, false, ["sign"])
+        const signature = await crypto.subtle.sign("HMAC", cryptoKey, msgData)
+        const hashHex = Array.from(new Uint8Array(signature)).map(b => b.toString(16).padStart(2, "0")).join("")
+        if (hashHex !== v1) {
+          console.error("Firma MP inválida")
+          return NextResponse.json({ error: "Firma inválida" }, { status: 401 })
+        }
+      }
+    }
     const body = await req.json()
     const { type, data } = body
     if (type !== "payment") return NextResponse.json({ ok: true })
