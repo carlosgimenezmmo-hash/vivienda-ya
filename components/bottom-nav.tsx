@@ -46,7 +46,7 @@ export function BottomNav() {
 
         <Link href="/buscar" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, textDecoration: 'none' }}>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={col('buscar')} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <span style={{ fontSize: 10, color: col('buscar'), fontWeight: active === 'buscar' ? 700 : 400 }}>Buscar</span>
+          <span style={{ fontSize: 10, color: col('buscar'), fontWeight: active === 'buscar' ? 700 : 400 }}>Propiedades</span>
         </Link>
 
         <Link href="/publicar" onClick={handlePublicar} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, textDecoration: 'none', marginTop: -16 }}>
