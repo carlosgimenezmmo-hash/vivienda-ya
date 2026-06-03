@@ -182,7 +182,7 @@ export default function PublicarPage() {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
           </button>
           <div style={{ flex: 1 }}>
-            <span style={{ fontSize: 17, fontWeight: 700 }}>Publicar propiedad</span>
+            <span style={{ fontSize: 17, fontWeight: 700 }}>Publica tu propiedad</span>
             <span style={{ color: "rgba(255,255,255,0.4)", fontSize: 13, marginLeft: 10 }}>Paso {step}/{totalSteps}</span>
           </div>
         </div>
@@ -198,8 +198,8 @@ export default function PublicarPage() {
         {/* PASO 1 — VIDEO */}
         {step === 1 && (
           <div>
-            <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Graba la propiedad</h1>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 16px" }}>El video es lo primero que ven los interesados</p>
+            <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>¿Qué querés publicar?</h1>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 16px" }}>Elegí el tipo y grabá un video corto</p>
 
             <div style={{ padding: "12px 16px", borderRadius: 12, marginBottom: 16, background: gpsOk ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)", border: `1px solid ${gpsOk ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.3)"}`, display: "flex", alignItems: "center", gap: 10 }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={gpsOk ? "#10B981" : "#EF4444"} strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -249,8 +249,8 @@ export default function PublicarPage() {
         {/* PASO 2 — DATOS */}
         {step === 2 && (
           <div>
-            <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 4px" }}>Datos de la propiedad</h1>
-            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 20px" }}>Se veran sobre el video en el feed</p>
+            <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 4px" }}>Contanos los detalles</h1>
+            <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 20px" }}>Esta info aparece en tu publicación</p>
 
             <p style={sectionLabel}>Titulo</p>
             <input value={titulo} onChange={e => setTitulo(e.target.value)} onBlur={e => setTitulo(sanitizeText(e.target.value, 100))} placeholder="Ej: Hermoso depto en Palermo" maxLength={100} style={{ ...inp, marginBottom: 16 }} />
@@ -355,7 +355,7 @@ export default function PublicarPage() {
         {/* PASO 3 — CONFIRMAR */}
         {step === 3 && (
           <div>
-            <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Todo listo!</h1>
+            <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>Revisá antes de publicar</h1>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 20px" }}>Revisa los datos antes de publicar</p>
 
             {videoPreview && <video src={videoPreview} style={{ width: "100%", borderRadius: 14, maxHeight: 200, objectFit: "cover", marginBottom: 16 }} />}

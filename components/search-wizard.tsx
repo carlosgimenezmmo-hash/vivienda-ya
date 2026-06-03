@@ -199,7 +199,7 @@ export function SearchWizard() {
 
       <div style={{ padding: "52px 20px 16px", position: "sticky", top: 0, background: "#0a0a0a", zIndex: 10 }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-          <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>Buscar</h1>
+          <h1 style={{ fontSize: 22, fontWeight: 800, margin: 0 }}>Buscar propiedades</h1>
           <span style={{ background: "rgba(37,99,235,0.2)", color: "#60A5FA", border: "1px solid rgba(37,99,235,0.3)", borderRadius: 20, padding: "4px 12px", fontSize: 12, fontWeight: 600 }}>
             Paso {step}/{TOTAL_STEPS}
           </span>
@@ -216,7 +216,7 @@ export function SearchWizard() {
         {/* PASO 1 */}
         {step === 1 && (
           <div>
-            <h2 style={{ fontSize: 28, fontWeight: 800, color: "#fff", margin: "0 0 4px" }}>Que estas buscando?</h2>
+            <h2 style={{ fontSize: 28, fontWeight: 800, color: "#fff", margin: "0 0 4px" }}>¿Qué estás buscando?</h2>
             <p style={{ fontSize: 18, color: "rgba(255,255,255,0.45)", margin: "0 0 24px" }}>Selecciona el tipo de operacion y propiedad</p>
 
             <p style={sectionLabel}>Operacion</p>
@@ -267,8 +267,8 @@ export function SearchWizard() {
         {/* PASO 2 */}
         {step === 2 && (
           <div>
-            <h2 style={{ fontSize: 28, fontWeight: 800, color: "#fff", margin: "0 0 4px" }}>Donde y cuanto?</h2>
-            <p style={{ fontSize: 16, color: "rgba(255,255,255,0.45)", margin: "0 0 24px" }}>Ubicacion y presupuesto</p>
+            <h2 style={{ fontSize: 28, fontWeight: 800, color: "#fff", margin: "0 0 4px" }}>¿Dónde y cuánto?</h2>
+            <p style={{ fontSize: 16, color: "rgba(255,255,255,0.45)", margin: "0 0 24px" }}>Elegí la zona y tu presupuesto</p>
 
             <p style={sectionLabel}>Provincia</p>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 20 }}>
@@ -323,8 +323,8 @@ export function SearchWizard() {
         {/* PASO 3 */}
         {step === 3 && (
           <div>
-            <h2 style={{ fontSize: 24, fontWeight: 800, color: "#fff", margin: "0 0 4px" }}>Algo mas?</h2>
-            <p style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", margin: "0 0 24px" }}>Filtros opcionales — podes saltear este paso</p>
+            <h2 style={{ fontSize: 24, fontWeight: 800, color: "#fff", margin: "0 0 4px" }}>¿Algo más?</h2>
+            <p style={{ fontSize: 14, color: "rgba(255,255,255,0.45)", margin: "0 0 24px" }}>Opcional — podés saltar este paso</p>
 
             {filters.operation === "hotel" ? (
               <>
@@ -414,3 +414,4 @@ export function SearchWizard() {
     </div>
   )
 }
+
