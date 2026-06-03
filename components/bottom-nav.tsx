@@ -46,7 +46,7 @@ export function BottomNav() {
           <span style={{ width: 52, height: 52, borderRadius: '50%', background: 'linear-gradient(135deg, #2563EB, #1d4ed8)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 20px rgba(37,99,235,0.6)' }}>
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </span>
-          <span style={{ fontSize: 15, color: 'rgba(255,255,255,0.45)', fontWeight: 400, marginTop: 2 }}>Publicar</span>
+          <span style={{ fontSize: 15, color: col('publicar'), fontWeight: active === 'publicar' ? 700 : 400, marginTop: 2 }}>Publicar</span>
         </Link>
 
         
@@ -60,6 +60,7 @@ export function BottomNav() {
     </>
   )
 }
+
 
 
 
