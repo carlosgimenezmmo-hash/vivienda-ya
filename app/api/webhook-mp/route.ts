@@ -109,13 +109,28 @@ export async function POST(req: NextRequest) {
         .select()
         .single()
 
-      // Notificar al dueño
       if (reservaActualizada?.id) {
+        // Notificar al dueño
         await fetch(`${process.env.APP_URL}/api/notificar-reserva`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ reserva_id: reservaActualizada.id }),
         })
+
+        // Distribuir comisiones por la red
+        const { data: propData } = await supabase
+          .from("properties")
+          .select("user_id")
+          .eq("id", reservaPropertyId)
+          .maybeSingle()
+
+        if (propData?.user_id && payment.transaction_amount) {
+          await distribuirComisiones(
+            reservaActualizada.id,
+            payment.transaction_amount,
+            propData.user_id
+          )
+        }
       }
 
       return NextResponse.json({ ok: true })
@@ -172,5 +187,55 @@ export async function POST(req: NextRequest) {
   } catch (err: any) {
     console.error("Webhook error:", err)
     return NextResponse.json({ error: err.message }, { status: 500 })
+  }
+}
+async function distribuirComisiones(reservaId: string, montoTotal: number, propertyUserId: string) {
+  const porcentajes: Record<number, number> = {
+    1: 0.8, 2: 0.4, 3: 0.2, 4: 0.1
+  }
+  const pctViviendaya = 3.0
+  const pctAgente = 2.0
+  const montoViviendaya = montoTotal * pctViviendaya / 100
+  const montoAgente = montoTotal * pctAgente / 100
+
+  await supabase.from("red_comisiones").insert({
+    reserva_id: reservaId,
+    beneficiario_id: propertyUserId,
+    origen_id: propertyUserId,
+    nivel: 0,
+    porcentaje: pctAgente,
+    monto: montoAgente,
+    tipo: "reserva",
+    estado: "pendiente",
+  })
+
+  let currentUserId = propertyUserId
+  let nivel = 1
+
+  while (nivel <= 10) {
+    const { data: userData } = await supabase
+      .from("users")
+      .select("referido_por")
+      .eq("id", currentUserId)
+      .maybeSingle()
+
+    if (!userData?.referido_por) break
+
+    const pct = nivel <= 4 ? porcentajes[nivel] : 0.05
+    const monto = montoTotal * pct / 100
+
+    await supabase.from("red_comisiones").insert({
+      reserva_id: reservaId,
+      beneficiario_id: userData.referido_por,
+      origen_id: propertyUserId,
+      nivel,
+      porcentaje: pct,
+      monto,
+      tipo: "reserva",
+      estado: "pendiente",
+    })
+
+    currentUserId = userData.referido_por
+    nivel++
   }
 }
