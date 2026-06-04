@@ -13,10 +13,12 @@ const PLAN_CONFIG = {
 export default function AgentDashboardScreen() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [user, setUser]             = useState(null);
-  const [subscription, setSub]      = useState(null);
+  const [user, setUser] = useState(null);
+  const [subscription, setSub] = useState(null);
   const [properties, setProperties] = useState([]);
-  const [stats, setStats]           = useState({ views: 0, contacts: 0, publicadas: 0 });
+  const [stats, setStats] = useState({ views: 0, contacts: 0, publicadas: 0 });
+  const [comisiones, setComisiones] = useState({ pendiente: 0, pagado: 0, operaciones: 0 });
+  const [red, setRed] = useState({ total: 0, directos: 0, codigo: '' });
 
   useEffect(() => { loadAll() }, []);
 
@@ -40,9 +42,40 @@ export default function AgentDashboardScreen() {
     const publicadas    = (props || []).filter(p => p.status === 'active').length;
     setStats({ views: totalViews, contacts: totalContacts, publicadas });
 
+    // Comisiones
+    const { data: comData } = await supabase
+      .from('red_comisiones')
+      .select('monto, estado')
+      .eq('beneficiario_id', user.id)
+
+    if (comData) {
+      const pendiente = comData.filter(c => c.estado === 'pendiente').reduce((a, c) => a + Number(c.monto), 0)
+      const pagado = comData.filter(c => c.estado === 'pagado').reduce((a, c) => a + Number(c.monto), 0)
+      setComisiones({ pendiente, pagado, operaciones: comData.length })
+    }
+
+    // Red
+    const { data: redData } = await supabase
+      .from('users')
+      .select('id')
+      .eq('referido_por', user.id)
+
+    const { data: agenteData } = await supabase
+      .from('agentes')
+      .select('codigo_referido')
+      .eq('user_id', user.id)
+      .maybeSingle()
+
+    setRed({
+      total: redData?.length || 0,
+      directos: redData?.length || 0,
+      codigo: agenteData?.codigo_referido || '',
+    })
+
     setLoading(false);
   };
 
+  const f = (n) => Number(n || 0).toLocaleString('es-AR');
   const planKey  = subscription?.plan || null;
   const planConf = planKey ? PLAN_CONFIG[planKey] : null;
 
@@ -52,10 +85,8 @@ export default function AgentDashboardScreen() {
     return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
   };
 
-  const f = (n) => Number(n || 0).toLocaleString('es-AR');
-
   if (loading) return (
-    <div style={{ minHeight: '100dvh', background: '#0a0a0a', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ background: '#0a0a0a', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <p style={{ color: 'rgba(255,255,255,0.4)', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' }}>Cargando...</p>
     </div>
   );
@@ -63,10 +94,8 @@ export default function AgentDashboardScreen() {
   return (
     <div style={{ minHeight: '100dvh', background: '#0a0a0a', color: '#fff', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif', paddingBottom: 100 }}>
 
-      {/* HEADER */}
-      <div style={{ padding: '52px 20px 24px' }}>
-        <p style={{ margin: '0 0 4px', fontSize: 13, color: 'rgba(255,255,255,0.4)', fontWeight: 600 }}>DASHBOARD</p>
-        <h1 style={{ margin: 0, fontSize: 26, fontWeight: 900 }}>
+      <div style={{ padding: '52px 20px 20px' }}>
+        <h1 style={{ fontSize: 26, fontWeight: 900, margin: 0 }}>
           Hola{user?.full_name ? `, ${user.full_name.split(' ')[0]}` : ''} 👋
         </h1>
       </div>
@@ -162,6 +191,51 @@ export default function AgentDashboardScreen() {
             </div>
           </div>
         )}
+
+        {/* COMISIONES */}
+        <div>
+          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', margin: '0 0 12px', fontWeight: 600 }}>MIS COMISIONES</p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+            <div style={{ background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.3)', borderRadius: 16, padding: '18px' }}>
+              <p style={{ margin: '0 0 4px', fontSize: 28, fontWeight: 900, color: '#A855F7' }}>${comisiones.pendiente.toLocaleString('es-AR', { maximumFractionDigits: 0 })}</p>
+              <p style={{ margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>Pendiente de cobro</p>
+            </div>
+            <div style={{ background: 'rgba(34,197,94,0.1)', border: '1px solid rgba(34,197,94,0.3)', borderRadius: 16, padding: '18px' }}>
+              <p style={{ margin: '0 0 4px', fontSize: 28, fontWeight: 900, color: '#22C55E' }}>${comisiones.pagado.toLocaleString('es-AR', { maximumFractionDigits: 0 })}</p>
+              <p style={{ margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>Total cobrado</p>
+            </div>
+          </div>
+          <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 14, padding: '14px 16px' }}>
+            <p style={{ margin: '0 0 4px', fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>Operaciones totales</p>
+            <p style={{ margin: 0, fontSize: 22, fontWeight: 800, color: '#fff' }}>{comisiones.operaciones}</p>
+          </div>
+        </div>
+
+        {/* RED */}
+        <div style={{ marginBottom: 40 }}>
+          <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', margin: '0 0 12px', fontWeight: 600 }}>MI RED</p>
+          <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 16, padding: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+              <div>
+                <p style={{ margin: '0 0 4px', fontSize: 28, fontWeight: 900, color: '#F59E0B' }}>{red.total}</p>
+                <p style={{ margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>Agentes en tu red</p>
+              </div>
+              <div style={{ textAlign: 'right' }}>
+                <p style={{ margin: '0 0 4px', fontSize: 20, fontWeight: 800, color: '#fff' }}>{red.directos}</p>
+                <p style={{ margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>Directos (nivel 1)</p>
+              </div>
+            </div>
+            <div style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 10, padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <p style={{ margin: '0 0 2px', fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>Tu código de referido</p>
+                <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: '#F59E0B', letterSpacing: 2 }}>{red.codigo}</p>
+              </div>
+              <button onClick={() => { navigator.clipboard.writeText(`Unite a ViviendaYa con mi código: ${red.codigo} https://vivienda-ya.vercel.app/registro?ref=${red.codigo}`); alert('Copiado!'); }} style={{ background: '#F59E0B', border: 'none', borderRadius: 10, padding: '8px 14px', color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' }}>
+                Compartir
+              </button>
+            </div>
+          </div>
+        </div>
 
       </div>
     </div>
