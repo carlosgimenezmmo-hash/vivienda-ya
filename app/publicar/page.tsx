@@ -123,7 +123,7 @@ export default function PublicarPage() {
         description: descripcionClean,
         whatsapp_number: whatsappClean,
         video_url: videoUrl,
-        verified: gpsOk && !videoDesdeGaleria,
+        verified: gpsOk,
         lat: gpsLat,
         lng: gpsLng,
         highlighted: false,
@@ -229,12 +229,21 @@ export default function PublicarPage() {
               </div>
             ) : (
               <div>
-                {videoDesdeGaleria && (
+                {videoDesdeGaleria && !gpsOk && (
                   <div style={{ background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.3)", borderRadius: 10, padding: "10px 14px", marginBottom: 12, display: "flex", alignItems: "center", gap: 8 }}>
                     <p style={{ margin: 0, fontSize: 13, color: "#F59E0B", fontWeight: 600 }}>Este video se publicara como No verificado</p>
                   </div>
                 )}
                 <video src={videoPreview} style={{ width: "100%", borderRadius: 16, maxHeight: 300, objectFit: "cover", marginBottom: 12 }} controls />
+                {!videoDesdeGaleria && (
+                  <a
+                    href={videoPreview}
+                    download="video-viviendaya.mp4"
+                    style={{ display: "block", textAlign: "center", padding: "12px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.12)", background: "transparent", color: "rgba(255,255,255,0.6)", fontSize: 14, fontWeight: 600, textDecoration: "none", marginBottom: 10 }}
+                  >
+                    Descargar para editar
+                  </a>
+                )}
                 <div style={{ display: "flex", gap: 10 }}>
                   <button onClick={() => { setVideo(null); setVideoPreview(null) }} style={{ padding: "14px 20px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.12)", background: "transparent", color: "rgba(255,255,255,0.7)", fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
                     Cambiar
@@ -366,11 +375,11 @@ export default function PublicarPage() {
                 ["Tipo", (operacion === "hotel" || operacion === "camping") ? (hotelName || operacion) : (tipoPropiedad || "No especificado")],
                 ...((operacion !== "hotel" && operacion !== "camping") ? [["Precio", precio ? `${moneda} ${parseInt(precio).toLocaleString()}` : "No especificado"]] : []),
                 ["Ubicacion", [barrio, ciudad].filter(Boolean).join(", ") || "No especificada"],
-                ["GPS", gpsOk && !videoDesdeGaleria ? "Verificado" : "No verificado"],
+                ["GPS", gpsOk ? "Verificado" : "No verificado"],
               ].map(([label, value], i, arr) => (
                 <div key={label} style={{ display: "flex", justifyContent: "space-between", marginBottom: i < arr.length - 1 ? 10 : 0 }}>
                   <span style={{ color: "rgba(255,255,255,0.5)", fontSize: 13 }}>{label}</span>
-                  <span style={{ color: label === "GPS" ? (gpsOk && !videoDesdeGaleria ? "#22C55E" : "#EF4444") : "#fff", fontSize: 13, fontWeight: 600 }}>{value}</span>
+                  <span style={{ color: label === "GPS" ? (gpsOk ? "#22C55E" : "#EF4444") : "#fff", fontSize: 13, fontWeight: 600 }}>{value}</span>
                 </div>
               ))}
             </div>
