@@ -51,6 +51,24 @@ export default function PublicarPage() {
   const [descripcion, setDescripcion] = useState("")
   const [whatsapp, setWhatsapp] = useState("")
   const [videoDesdeGaleria, setVideoDesdeGaleria] = useState(false)
+  const [planActual, setPlanActual] = useState("gratis")
+
+  // AGREGADO 2 — Carga el plan del usuario
+  useEffect(() => {
+    const cargarPlan = async () => {
+      const { data: sessionData } = await supabase.auth.getSession()
+      const uid = sessionData?.session?.user?.id
+      if (!uid) return
+      const { data: sub } = await supabase
+        .from("subscriptions")
+        .select("plan")
+        .eq("user_id", uid)
+        .eq("estado", "activo")
+        .maybeSingle()
+      if (sub?.plan) setPlanActual(sub.plan)
+    }
+    cargarPlan()
+  }, [])
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -61,13 +79,45 @@ export default function PublicarPage() {
     }
   }, [])
 
+  // AGREGADO 3 — Límite de segundos según plan
+  const getLimiteSegundos = (plan: string): number => {
+    switch (plan) {
+      case "junior":        return 120
+      case "agente":        return 180
+      case "especializado": return 300
+      case "senior":        return 300
+      default:              return 60
+    }
+  }
+
+  // AGREGADO 4 — Validación de duración del video
   const handleVideo = (e: React.ChangeEvent<HTMLInputElement>, desdeGaleria = false) => {
     const file = e.target.files?.[0]
     if (!file) return
     const url = URL.createObjectURL(file)
-    setVideoDesdeGaleria(desdeGaleria)
-    setVideo(file)
-    setVideoPreview(url)
+    const videoEl = document.createElement("video")
+    videoEl.preload = "metadata"
+    videoEl.src = url
+    videoEl.onloadedmetadata = () => {
+      const duracion = videoEl.duration
+      const limite = getLimiteSegundos(planActual)
+      const minutos = Math.floor(limite / 60)
+      const segundos = limite % 60
+      const limiteTexto = segundos === 0 ? `${minutos} minuto${minutos > 1 ? "s" : ""}` : `${limite} segundos`
+      if (duracion > limite) {
+        URL.revokeObjectURL(url)
+        setError(`Tu plan ${planActual === "gratis" ? "gratuito" : planActual} permite videos de hasta ${limiteTexto}. Este video dura ${Math.round(duracion)} segundos. Editalo o elegí uno más corto.`)
+        return
+      }
+      setError("")
+      setVideoDesdeGaleria(desdeGaleria)
+      setVideo(file)
+      setVideoPreview(url)
+    }
+    videoEl.onerror = () => {
+      URL.revokeObjectURL(url)
+      setError("No se pudo leer el video. Probá con otro archivo.")
+    }
   }
 
   const handlePublicar = async () => {
@@ -201,6 +251,12 @@ export default function PublicarPage() {
             <h1 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 6px" }}>¿Qué querés publicar?</h1>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, margin: "0 0 16px" }}>Elegí el tipo y grabá un video corto</p>
 
+            {error && (
+              <div style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 10, padding: "10px 14px", marginBottom: 16 }}>
+                <p style={{ color: "#EF4444", fontSize: 13, margin: 0 }}>{error}</p>
+              </div>
+            )}
+
             <div style={{ padding: "12px 16px", borderRadius: 12, marginBottom: 16, background: gpsOk ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)", border: `1px solid ${gpsOk ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.3)"}`, display: "flex", alignItems: "center", gap: 10 }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={gpsOk ? "#10B981" : "#EF4444"} strokeWidth="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               <div>
@@ -245,7 +301,7 @@ export default function PublicarPage() {
                   </a>
                 )}
                 <div style={{ display: "flex", gap: 10 }}>
-                  <button onClick={() => { setVideo(null); setVideoPreview(null) }} style={{ padding: "14px 20px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.12)", background: "transparent", color: "rgba(255,255,255,0.7)", fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
+                  <button onClick={() => { setVideo(null); setVideoPreview(null); setError("") }} style={{ padding: "14px 20px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.12)", background: "transparent", color: "rgba(255,255,255,0.7)", fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
                     Cambiar
                   </button>
                   <button onClick={() => setStep(2)} style={{ ...btn, flex: 1 }}>Usar este video</button>
