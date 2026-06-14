@@ -143,13 +143,18 @@ export default function PublicarPage() {
       if (!video) throw new Error("Debes seleccionar un video")
 
       let videoUrl = ""
-      const ext = video.name.split('.').pop()
-      const path = `${Date.now()}.${ext}`
-      const { error: uploadError } = await supabase.storage.from('videos-app').upload(path, video, { contentType: video.type })
-      if (uploadError) throw uploadError
-      const { data } = supabase.storage.from('videos-app').getPublicUrl(path)
-      videoUrl = data.publicUrl
-
+      const formDataVideo = new FormData()
+      formDataVideo.append("video", video)
+      const uploadRes = await fetch("/api/subir-video", {
+        method: "POST",
+        body: formDataVideo
+      })
+      if (!uploadRes.ok) {
+        const uploadErr = await uploadRes.json()
+        throw new Error(uploadErr.error || "Error al subir el video")
+      }
+      const { videoUrl: bunnyUrl } = await uploadRes.json()
+      videoUrl = bunnyUrl
       const { error: insertError } = await supabase.from("properties").insert({
         user_id: uid,
         owner_name: user?.name || "Propietario",
