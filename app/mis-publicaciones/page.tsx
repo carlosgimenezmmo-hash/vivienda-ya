@@ -34,11 +34,22 @@ export default function MisPublicacionesPage() {
   const handleDelete = async (id: number) => {
     setConfirmarId(null)
     setDeleting(id)
+    const propiedad = properties.find(p => p.id === id)
+    if (propiedad?.bunny_guid) {
+      try {
+        await fetch("/api/borrar-video", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ guid: propiedad.bunny_guid })
+        })
+      } catch (err) {
+        console.error("Error al borrar video de Bunny:", err)
+      }
+    }
     const { error } = await supabase.from("properties").delete().eq("id", id)
     if (!error) setProperties(prev => prev.filter(p => p.id !== id))
     setDeleting(null)
   }
-
   const chipStyle = (active: boolean) => ({
     padding: "8px 16px", borderRadius: 20,
     border: `1px solid ${active ? "#2563EB" : "rgba(255,255,255,0.2)"}`,

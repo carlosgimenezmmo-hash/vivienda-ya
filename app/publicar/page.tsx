@@ -153,7 +153,7 @@ export default function PublicarPage() {
         const uploadErr = await uploadRes.json()
         throw new Error(uploadErr.error || "Error al subir el video")
       }
-      const { videoUrl: bunnyUrl } = await uploadRes.json()
+      const { videoUrl: bunnyUrl, guid: bunnyGuid } = await uploadRes.json()
       videoUrl = bunnyUrl
       const { error: insertError } = await supabase.from("properties").insert({
         user_id: uid,
@@ -178,6 +178,7 @@ export default function PublicarPage() {
         description: descripcionClean,
         whatsapp_number: whatsappClean,
         video_url: videoUrl,
+                bunny_guid: bunnyGuid,
         verified: gpsOk,
         lat: gpsLat,
         lng: gpsLng,
