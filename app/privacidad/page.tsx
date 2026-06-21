@@ -38,7 +38,7 @@ export default function PrivacidadPage() {
           },
           {
             titulo: "6. Almacenamiento de datos",
-            contenido: `Los datos se almacenan en servidores seguros provistos por Supabase (base de datos) y Vercel (infraestructura). Ambos proveedores cumplen con estándares internacionales de seguridad. Los videos se almacenan en Supabase Storage.`
+            contenido: `Los datos se almacenan en servidores seguros provistos por Supabase (base de datos) y Vercel (infraestructura). Ambos proveedores cumplen con estándares internacionales de seguridad. Los videos se almacenan y procesan a través de Bunny.net (servicio de streaming de video).`
           },
           {
             titulo: "7. Derechos del usuario",
@@ -54,18 +54,23 @@ export default function PrivacidadPage() {
           },
           {
             titulo: "10. Servicios de terceros",
-            contenido: `La Plataforma utiliza los siguientes servicios de terceros que tienen sus propias políticas de privacidad:\n\n• Google (autenticación)\n• MercadoPago (procesamiento de pagos)\n• Supabase (almacenamiento de datos)\n• Vercel (infraestructura)\n• Resend (envío de emails)\n\nRecomendamos leer las políticas de privacidad de cada uno de estos servicios.`
+contenido: `La Plataforma utiliza los siguientes servicios de terceros que tienen sus propias políticas de privacidad:\n\n• Google (autenticación)\n• MercadoPago (procesamiento de pagos)\n• Supabase (almacenamiento de datos)\n• Vercel (infraestructura)\n• Resend (envío de emails)\n• Bunny.net (almacenamiento y streaming de video)\n\nRecomendamos leer las políticas de privacidad de cada uno de estos servicios.`
           },
           {
-            titulo: "11. Menores de edad",
+            titulo: "11. Uso de Inteligencia Artificial",
+            contenido: `ViviendaYa utiliza herramientas de inteligencia artificial (Google Gemini) para la moderación automática de contenido publicado, con el fin de detectar material inapropiado o que no corresponda al propósito de la Plataforma. ViviendaYa se reserva el derecho de incorporar o modificar el uso de estas herramientas de inteligencia artificial en el futuro.`
+          },
+          {
+
+            titulo: "12. Menores de edad",
             contenido: `ViviendaYa no está dirigida a menores de 18 años. No recopilamos intencionalmente datos de menores. Si detectamos que un menor ha proporcionado datos personales, procederemos a eliminarlos de inmediato.`
           },
           {
-            titulo: "12. Cambios en la política",
+            titulo: "13. Cambios en la política",
             contenido: `ViviendaYa se reserva el derecho de modificar esta Política de Privacidad en cualquier momento. Los cambios serán notificados a través de la Plataforma. El uso continuado del servicio luego de la notificación implica la aceptación de los cambios.`
           },
           {
-            titulo: "13. Contacto",
+            titulo: "14. Contacto",
             contenido: `Para consultas sobre esta Política de Privacidad escribinos a: viviendayatresa@gmail.com`
           },
         ].map((seccion, i) => (
