@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useRouter } from "next/navigation"
 
@@ -58,20 +58,15 @@ export default function TerminosPage() {
             contenido: `El nombre, logo, diseño y código de ViviendaYa son propiedad de Carlos Alberto Gimenez. Los contenidos publicados por los usuarios (fotos, videos, textos) son propiedad de sus respectivos autores. Al publicar contenido en la Plataforma, el usuario otorga a ViviendaYa una licencia no exclusiva, gratuita y mundial para mostrar dicho contenido dentro de la Plataforma.`
           },
           {
-            titulo: "10. Reclamos por infracción de derechos de autor",
-            contenido: `El usuario que publica contenido (videos, imágenes, textos) en ViviendaYa declara y garantiza ser titular de los derechos correspondientes o contar con la debida autorización para su publicación y difusión a través de la Plataforma.\n\nSi un tercero considera que un contenido publicado infringe sus derechos de autor o propiedad intelectual, podrá notificarlo a ViviendaYa enviando un correo a viviendayatresa@gmail.com con el asunto "Reclamo de derechos de autor", indicando: (a) identificación de la obra protegida, (b) ubicación del contenido reclamado dentro de la Plataforma, (c) datos de contacto del reclamante, y (d) declaración de buena fe sobre la titularidad del derecho invocado.\n\nViviendaYa se reserva el derecho de retirar, suspender o eliminar cualquier contenido reportado mientras se evalúa el reclamo, sin que ello implique reconocimiento de responsabilidad alguna. El usuario que hubiera publicado contenido infractor será el único responsable frente a terceros por dicha infracción, liberando a ViviendaYa de cualquier reclamo, demanda o acción legal derivada de dicha publicación.`
-          },
-          {
-            
-          titulo: "11. Modificaciones y cancelación del servicio",
+            titulo: "10. Modificaciones y cancelación del servicio",
             contenido: `ViviendaYa se reserva el derecho de modificar, suspender o interrumpir el servicio en cualquier momento, con o sin previo aviso, sin que ello genere derecho a indemnización alguna a favor del usuario. Asimismo, podrá dar de baja cuentas de usuarios que incumplan estos términos.`
           },
           {
-            titulo: "12. Ley aplicable y jurisdicción",
+            titulo: "11. Ley aplicable y jurisdicción",
             contenido: `Los presentes Términos y Condiciones se rigen por las leyes de la República Argentina. Ante cualquier controversia, las partes se someten a la jurisdicción de los tribunales ordinarios de la ciudad de Tres Arroyos, Provincia de Buenos Aires, renunciando a cualquier otro fuero que pudiera corresponder.`
           },
           {
-            titulo: "13. Contacto",
+            titulo: "12. Contacto",
             contenido: `Para consultas sobre estos Términos y Condiciones podés escribirnos a: viviendayatresa@gmail.com`
           },
         ].map((seccion, i) => (
