@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
@@ -54,8 +54,20 @@ export default function AuthHandler() {
           verificado: false,
         })
 
-        
-       router.push("/bienvenida")
+        const ahora = new Date()
+        const vencimiento = new Date()
+        vencimiento.setDate(vencimiento.getDate() + 30)
+
+        await supabase.from("subscriptions").insert({
+          user_id: user.id,
+          plan: "senior",
+          estado: "activo",
+          fecha_inicio: ahora.toISOString(),
+          fecha_vencimiento: vencimiento.toISOString(),
+          precio_usd: 0,
+        })
+
+        router.push("/bienvenida")
         return
       }
 
