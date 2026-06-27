@@ -29,7 +29,7 @@ export default function AuthHandler() {
     const checkAndRedirect = async (user: any) => {
       const { data: existing } = await supabase
         .from("users")
-        .select("id, phone")
+        .select("id, whatsapp, age")
         .eq("id", user.id)
         .single()
 
@@ -54,13 +54,12 @@ export default function AuthHandler() {
           verificado: false,
         })
 
-        
-       router.push("/bienvenida")
+        router.push("/completar-perfil")
         return
       }
 
-      if (!existing.phone) {
-        router.push("/bienvenida")
+      if (!existing.whatsapp || !existing.age) {
+        router.push("/completar-perfil")
         return
       }
 
