@@ -15,6 +15,7 @@ const supabase = createClient(
 
 
 export async function POST(req: NextRequest) {
+  return NextResponse.json({ error: "Ruta deshabilitada" }, { status: 403 })
   try {
     const { propertyId, videoUrl } = await req.json()
     if (!propertyId || !videoUrl) {

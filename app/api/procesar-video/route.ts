@@ -21,10 +21,11 @@ function checkRateLimit(userId: string): boolean {
   return true
 }
 
-export async function POST(req: NextRequest) {
+  export async function POST(req: NextRequest) {
+  return NextResponse.json({ error: "Ruta deshabilitada" }, { status: 403 })
   try {
-    const authHeader = req.headers.get("authorization")
-    if (!authHeader?.startsWith("Bearer ")) {
+    const authHeader = req.headers.get("authorization") 
+     if (!authHeader?.startsWith("Bearer ")) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 })
     }
     const token = authHeader.split(" ")[1]

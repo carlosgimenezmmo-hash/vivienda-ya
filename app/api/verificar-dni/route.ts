@@ -22,9 +22,9 @@ function checkRateLimit(ip: string): boolean {
 }
 
 export async function POST(req: NextRequest) {
+  return NextResponse.json({ error: "Ruta deshabilitada" }, { status: 403 })
   try {
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0] || "unknown"
-
     if (!checkRateLimit(ip)) {
       return NextResponse.json(
         { error: "Demasiados intentos. Esperá 10 minutos e intentá de nuevo." },
