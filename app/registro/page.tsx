@@ -87,8 +87,8 @@ export default function RegistroPage() {
     </span>
   </label>
 </div>
-        <button onClick={handleGoogle} disabled={loading} style={{
-          width: "100%", padding: "16px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.15)",
+<button onClick={handleGoogle} disabled={loading || !aceptaTerminos || !aceptaMayorEdad} style={{
+                  width: "100%", padding: "16px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.15)",
           background: "#fff", color: "#000", fontSize: 16, fontWeight: 700,
           cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 12,
           fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
