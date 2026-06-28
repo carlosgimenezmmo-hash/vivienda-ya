@@ -148,6 +148,8 @@ export default function PublicarPage() {
       let videoUrl = ""
       const formDataVideo = new FormData()
       formDataVideo.append("video", video)
+      formDataVideo.append("user_id", uid)
+
       const uploadRes = await fetch("/api/subir-video", {
         method: "POST",
         body: formDataVideo

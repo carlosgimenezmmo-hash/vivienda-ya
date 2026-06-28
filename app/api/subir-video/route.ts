@@ -2,9 +2,28 @@ import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(req: NextRequest) {
   try {
-    const formData = await req.formData()
+   const formData = await req.formData()
     const file = formData.get("video") as File
+    const userId = formData.get("user_id") as string
     if (!file) return NextResponse.json({ error: "No se recibió video" }, { status: 400 })
+    if (!userId) return NextResponse.json({ error: "Usuario no identificado" }, { status: 400 })
+
+    const { createClient } = await import("@supabase/supabase-js")
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
+
+    const unaHoraAtras = new Date(Date.now() - 60 * 60 * 1000).toISOString()
+    const { count } = await supabaseAdmin
+      .from("properties")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .gte("created_at", unaHoraAtras)
+
+    if (count !== null && count >= 10) {
+      return NextResponse.json({ error: "Alcanzaste el límite de 10 publicaciones por hora. Esperá un poco antes de subir más." }, { status: 429 })
+    }
 
     const libraryId = process.env.BUNNY_LIBRARY_ID
     const apiKey = process.env.BUNNY_API_KEY
