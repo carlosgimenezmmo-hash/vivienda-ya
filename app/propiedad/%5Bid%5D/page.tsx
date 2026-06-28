@@ -98,6 +98,7 @@ export default function PropiedadPage() {
               { label: "Dormitorios", valor: property.bedrooms, icono: "🛏" },
               { label: "Baños", valor: property.bathrooms, icono: "🚿" },
               { label: "Superficie", valor: property.surface ? `${property.surface} m²` : null, icono: "📐" },
+              { label: "Precio x m²", valor: property.precio_m2 ? `$${Number(property.precio_m2).toLocaleString()}` : null, icono: "💲" },
               { label: "Habitacion", valor: property.room_type, icono: "🛎" },
               { label: "Huespedes", valor: property.max_guests ? `${property.max_guests} pers.` : null, icono: "👥" },
             ].filter(c => c.valor).map(c => (

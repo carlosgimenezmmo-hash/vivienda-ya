@@ -132,6 +132,9 @@ export default function PublicarPage() {
       const precioClean = sanitizeNumber(precio, 99999999)
       const ambientesClean = sanitizeNumber(ambientes, 50)
       const superficieClean = sanitizeNumber(superficie, 99999)
+      const precioM2 = (operacion !== "hotel" && operacion !== "camping" && precioClean > 0 && superficieClean > 0)
+        ? Math.round(precioClean / superficieClean)
+        : null
 
       if (!tituloClean) throw new Error("El título no puede estar vacío")
       if (!ciudadClean) throw new Error("La ciudad no puede estar vacía")
@@ -170,6 +173,7 @@ export default function PublicarPage() {
         stars: operacion === "hotel" ? stars || null : null,
         hotel_services: (operacion === "hotel" || operacion === "camping") ? hotelServices : null,
         surface: operacion !== "hotel" && operacion !== "camping" ? superficieClean || null : null,
+        precio_m2: precioM2,
         neighborhood: barrioClean,
         city: ciudadClean,
         province: provincia || null,
