@@ -63,7 +63,8 @@ export default function AuthHandler() {
         return
       }
 
-      router.push("/feed")
+      const returnTo = new URLSearchParams(window.location.search).get("returnTo")
+      router.push(returnTo ? decodeURIComponent(returnTo) : "/feed")
     }
 
     handle()

@@ -1,4 +1,5 @@
 "use client"
+import ModalLogin from "@/components/ModalLogin"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabaseClient"
@@ -44,15 +45,7 @@ export default function MisReservasPage() {
     fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
   }
 
-  if (!isLoggedIn) {
-    return (
-      <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 24px", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
-        <p style={{ fontSize: 18, marginBottom: 16 }}>Necesitas una cuenta</p>
-        <button onClick={() => router.push("/registro")} style={btn}>Registrarme</button>
-      </div>
-    )
-  }
-
+ if (!isLoggedIn || !user) return <ModalLogin />
   return (
     <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", paddingBottom: 100 }}>
 

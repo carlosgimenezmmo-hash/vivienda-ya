@@ -1,4 +1,5 @@
 ﻿"use client"
+import ModalLogin from "@/components/ModalLogin"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth-context"
@@ -59,17 +60,7 @@ export default function MisPublicacionesPage() {
     fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
   })
 
-  if (!isLoggedIn || !user) {
-    return (
-      <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
-        <div style={{ textAlign: "center" }}>
-          <p style={{ fontSize: 18, marginBottom: 16 }}>Necesitas una cuenta</p>
-          <button onClick={() => router.push("/registro")} style={{ background: "#2563EB", border: "none", borderRadius: 12, padding: "12px 24px", color: "#fff", fontSize: 15, cursor: "pointer" }}>Registrarme</button>
-        </div>
-      </div>
-    )
-  }
-
+ if (!isLoggedIn || !user) return <ModalLogin />
   return (
     <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", paddingBottom: 100 }}>
       <div style={{ padding: "52px 20px 20px", display: "flex", alignItems: "center", gap: 14 }}>
