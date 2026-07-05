@@ -1,5 +1,4 @@
 ﻿"use client"
-
 import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabaseClient"
 import { useAuth } from "@/lib/auth-context"
@@ -45,12 +44,10 @@ const [reservas, setReservas] = useState<any[]>([])
   const puedeVerContactos = nivel >= 1
   const puedeVerPropiedades = nivel >= 1
   const puedeVerZonas = nivel >= 2
-
-  useEffect(() => {
-    if (!isLoggedIn) { router.push("/registro"); return }
+useEffect(() => {
+    if (!isLoggedIn) { router.push(`/registro?returnTo=/dashboard`); return }
     fetchData()
   }, [isLoggedIn])
-
   const fetchData = async () => {
     setLoading(true)
     try {

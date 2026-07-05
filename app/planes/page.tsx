@@ -1,5 +1,5 @@
 ﻿"use client"
-
+import ModalLogin from "@/components/ModalLogin"
 import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabaseClient"
 import { useRouter } from "next/navigation"
@@ -45,13 +45,7 @@ export default function PlanesPage() {
     setPlanSeleccionado(planId)
     await pagarMP(`Plan ${nombre} - ViviendaYa`, precio, planId)
   }
-
-  if (loading) return (
-    <div style={{ minHeight: "100dvh", background: "#0a0a0a", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <p style={{ color: "rgba(255,255,255,0.4)", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>Cargando planes...</p>
-    </div>
-  )
-
+  if (!isLoggedIn || !user) return <ModalLogin />
   return (
     <div style={{
       minHeight: "100dvh",

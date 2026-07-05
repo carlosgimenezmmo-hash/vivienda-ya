@@ -75,7 +75,7 @@ function HotelReservarContent() {
   }
 
   const handleReservar = async () => {
-    if (!isLoggedIn) return router.push("/registro")
+  if (!isLoggedIn) return router.push(`/registro?returnTo=/hotel-reservar?id=${propertyId}`)
     setError("")
     if (!fechaDesde || !fechaHasta) return setError("Selecciona las fechas")
     if (!habitacionSeleccionada) return setError("Selecciona una habitación")
