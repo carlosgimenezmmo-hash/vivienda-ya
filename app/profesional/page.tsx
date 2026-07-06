@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabaseClient"
@@ -13,8 +12,7 @@ export default function MartilleroPage() {
   useEffect(() => {
     const init = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { router.push("/registro"); return }
-
+     if (!user) { router.push("/registro?returnTo=/profesional"); return }
       const { data: userData } = await supabase
         .from("users")
         .select("rol, full_name")
@@ -64,13 +62,6 @@ export default function MartilleroPage() {
     cerrada: "#22C55E",
     cancelada: "#EF4444",
   }
-
-  if (loading) return (
-    <div style={{ minHeight: "100dvh", background: "#0a0a0a", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <p style={{ color: "rgba(255,255,255,0.4)", fontFamily: "sans-serif" }}>Cargando...</p>
-    </div>
-  )
-
   return (
     <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", padding: "24px 16px 80px" }}>
       <div style={{ maxWidth: 600, margin: "0 auto" }}>

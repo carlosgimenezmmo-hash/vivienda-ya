@@ -1,4 +1,5 @@
 ﻿"use client"
+import ModalLogin from "@/components/ModalLogin"
 import { Suspense } from "react"
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -75,7 +76,7 @@ function ReservarContent() {
   }
 
   const handleReservar = async () => {
-    if (!isLoggedIn) return router.push("/registro")
+   if (!isLoggedIn) return router.push(`/registro?returnTo=/reservar?id=${propertyId}`)
     setError("")
     if (!fechaDesde || !fechaHasta) return setError("Selecciona las fechas")
     if (!periodoSeleccionado) return setError("Selecciona un periodo disponible")

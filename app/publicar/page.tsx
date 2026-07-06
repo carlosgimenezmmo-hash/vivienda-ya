@@ -1,4 +1,5 @@
 ﻿"use client"
+import ModalLogin from "@/components/ModalLogin"
 import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabaseClient"
@@ -224,17 +225,7 @@ export default function PublicarPage() {
   const sectionLabel: React.CSSProperties = {
     fontSize: 13, color: "rgba(255,255,255,0.5)", margin: "0 0 8px", fontWeight: 600,
   }
-
-  if (!isLoggedIn) {
-    return (
-      <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 24px", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
-        <h2 style={{ fontSize: 22, fontWeight: 800, margin: "0 0 10px", textAlign: "center" }}>Necesitas una cuenta</h2>
-        <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, textAlign: "center", margin: "0 0 28px" }}>Para publicar propiedades tenes que estar registrado.</p>
-        <button onClick={() => router.push("/registro")} style={btn}>Registrarme gratis</button>
-      </div>
-    )
-  }
-
+  if (!isLoggedIn) return <ModalLogin />
   return (
     <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
 

@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { supabase } from "@/lib/supabaseClient"
@@ -12,8 +11,7 @@ export default function MisOperacionesPage() {
   useEffect(() => {
     const init = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { router.push("/registro"); return }
-
+      if (!user) { router.push("/registro?returnTo=/intermediacion/solicitar"); return }
       const { data: ops } = await supabase
         .from("operaciones")
         .select(`
@@ -36,14 +34,7 @@ export default function MisOperacionesPage() {
     cerrada: "#22C55E",
     cancelada: "#EF4444",
   }
-
-  if (loading) return (
-    <div style={{ minHeight: "100dvh", background: "#0a0a0a", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <p style={{ color: "rgba(255,255,255,0.4)", fontFamily: "sans-serif" }}>Cargando...</p>
-    </div>
-  )
-
-  return (
+    return (
     <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", padding: "24px 16px 80px" }}>
       <div style={{ maxWidth: 480, margin: "0 auto" }}>
 

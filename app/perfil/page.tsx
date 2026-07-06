@@ -1,5 +1,5 @@
 ﻿"use client"
-
+import ModalLogin from "@/components/ModalLogin"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth-context"
@@ -59,17 +59,7 @@ export default function PerfilPage() {
     }
     cargarDatos()
   }, [user?.id])
-
-  if (!isLoggedIn || !user) {
-    return (
-      <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "0 24px" }}>
-        <h2 style={{ fontSize: 24, fontWeight: 800, margin: "0 0 10px", textAlign: "center" }}>Tu perfil te espera</h2>
-        <button onClick={() => router.push("/registro")} style={{ width: "100%", maxWidth: 340, padding: "16px", borderRadius: 14, border: "none", background: "linear-gradient(135deg, #2563EB, #1d4ed8)", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer", marginBottom: 12, fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>Registrarme gratis</button>
-        <button onClick={() => router.push("/login")} style={{ width: "100%", maxWidth: 340, padding: "15px", borderRadius: 14, border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.7)", fontSize: 15, fontWeight: 600, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>Ya tengo cuenta</button>
-      </div>
-    )
-  }
-
+if (!isLoggedIn || !user) return <ModalLogin />
   const initials = user.name
     ? user.name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2)
     : "?"
