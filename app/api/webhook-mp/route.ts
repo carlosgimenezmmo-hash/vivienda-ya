@@ -111,12 +111,14 @@ export async function POST(req: NextRequest) {
 
       if (reservaActualizada?.id) {
         // Notificar al dueño
-        await fetch(`${process.env.APP_URL}/api/notificar-reserva`, {
+await fetch(`${process.env.APP_URL}/api/notificar-reserva`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            "x-internal-secret": process.env.INTERNAL_API_SECRET || ""
+          },
           body: JSON.stringify({ reserva_id: reservaActualizada.id }),
         })
-
         // Distribuir comisiones por la red
         const { data: propData } = await supabase
           .from("properties")
