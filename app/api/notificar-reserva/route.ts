@@ -11,6 +11,11 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(req: NextRequest) {
   try {
+    const secret = req.headers.get("x-internal-secret")
+    if (secret !== process.env.INTERNAL_API_SECRET) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+    }
+
     const { reserva_id } = await req.json()
     if (!reserva_id) return NextResponse.json({ error: "Falta reserva_id" }, { status: 400 })
 
