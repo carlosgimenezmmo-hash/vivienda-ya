@@ -2,10 +2,12 @@
 import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
 import { supabase } from "@/lib/supabaseClient"
+import { useAuth } from "@/lib/auth-context"
 
 export default function PropiedadPage() {
   const router = useRouter()
-  const params = useParams()
+  const { isLoggedIn } = useAuth()
+const params = useParams()
   const id = params?.id
   const [property, setProperty] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -35,13 +37,13 @@ export default function PropiedadPage() {
     </div>
   )
 
-  const handleWhatsApp = () => {
+ const handleWhatsApp = () => {
+    if (!isLoggedIn) { router.push(`/registro?returnTo=/propiedad/${id}`); return }
     const clean = property.whatsapp_number?.replace(/\D/g, "")
     const msg = `Hola! Vi tu propiedad "${property.title}" en ViviendaYa y me interesa. Podes darme mas info?`
     window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`, "_blank")
     supabase.from("properties").update({ contacts: (property.contacts || 0) + 1 }).eq("id", property.id)
   }
-
   return (
     <div style={{ minHeight: "100dvh", background: "#0a0a0a", color: "#fff", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif", paddingBottom: 120 }}>
 
@@ -148,12 +150,12 @@ export default function PropiedadPage() {
       {/* BOTONES FIJOS */}
       <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, padding: "16px 20px 32px", background: "rgba(10,10,10,0.97)", borderTop: "1px solid rgba(255,255,255,0.08)", display: "flex", flexDirection: "column", gap: 10, zIndex: 20 }}>
         {(property.operation_type === "hotel") && (
-          <button onClick={() => router.push(`/hotel-reservar?id=${property.id}`)} style={{ width: "100%", padding: "16px", borderRadius: 14, border: "none", background: "#F97316", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
+          <button onClick={() => isLoggedIn ? router.push(`/hotel-reservar?id=${property.id}`) : router.push(`/registro?returnTo=/propiedad/${id}`)} style={{ width: "100%", padding: "16px", borderRadius: 14, border: "none", background: "#F97316", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
             🏨 Ver habitaciones y reservar
           </button>
         )}
         {property.operation_type === "temporario" && (
-          <button onClick={() => router.push(`/reservar?id=${property.id}`)} style={{ width: "100%", padding: "16px", borderRadius: 14, border: "none", background: "#F97316", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
+          <button onClick={() => isLoggedIn ? router.push(`/reservar?id=${property.id}`) : router.push(`/registro?returnTo=/propiedad/${id}`)} style={{ width: "100%", padding: "16px", borderRadius: 14, border: "none", background: "#F97316", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
             📅 Ver disponibilidad y reservar
           </button>
         )}
@@ -163,7 +165,6 @@ export default function PropiedadPage() {
           </button>
         )}
       </div>
-
-    </div>
-  )
+      </div>
+        )
 }
