@@ -83,14 +83,15 @@ function HotelReservarContent() {
 
     setLoading(true)
     const { data: sessionData } = await supabase.auth.getSession()
-    const uid = sessionData?.session?.user?.id
 
     const res = await fetch("/api/crear-reserva", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "authorization": `Bearer ${sessionData?.session?.access_token}`
+      },
       body: JSON.stringify({
         property_id: parseInt(propertyId!),
-        user_id: uid || null,
         fecha_desde: fechaDesde,
         fecha_hasta: fechaHasta,
         noches,
@@ -98,7 +99,6 @@ function HotelReservarContent() {
         comision,
       }),
     })
-
     const data = await res.json()
     setLoading(false)
 

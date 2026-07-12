@@ -8,11 +8,25 @@ const supabase = createClient(
 
 export async function POST(req: NextRequest) {
   try {
+   const authHeader = req.headers.get("authorization")
+    if (!authHeader?.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+    }
+    const token = authHeader.split(" ")[1]
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+    if (authError || !user) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+    }
+
     const body = await req.json()
-    const { property_id, user_id, fecha_desde, fecha_hasta, noches, precio_total, comision } = body
+    const { property_id, fecha_desde, fecha_hasta, noches, precio_total, comision } = body
+    const user_id = user.id
 
     if (!property_id || !fecha_desde || !fecha_hasta || !precio_total) {
       return NextResponse.json({ error: "Faltan datos" }, { status: 400 })
+    }
+    if (Number(precio_total) <= 0 || Number(precio_total) > 99999999) {
+      return NextResponse.json({ error: "Precio inválido" }, { status: 400 })
     }
 // Verificar que no haya reservas confirmadas que se superpongan
     const { data: reservasExistentes } = await supabase

@@ -82,16 +82,17 @@ function ReservarContent() {
     if (!periodoSeleccionado) return setError("Selecciona un periodo disponible")
     if (new Date(fechaDesde) >= new Date(fechaHasta)) return setError("Las fechas no son validas")
 
-    setLoading(true)
+   setLoading(true)
     const { data: sessionData } = await supabase.auth.getSession()
-    const uid = sessionData?.session?.user?.id
 
     const res = await fetch("/api/crear-reserva", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "authorization": `Bearer ${sessionData?.session?.access_token}`
+      },
       body: JSON.stringify({
         property_id: parseInt(propertyId!),
-        user_id: uid || null,
         fecha_desde: fechaDesde,
         fecha_hasta: fechaHasta,
         noches,
@@ -99,7 +100,6 @@ function ReservarContent() {
         comision,
       }),
     })
-
     const data = await res.json()
     setLoading(false)
 
