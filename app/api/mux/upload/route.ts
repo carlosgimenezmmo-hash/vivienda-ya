@@ -5,8 +5,8 @@ const mux = new Mux({
   tokenId: process.env.MUX_TOKEN_ID!,
   tokenSecret: process.env.MUX_TOKEN_SECRET!,
 });
-
 export async function POST(request: NextRequest) {
+  return NextResponse.json({ error: "Ruta deshabilitada" }, { status: 403 });
   try {
     const body = await request.json();
     const { metadata } = body;
