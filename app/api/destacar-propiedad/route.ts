@@ -8,11 +8,33 @@ const supabase = createClient(
 
 export async function POST(req: NextRequest) {
   try {
+const authHeader = req.headers.get("authorization")
+    if (!authHeader?.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+    }
+    const token = authHeader.split(" ")[1]
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+    if (authError || !user) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+    }
+
     const { property_id, plan, precio } = await req.json()
     if (!property_id || !plan || !precio) {
       return NextResponse.json({ error: "Faltan datos" }, { status: 400 })
     }
+    if (Number(precio) <= 0 || Number(precio) > 999999) {
+      return NextResponse.json({ error: "Precio inválido" }, { status: 400 })
+    }
 
+    // Verificar que la propiedad pertenece al usuario
+    const { data: prop } = await supabase
+      .from("properties")
+      .select("user_id")
+      .eq("id", property_id)
+      .single()
+    if (!prop || prop.user_id !== user.id) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+    }
     const dias = plan === "24h" ? 1 : 7
 
     const mpRes = await fetch("https://api.mercadopago.com/checkout/preferences", {

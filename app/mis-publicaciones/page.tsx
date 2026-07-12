@@ -177,9 +177,13 @@ const handleDelete = async (id: number) => {
             ].map(op => (
               <button key={op.plan} disabled={destacandoId !== null} onClick={async () => {
                 setDestacandoId(showDestacarModal)
+                const { data: sessionData } = await supabase.auth.getSession()
                 const res = await fetch("/api/destacar-propiedad", {
                   method: "POST",
-                  headers: { "Content-Type": "application/json" },
+                  headers: { 
+                    "Content-Type": "application/json",
+                    "authorization": `Bearer ${sessionData?.session?.access_token}`
+                  },
                   body: JSON.stringify({ property_id: showDestacarModal, plan: op.plan, precio: op.precio }),
                 })
                 const data = await res.json()
