@@ -2,7 +2,31 @@
 
 export async function POST(req: NextRequest) {
   try {
+const authHeader = req.headers.get("authorization")
+    if (!authHeader?.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+    }
+    const token = authHeader.split(" ")[1]
+    const { createClient } = await import("@supabase/supabase-js")
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
+    if (authError || !user) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+    }
+
     const { titulo, precio, planId, userId } = await req.json()
+    if (user.id !== userId) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+    }
+    if (!titulo || !precio || !planId || !userId) {
+      return NextResponse.json({ error: "Faltan datos" }, { status: 400 })
+    }
+    if (Number(precio) <= 0 || Number(precio) > 9999999) {
+      return NextResponse.json({ error: "Precio inválido" }, { status: 400 })
+    }
     const response = await fetch("https://api.mercadopago.com/checkout/preferences", {
       method: "POST",
       headers: {
