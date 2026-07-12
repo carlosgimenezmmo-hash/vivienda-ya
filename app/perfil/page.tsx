@@ -199,9 +199,12 @@ if (!isLoggedIn || !user) return <ModalLogin />
               const { data: sessionData } = await supabase.auth.getSession()
               const uid = sessionData?.session?.user?.id
               if (!uid) return
-              const res = await fetch("/api/eliminar-cuenta", {
+            const res = await fetch("/api/eliminar-cuenta", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                  "Content-Type": "application/json",
+                  "authorization": `Bearer ${sessionData?.session?.access_token}`
+                },
                 body: JSON.stringify({ user_id: uid }),
               })
               const data = await res.json()

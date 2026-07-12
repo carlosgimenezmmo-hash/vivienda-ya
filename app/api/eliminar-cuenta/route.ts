@@ -8,9 +8,21 @@ const supabase = createClient(
 
 export async function POST(req: NextRequest) {
   try {
+  const authHeader = req.headers.get("authorization")
+    if (!authHeader?.startsWith("Bearer ")) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+    }
+    const token = authHeader.split(" ")[1]
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+    if (authError || !user) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+    }
+
     const { user_id } = await req.json()
     if (!user_id) return NextResponse.json({ error: "Falta user_id" }, { status: 400 })
-
+    if (user.id !== user_id) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 })
+    }
     // Borrar datos del usuario en orden
     await supabase.from("saved_properties").delete().eq("user_id", user_id)
     await supabase.from("reservas").delete().eq("user_id", user_id)
