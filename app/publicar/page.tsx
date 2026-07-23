@@ -143,16 +143,19 @@ export default function PublicarPage() {
 
       const { data: sessionData } = await supabase.auth.getSession()
       const uid = sessionData?.session?.user?.id
-      if (!uid) throw new Error("Sesión expirada. Volvé a iniciar sesión.")
+      const token = sessionData?.session?.access_token
+      if (!uid || !token) throw new Error("Sesión expirada. Volvé a iniciar sesión.")
       if (!video) throw new Error("Debes seleccionar un video")
 
       let videoUrl = ""
       const formDataVideo = new FormData()
       formDataVideo.append("video", video)
-      formDataVideo.append("user_id", uid)
 
       const uploadRes = await fetch("/api/subir-video", {
         method: "POST",
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
         body: formDataVideo
       })
       if (!uploadRes.ok) {

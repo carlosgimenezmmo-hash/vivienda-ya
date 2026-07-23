@@ -81,6 +81,27 @@ export interface User {
   }
   properties: string[]
   isLoggedIn: boolean
+  phone?: string
+  verified: boolean
+}
+
+export interface Chat {
+  id: string
+  contactName: string
+  contactAvatar: string
+  lastMessage: string
+  timestamp: string
+  unread: number
+  propertyId?: string
+}
+
+export interface Notification {
+  id: string
+  type: 'like' | 'match' | 'credit' | 'arryse' | 'system'
+  title: string
+  description: string
+  timestamp: string
+  read: boolean
 }
 // ===== SISTEMA DE CREDITOS =====
 

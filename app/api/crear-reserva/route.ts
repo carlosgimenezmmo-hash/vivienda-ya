@@ -1,22 +1,21 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+import { parseBearerToken, requireEnv } from "@/lib/utils"
+import { supabaseAdmin } from "@/lib/supabaseAdmin"
 
 export async function POST(req: NextRequest) {
   try {
-   const authHeader = req.headers.get("authorization")
-    if (!authHeader?.startsWith("Bearer ")) {
+    const authHeader = req.headers.get("authorization")
+    const token = parseBearerToken(authHeader)
+    if (!token) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 })
     }
-    const token = authHeader.split(" ")[1]
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
     if (authError || !user) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 })
     }
+
+    const mpAccessToken = requireEnv("MP_ACCESS_TOKEN")
+    const appUrl = requireEnv("APP_URL")
 
     const body = await req.json()
     const { property_id, fecha_desde, fecha_hasta, noches, precio_total, comision } = body
@@ -29,7 +28,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Precio inválido" }, { status: 400 })
     }
 // Verificar que no haya reservas confirmadas que se superpongan
-    const { data: reservasExistentes } = await supabase
+    const { data: reservasExistentes } = await supabaseAdmin
       .from("reservas")
       .select("id")
       .eq("property_id", property_id)
@@ -44,7 +43,7 @@ export async function POST(req: NextRequest) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`,
+        Authorization: `Bearer ${mpAccessToken}`,
       },
       body: JSON.stringify({
         items: [
@@ -56,9 +55,9 @@ export async function POST(req: NextRequest) {
           },
         ],
         back_urls: {
-          success: `${process.env.APP_URL}/reservas-confirmadas`,
-          failure: `${process.env.APP_URL}/reservar?id=${property_id}&error=1`,
-          pending: `${process.env.APP_URL}/reservas-confirmadas`,
+          success: `${appUrl}/reservas-confirmadas`,
+          failure: `${appUrl}/reservar?id=${property_id}&error=1`,
+          pending: `${appUrl}/reservas-confirmadas`,
         },
         auto_return: "approved",
         metadata: {
@@ -70,7 +69,7 @@ export async function POST(req: NextRequest) {
           precio_total,
           comision,
         },
-        notification_url: `${process.env.APP_URL}/api/webhook-mp`,
+        notification_url: `${appUrl}/api/webhook-mp`,
       }),
     })
 
@@ -81,7 +80,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Guardar reserva en Supabase con estado pendiente
-    const { data: reserva, error: insertError } = await supabase.from("reservas").insert({
+    const { data: reserva, error: insertError } = await supabaseAdmin.from("reservas").insert({
       property_id,
       user_id: user_id || null,
       fecha_desde,

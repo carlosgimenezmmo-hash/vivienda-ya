@@ -1,17 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
+import { supabaseAdmin } from "@/lib/supabaseAdmin"
+import { requireEnv } from "@/lib/utils"
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-if (!supabaseUrl || !supabaseKey) {
-  console.error("Missing Supabase env vars")
-}
-
-const supabase = createClient(
-  supabaseUrl || "",
-  supabaseKey || ""
-)
+const geminiApiKey = requireEnv("GEMINI_API_KEY")
 
 
 export async function POST(req: NextRequest) {
@@ -23,7 +14,7 @@ export async function POST(req: NextRequest) {
     }
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -59,7 +50,7 @@ Aprobá si parece un video normal de propiedad inmobiliaria.`
       result = { status: "approved", reason: "Auto-aprobado" }
     }
 
-    await supabase
+    await supabaseAdmin
       .from("properties")
       .update({ status: result.status })
       .eq("id", propertyId)
@@ -71,7 +62,7 @@ Aprobá si parece un video normal de propiedad inmobiliaria.`
     if (req.body) {
       const { propertyId } = await req.json().catch(() => ({}))
       if (propertyId) {
-        await supabase.from("properties").update({ status: "approved" }).eq("id", propertyId)
+        await supabaseAdmin.from("properties").update({ status: "approved" }).eq("id", propertyId)
       }
     }
     return NextResponse.json({ error: err.message }, { status: 500 })

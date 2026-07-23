@@ -1,22 +1,21 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+import { parseBearerToken, requireEnv } from "@/lib/utils"
+import { supabaseAdmin } from "@/lib/supabaseAdmin"
 
 export async function POST(req: NextRequest) {
   try {
-const authHeader = req.headers.get("authorization")
-    if (!authHeader?.startsWith("Bearer ")) {
+    const authHeader = req.headers.get("authorization")
+    const token = parseBearerToken(authHeader)
+    if (!token) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 })
     }
-    const token = authHeader.split(" ")[1]
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
     if (authError || !user) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 })
     }
+
+    const mpAccessToken = requireEnv("MP_ACCESS_TOKEN")
+    const appUrl = requireEnv("APP_URL")
 
     const { property_id, plan, precio } = await req.json()
     if (!property_id || !plan || !precio) {
@@ -27,7 +26,7 @@ const authHeader = req.headers.get("authorization")
     }
 
     // Verificar que la propiedad pertenece al usuario
-    const { data: prop } = await supabase
+    const { data: prop } = await supabaseAdmin
       .from("properties")
       .select("user_id")
       .eq("id", property_id)
@@ -41,7 +40,7 @@ const authHeader = req.headers.get("authorization")
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`,
+        Authorization: `Bearer ${mpAccessToken}`,
       },
       body: JSON.stringify({
         items: [
@@ -53,9 +52,9 @@ const authHeader = req.headers.get("authorization")
           },
         ],
         back_urls: {
-          success: `${process.env.APP_URL}/mis-publicaciones?destacado=1`,
-          failure: `${process.env.APP_URL}/mis-publicaciones`,
-          pending: `${process.env.APP_URL}/mis-publicaciones`,
+          success: `${appUrl}/mis-publicaciones?destacado=1`,
+          failure: `${appUrl}/mis-publicaciones`,
+          pending: `${appUrl}/mis-publicaciones`,
         },
         auto_return: "approved",
         metadata: {
@@ -64,7 +63,7 @@ const authHeader = req.headers.get("authorization")
           plan,
           dias,
         },
-        notification_url: `${process.env.APP_URL}/api/webhook-mp`,
+        notification_url: `${appUrl}/api/webhook-mp`,
       }),
     })
 

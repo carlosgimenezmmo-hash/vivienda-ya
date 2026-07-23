@@ -1,18 +1,15 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
+import { supabaseAdmin } from "@/lib/supabaseAdmin"
+import { requireEnv } from "@/lib/utils"
 import { Resend } from "resend"
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-
-const resend = new Resend(process.env.RESEND_API_KEY)
+const resend = new Resend(requireEnv("RESEND_API_KEY"))
 
 export async function POST(req: NextRequest) {
   try {
     const secret = req.headers.get("x-internal-secret")
-    if (secret !== process.env.INTERNAL_API_SECRET) {
+    const internalSecret = requireEnv("INTERNAL_API_SECRET")
+    if (secret !== internalSecret) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 })
     }
 
@@ -20,7 +17,7 @@ export async function POST(req: NextRequest) {
     if (!reserva_id) return NextResponse.json({ error: "Falta reserva_id" }, { status: 400 })
 
     // Traer datos de la reserva
-    const { data: reserva } = await supabase
+    const { data: reserva } = await supabaseAdmin
       .from("reservas")
       .select("*, properties(title, neighborhood, city, user_id, whatsapp_number)")
       .eq("id", reserva_id)
@@ -32,7 +29,7 @@ export async function POST(req: NextRequest) {
     if (!propertyOwnerId) return NextResponse.json({ ok: true })
 
     // Traer preferencias del dueño
-    const { data: ownerData } = await supabase
+    const { data: ownerData } = await supabaseAdmin
       .from("users")
       .select("notification_preference, notification_email, notification_whatsapp, name")
       .eq("id", propertyOwnerId)

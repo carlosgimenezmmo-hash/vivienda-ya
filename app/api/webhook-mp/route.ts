@@ -1,10 +1,11 @@
 ﻿import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
+import { supabaseAdmin } from "@/lib/supabaseAdmin"
+import { requireEnv } from "@/lib/utils"
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+const mpWebhookSecret = requireEnv("MP_WEBHOOK_SECRET")
+const mpAccessToken = requireEnv("MP_ACCESS_TOKEN")
+const appUrl = requireEnv("APP_URL")
+const internalApiSecret = requireEnv("INTERNAL_API_SECRET")
 
 const rateLimit = new Map<string, { count: number; reset: number }>()
 
@@ -42,7 +43,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Demasiadas peticiones." }, { status: 429 })
     }
 // Verificar firma de MercadoPago
-    const secret = process.env.MP_WEBHOOK_SECRET
+    const secret = mpWebhookSecret
     if (secret) {
       const xSignature = req.headers.get("x-signature")
       const xRequestId = req.headers.get("x-request-id")
@@ -78,7 +79,7 @@ export async function POST(req: NextRequest) {
     if (!paymentId) return NextResponse.json({ ok: true })
 
     const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
-      headers: { Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}` },
+      headers: { Authorization: `Bearer ${mpAccessToken}` },
     })
     const payment = await response.json()
 
@@ -93,7 +94,7 @@ export async function POST(req: NextRequest) {
       const dias = payment.metadata?.dias || 1
       const hasta = new Date()
       hasta.setDate(hasta.getDate() + dias)
-      await supabase.from("properties").update({
+      await supabaseAdmin.from("properties").update({
         highlighted: true,
         highlighted_until: hasta.toISOString(),
       }).eq("id", propertyId)
@@ -103,7 +104,7 @@ export async function POST(req: NextRequest) {
    // Si es una reserva
     const reservaPropertyId = payment.metadata?.property_id
     if (reservaPropertyId) {
-      const { data: reservaActualizada } = await supabase.from("reservas")
+      const { data: reservaActualizada } = await supabaseAdmin.from("reservas")
         .update({ estado: "confirmada", mp_payment_id: String(paymentId) })
         .eq("mp_payment_id", String(payment.order?.id || paymentId))
         .select()
@@ -111,16 +112,16 @@ export async function POST(req: NextRequest) {
 
       if (reservaActualizada?.id) {
         // Notificar al dueño
-await fetch(`${process.env.APP_URL}/api/notificar-reserva`, {
+await fetch(`${appUrl}/api/notificar-reserva`, {
           method: "POST",
           headers: { 
             "Content-Type": "application/json",
-            "x-internal-secret": process.env.INTERNAL_API_SECRET || ""
+            "x-internal-secret": internalApiSecret
           },
           body: JSON.stringify({ reserva_id: reservaActualizada.id }),
         })
         // Distribuir comisiones por la red
-        const { data: propData } = await supabase
+        const { data: propData } = await supabaseAdmin
           .from("properties")
           .select("user_id")
           .eq("id", reservaPropertyId)
@@ -144,7 +145,7 @@ await fetch(`${process.env.APP_URL}/api/notificar-reserva`, {
       const dias = PLANES_VENCIMIENTO[planId]
       const fechaVencimiento = new Date()
       fechaVencimiento.setDate(fechaVencimiento.getDate() + dias)
-      await supabase.from("subscriptions").upsert({
+      await supabaseAdmin.from("subscriptions").upsert({
         user_id: userId,
         plan: planId,
         estado: "activo",
@@ -158,16 +159,16 @@ await fetch(`${process.env.APP_URL}/api/notificar-reserva`, {
 
     if (SERVICIOS_VIDEOS[planId]) {
       const videosExtra = SERVICIOS_VIDEOS[planId]
-      const { data: userData } = await supabase
+      const { data: userData } = await supabaseAdmin
         .from("users")
         .select("videos_extra")
         .eq("id", userId)
         .single()
       const actual = userData?.videos_extra || 0
-      await supabase.from("users").update({
+      await supabaseAdmin.from("users").update({
         videos_extra: actual + videosExtra
       }).eq("id", userId)
-      await supabase.from("pagos_servicios").insert({
+      await supabaseAdmin.from("pagos_servicios").insert({
         user_id: userId,
         servicio: planId,
         mp_payment_id: String(paymentId),
@@ -177,7 +178,7 @@ await fetch(`${process.env.APP_URL}/api/notificar-reserva`, {
       return NextResponse.json({ ok: true })
     }
 
-    await supabase.from("pagos_servicios").insert({
+    await supabaseAdmin.from("pagos_servicios").insert({
       user_id: userId,
       servicio: planId,
       mp_payment_id: String(paymentId),
@@ -200,7 +201,7 @@ async function distribuirComisiones(reservaId: string, montoTotal: number, prope
   const montoViviendaya = montoTotal * pctViviendaya / 100
   const montoAgente = montoTotal * pctAgente / 100
 
-  await supabase.from("red_comisiones").insert({
+  await supabaseAdmin.from("red_comisiones").insert({
     reserva_id: reservaId,
     beneficiario_id: propertyUserId,
     origen_id: propertyUserId,
@@ -215,7 +216,7 @@ async function distribuirComisiones(reservaId: string, montoTotal: number, prope
   let nivel = 1
 
   while (nivel <= 10) {
-    const { data: userData } = await supabase
+    const { data: userData } = await supabaseAdmin
       .from("users")
       .select("referido_por")
       .eq("id", currentUserId)
@@ -226,7 +227,7 @@ async function distribuirComisiones(reservaId: string, montoTotal: number, prope
     const pct = nivel <= 4 ? porcentajes[nivel] : 0.05
     const monto = montoTotal * pct / 100
 
-    await supabase.from("red_comisiones").insert({
+    await supabaseAdmin.from("red_comisiones").insert({
       reserva_id: reservaId,
       beneficiario_id: userData.referido_por,
       origen_id: propertyUserId,

@@ -60,11 +60,8 @@ useEffect(() => {
         .eq("user_id", uid)
         .order("created_at", { ascending: false })
       setProperties(data || [])
-    } catch (err) {
-      console.error(err)
-    } finally {
-      setLoading(false)
-    }const propertyIds = (data || []).map((p: any) => p.id)
+
+      const propertyIds = (data || []).map((p: any) => p.id)
       if (propertyIds.length > 0) {
         const { data: reservasData } = await supabase
           .from("reservas")
@@ -73,6 +70,11 @@ useEffect(() => {
           .order("created_at", { ascending: false })
         setReservas(reservasData || [])
       }
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleDelete = async (id: number) => {

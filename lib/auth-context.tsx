@@ -33,44 +33,92 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isLoggedIn = user !== null && user.isLoggedIn
 
   const buildUser = async (supabaseUser: any): Promise<User> => {
-    const meta = supabaseUser.user_metadata
-    const { data: userData } = await supabase
-      .from('users')
-      .select('avatar_url, credits, full_name, phone')
-      .eq('id', supabaseUser.id)
-      .single()
-    const { data: subData } = await supabase
-      .from("subscriptions")
-      .select("plan, estado, fecha_vencimiento")
-      .eq("user_id", supabaseUser.id)
-      .eq("estado", "activo")
-      .single()
-    if (subData && new Date(subData.fecha_vencimiento) > new Date()) {
-      setPlan(subData.plan)
-    } else {
-      setPlan("gratis")
-    }
-    return {
-      id: supabaseUser.id,
-      name: userData?.full_name || `${meta.nombre || ''} ${meta.apellido || ''}`.trim() || supabaseUser.email || 'Usuario',
-      email: supabaseUser.email || '',
-      isLoggedIn: true,
-      avatar_url: userData?.avatar_url || meta.avatar_url || null,
-      credits: userData?.credits ?? 0,
-      phone: userData?.phone || meta.telefono || '',
-      level: 'basico',
-      verified: false,
+    try {
+      const meta = supabaseUser.user_metadata || {}
+      const { data: userData } = await supabase
+        .from('users')
+        .select('avatar_url, credits, full_name, phone')
+        .eq('id', supabaseUser.id)
+        .single()
+        .catch(() => ({ data: null }))
+      
+      const { data: subData } = await supabase
+        .from("subscriptions")
+        .select("plan, estado, fecha_vencimiento")
+        .eq("user_id", supabaseUser.id)
+        .eq("estado", "activo")
+        .single()
+        .catch(() => ({ data: null }))
+      
+      if (subData && new Date(subData.fecha_vencimiento) > new Date()) {
+        setPlan(subData.plan)
+      } else {
+        setPlan("gratis")
+      }
+      
+      return {
+        id: supabaseUser.id,
+        name: userData?.full_name || `${meta.nombre || ''} ${meta.apellido || ''}`.trim() || supabaseUser.email || 'Usuario',
+        email: supabaseUser.email || '',
+        avatar: userData?.avatar_url || meta.avatar_url || '',
+        isLoggedIn: true,
+        avatar_url: userData?.avatar_url || meta.avatar_url || null,
+        credits: userData?.credits ?? 0,
+        phone: userData?.phone || meta.telefono || '',
+        level: 'basico',
+        stats: {
+          publications: 0,
+          saved: 0,
+          permutas: 0,
+          likes: 0,
+        },
+        properties: [],
+        verified: false,
+      }
+    } catch (error) {
+      console.error("Error building user:", error)
+      return {
+        id: supabaseUser.id,
+        name: supabaseUser.email || 'Usuario',
+        email: supabaseUser.email || '',
+        avatar: '',
+        isLoggedIn: true,
+        avatar_url: null,
+        credits: 0,
+        phone: '',
+        level: 'basico',
+        stats: {
+          publications: 0,
+          saved: 0,
+          permutas: 0,
+          likes: 0,
+        },
+        properties: [],
+        verified: false,
+      }
     }
   }
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user) setUser(await buildUser(session.user))
-    })
+    const initSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session?.user) {
+          const builtUser = await buildUser(session.user)
+          setUser(builtUser)
+        }
+      } catch (error) {
+        console.error("Error initializing session:", error)
+      }
+    }
+    
+    initSession()
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (session?.user) {
-        buildUser(session.user).then(setUser)
+        buildUser(session.user).then(setUser).catch(error => {
+          console.error("Error in auth state change:", error)
+        })
       } else {
         setUser(null)
         setPlan("gratis")

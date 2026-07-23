@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabaseClient"
 import { useAuth } from "@/lib/auth-context"
 
 export default function HotelHabitacionesPage() {
-  const { isLoggedIn } = useAuth()
+  const { isLoggedIn, user } = useAuth()
   const router = useRouter()
   const [hotels, setHotels] = useState<any[]>([])
   const [selectedHotel, setSelectedHotel] = useState<any>(null)

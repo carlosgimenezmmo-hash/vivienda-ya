@@ -6,50 +6,69 @@ import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth-context"
 
 const pagarMP = async (titulo: string, precio: number, planId: string) => {
- const session = (await supabase.auth.getSession()).data.session
+  try {
+    const { data } = await supabase.auth.getSession()
+    const session = data?.session
+    
+    if (!session) {
+      alert("Por favor inicia sesión para contratar un plan")
+      return
+    }
+
     const res = await fetch("/api/pago", {
       method: "POST",
       headers: { 
         "Content-Type": "application/json",
-        "authorization": `Bearer ${session?.access_token}`
+        "authorization": `Bearer ${session.access_token}`
       },
       body: JSON.stringify({
         titulo,
         precio,
         planId,
-        userId: session?.user?.id,
+        userId: session.user?.id,
       }),
     })
-  const data = await res.json()
-  if (data.url) window.location.href = data.url
-  else alert("Error al procesar el pago.")
+    
+    const data_response = await res.json()
+    if (data_response.url) window.location.href = data_response.url
+    else alert("Error al procesar el pago.")
+  } catch (error) {
+    console.error("Error en pago:", error)
+    alert("Error al procesar el pago. Intenta nuevamente.")
+  }
 }
 
-export default function PlanesPage() {
+function PlanesPageContent({ isLoggedIn, user }: { isLoggedIn: boolean; user: any }) {
   const router = useRouter()
-  const { isLoggedIn } = useAuth()
   const [planes, setPlanes] = useState<any[]>([])
   const [planSeleccionado, setPlanSeleccionado] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
 
-  useEffect(() => { fetchPlanes() }, [])
+  useEffect(() => { 
+    fetchPlanes()
+  }, [])
 
   const fetchPlanes = async () => {
-    const { data } = await supabase
-      .from("planes")
-      .select("*")
-      .eq("activo", true)
-      .order("orden", { ascending: true })
-    setPlanes(data || [])
-    setLoading(false)
+    try {
+      const { data } = await supabase
+        .from("planes")
+        .select("*")
+        .eq("activo", true)
+        .order("orden", { ascending: true })
+      setPlanes(data || [])
+    } catch (error) {
+      console.error("Error fetching planes:", error)
+    }
   }
 
   const handleContratar = async (planId: string, precio: number, nombre: string) => {
-    if (!isLoggedIn) { router.push("/registro"); return }
+    if (!isLoggedIn) { 
+      router.push("/registro")
+      return 
+    }
     setPlanSeleccionado(planId)
     await pagarMP(`Plan ${nombre} - ViviendaYa`, precio, planId)
   }
-  if (!isLoggedIn || !user) return <ModalLogin />
+  
   return (
     <div style={{
       minHeight: "100dvh",
@@ -165,3 +184,14 @@ export default function PlanesPage() {
     </div>
   )
 }
+
+export default function PlanesPage() {
+  const { isLoggedIn, user } = useAuth()
+
+  if (!isLoggedIn || !user) {
+    return <ModalLogin />
+  }
+
+  return <PlanesPageContent isLoggedIn={isLoggedIn} user={user} />
+}
+  

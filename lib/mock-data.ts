@@ -26,6 +26,7 @@ export const mockUser: User = {
   },
   properties: ["p1", "p3", "p5"],
   isLoggedIn: true,
+  verified: true,
 }
 
 // ===== PROPIEDADES MOCK =====

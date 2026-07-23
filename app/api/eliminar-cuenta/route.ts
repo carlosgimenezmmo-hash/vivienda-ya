@@ -1,19 +1,15 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+import { parseBearerToken } from "@/lib/utils"
+import { supabaseAdmin } from "@/lib/supabaseAdmin"
 
 export async function POST(req: NextRequest) {
   try {
-  const authHeader = req.headers.get("authorization")
-    if (!authHeader?.startsWith("Bearer ")) {
+    const authHeader = req.headers.get("authorization")
+    const token = parseBearerToken(authHeader)
+    if (!token) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 })
     }
-    const token = authHeader.split(" ")[1]
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
     if (authError || !user) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 })
     }
@@ -24,15 +20,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 })
     }
     // Borrar datos del usuario en orden
-    await supabase.from("saved_properties").delete().eq("user_id", user_id)
-    await supabase.from("reservas").delete().eq("user_id", user_id)
-    await supabase.from("subscriptions").delete().eq("user_id", user_id)
-    await supabase.from("comments").delete().eq("user_id", user_id)
-    await supabase.from("properties").delete().eq("user_id", user_id)
-    await supabase.from("users").delete().eq("id", user_id)
+    await supabaseAdmin.from("saved_properties").delete().eq("user_id", user_id)
+    await supabaseAdmin.from("reservas").delete().eq("user_id", user_id)
+    await supabaseAdmin.from("subscriptions").delete().eq("user_id", user_id)
+    await supabaseAdmin.from("comments").delete().eq("user_id", user_id)
+    await supabaseAdmin.from("properties").delete().eq("user_id", user_id)
+    await supabaseAdmin.from("users").delete().eq("id", user_id)
 
     // Eliminar el usuario de Supabase Auth
-    const { error } = await supabase.auth.admin.deleteUser(user_id)
+    const { error } = await supabaseAdmin.auth.admin.deleteUser(user_id)
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
     return NextResponse.json({ ok: true })

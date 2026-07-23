@@ -1,31 +1,29 @@
 ﻿import { NextRequest, NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
+import { supabaseAdmin } from "@/lib/supabaseAdmin"
+import { requireEnv } from "@/lib/utils"
 import { Resend } from "resend"
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
-const resend = new Resend(process.env.RESEND_API_KEY)
+const resend = new Resend(requireEnv("RESEND_API_KEY"))
 
 export async function POST(req: NextRequest) {
   try {
     const secret = req.headers.get("x-internal-secret")
-    if (secret !== process.env.INTERNAL_API_SECRET) {
+    const internalSecret = requireEnv("INTERNAL_API_SECRET")
+    if (secret !== internalSecret) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 })
     }
 
     const { reserva_id, estado } = await req.json()
     if (!reserva_id) return NextResponse.json({ error: "Falta reserva_id" }, { status: 400 })
 
-    const { data: reserva } = await supabase
+    const { data: reserva } = await supabaseAdmin
       .from("reservas")
       .select("*, properties(title, neighborhood, city)")
       .eq("id", reserva_id)
       .single()
     if (!reserva || !reserva.user_id) return NextResponse.json({ ok: true })
 
-    const { data: huesped } = await supabase
+    const { data: huesped } = await supabaseAdmin
       .from("users")
       .select("name, email")
       .eq("id", reserva.user_id)

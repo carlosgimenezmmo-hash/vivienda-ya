@@ -6,7 +6,7 @@ import { supabase } from "@/lib/supabaseClient"
 import { useAuth } from "@/lib/auth-context"
 
 export default function ReservasRecibidasPage() {
-  const { isLoggedIn } = useAuth()
+  const { isLoggedIn, user } = useAuth()
   const router = useRouter()
   const [reservas, setReservas] = useState<any[]>([])
   const [loading, setLoading] = useState(true)

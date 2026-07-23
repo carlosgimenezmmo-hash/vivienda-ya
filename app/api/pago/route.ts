@@ -1,21 +1,21 @@
 ﻿import { NextRequest, NextResponse } from "next/server"
+import { parseBearerToken, requireEnv } from "@/lib/utils"
+import { supabaseAdmin } from "@/lib/supabaseAdmin"
 
 export async function POST(req: NextRequest) {
   try {
-const authHeader = req.headers.get("authorization")
-    if (!authHeader?.startsWith("Bearer ")) {
+    const authHeader = req.headers.get("authorization")
+    const token = parseBearerToken(authHeader)
+    if (!token) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 })
     }
-    const token = authHeader.split(" ")[1]
-    const { createClient } = await import("@supabase/supabase-js")
-    const supabaseAdmin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
     const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
     if (authError || !user) {
       return NextResponse.json({ error: "No autorizado" }, { status: 401 })
     }
+
+    const mpAccessToken = requireEnv("MP_ACCESS_TOKEN")
+    const appUrl = requireEnv("APP_URL")
 
     const { titulo, precio, planId, userId } = await req.json()
     if (user.id !== userId) {
@@ -31,7 +31,7 @@ const authHeader = req.headers.get("authorization")
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.MP_ACCESS_TOKEN}`,
+        "Authorization": `Bearer ${mpAccessToken}`,
       },
       body: JSON.stringify({
         items: [
@@ -51,14 +51,14 @@ const authHeader = req.headers.get("authorization")
           installments: 12,
         },
         back_urls: {
-          success: "https://vivienda-ya.vercel.app/planes?pago=ok",
-          failure: "https://vivienda-ya.vercel.app/planes?pago=error",
-          pending: "https://vivienda-ya.vercel.app/planes?pago=pendiente",
+          success: `${appUrl}/planes?pago=ok`,
+          failure: `${appUrl}/planes?pago=error`,
+          pending: `${appUrl}/planes?pago=pendiente`,
         },
         auto_return: "approved",
         metadata: { planId, userId },
         external_reference: `${userId}-${planId}-${Date.now()}`,
-        notification_url: "https://vivienda-ya.vercel.app/api/webhook-mp",
+        notification_url: `${appUrl}/api/webhook-mp`,
       }),
     })
     const data = await response.json()

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { requireEnv } from "@/lib/utils"
 export async function POST(req: NextRequest) {
   return NextResponse.json({ error: "Ruta deshabilitada" }, { status: 403 })
   try {
@@ -9,12 +10,15 @@ export async function POST(req: NextRequest) {
     const cfFormData = new FormData()
     cfFormData.append("file", file)
 
+    const cloudflareAccountId = requireEnv("CLOUDFLARE_ACCOUNT_ID")
+    const cloudflareApiToken = requireEnv("CLOUDFLARE_API_TOKEN")
+
     const response = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream`,
+      `https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/stream`,
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${process.env.CLOUDFLARE_API_TOKEN}`,
+          Authorization: `Bearer ${cloudflareApiToken}`,
         },
         body: cfFormData,
       }
