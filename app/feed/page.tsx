@@ -227,7 +227,7 @@ export default function ViviendaYaFull() {
                   ref={(el) => { if (el) videoRefs.current[i] = el; }}
                   src={p.video_url}
                   autoPlay
-                  loop
+                 loop
                   muted
                   playsInline
                   onPlay={() => setPaused((prev: any) => ({ ...prev, [p.id]: false }))}
