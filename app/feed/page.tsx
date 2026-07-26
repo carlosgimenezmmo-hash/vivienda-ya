@@ -85,9 +85,12 @@ export default function ViviendaYaFull() {
             setActiveIndex(index);
             setActiveProperty({ id: prop.id, title: prop.title, whatsapp_number: prop.whatsapp_number });
             // Sumar vista
-            supabase.from("properties").update({ views: (prop.views || 0) + 1 }).eq("id", prop.id).then(() => {
-              setProperties(prev => prev.map(p => p.id === prop.id ? { ...p, views: (p.views || 0) + 1 } : p))
-            })
+supabase.from("properties").update({ 
+                views: (prop.views || 0) + 1,
+                score: ((prop.likes || 0) * 3) + ((prop.contacts || 0) * 5) + ((prop.saves || 0) * 2) + (((prop.views || 0) + 1) * 0.1)
+              }).eq("id", prop.id).then(() => {
+                setProperties(prev => prev.map(p => p.id === prop.id ? { ...p, views: (p.views || 0) + 1 } : p))
+              })
           } else {
             video.pause();
             // Al salir de pantalla se limpia la pausa manual → al volver el video arranca solo
@@ -511,9 +514,12 @@ export default function ViviendaYaFull() {
         const clean = p.whatsapp_number?.replace(/\D/g, "");
         const msg = `Hola! Vi tu propiedad "${p.title}" en ViviendaYa y me interesa. Podes darme mas info?`;
         window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`, "_blank");
-        supabase.from("properties").update({ contacts: (p.contacts || 0) + 1 }).eq("id", p.id).then(() => {
-          setProperties(prev => prev.map(prop => prop.id === p.id ? { ...prop, contacts: (prop.contacts || 0) + 1 } : prop))
-        })
+       supabase.from("properties").update({ 
+            contacts: (p.contacts || 0) + 1,
+            score: ((p.likes || 0) * 3) + (((p.contacts || 0) + 1) * 5) + ((p.saves || 0) * 2) + ((p.views || 0) * 0.1)
+          }).eq("id", p.id).then(() => {
+            setProperties(prev => prev.map(prop => prop.id === p.id ? { ...prop, contacts: (prop.contacts || 0) + 1 } : prop))
+          })
       }, "contactar")} style={{
         width: "100%", padding: "16px", borderRadius: 14, border: "none",
         background: "#25D366", color: "#fff", fontSize: 16, fontWeight: 700,
