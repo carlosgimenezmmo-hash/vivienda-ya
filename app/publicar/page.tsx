@@ -162,10 +162,29 @@ export default function PublicarPage() {
         const uploadErr = await uploadRes.json()
         throw new Error(uploadErr.error || "Error al subir el video")
       }
-      const { videoUrl: bunnyUrl, guid: bunnyGuid } = await uploadRes.json()
+     const { videoUrl: bunnyUrl, guid: bunnyGuid } = await uploadRes.json()
       videoUrl = bunnyUrl
-      const { error: insertError } = await supabase.from("properties").insert({
-        user_id: uid,
+
+      // Si no hay GPS, intentamos geocodificar por dirección (aproximado, gratis via OSM)
+      let finalLat = gpsLat
+      let finalLng = gpsLng
+      if (!gpsOk) {
+        try {
+          const direccion = [barrioClean, ciudadClean, provincia].filter(Boolean).join(", ")
+          const geoRes = await fetch(
+            `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(direccion + ", Argentina")}`
+          )
+          const geoData = await geoRes.json()
+          if (geoData && geoData[0]) {
+            finalLat = parseFloat(geoData[0].lat)
+            finalLng = parseFloat(geoData[0].lon)
+          }
+        } catch {
+          // si falla la geocodificación, la propiedad se publica sin coordenadas
+        }
+      }
+
+      const { error: insertError } = await supabase.from("properties").insert({        user_id: uid,
         owner_name: user?.name || "Propietario",
         owner_avatar: user?.avatar_url || null,
         operation_type: operacion,
@@ -190,8 +209,8 @@ export default function PublicarPage() {
         video_url: videoUrl,
                 bunny_guid: bunnyGuid,
         verified: gpsOk,
-        lat: gpsLat,
-        lng: gpsLng,
+        lat: finalLat,
+        lng: finalLng,
         highlighted: false,
         likes: 0,
         status: "approved"
