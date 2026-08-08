@@ -26,7 +26,7 @@ export default function MapaPage() {
         .not("lng", "is", null)
         .eq("mostrar_en_mapa", true)
         .eq("status", "approved")
-
+        .eq("listing_status", "activa")
       if (error) {
         console.error("Error al traer propiedades para el mapa:", error)
       } else {
