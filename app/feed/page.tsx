@@ -278,13 +278,33 @@ supabase.from("properties").update({
 
               <div style={{ position: 'absolute', bottom: 0, width: '100%', height: '75%', background: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.75) 100%)', pointerEvents: 'none', zIndex: 5 }} />
 
-              <div style={{ position: 'absolute', top: 0, width: '100%', zIndex: 20, padding: '52px 16px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxSizing: 'border-box', background: 'linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, transparent 100%)', pointerEvents: 'none' }}>
+             <div style={{ position: 'absolute', top: 0, width: '100%', zIndex: 20, padding: '52px 16px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxSizing: 'border-box', background: 'linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, transparent 100%)', pointerEvents: 'none' }}>
                 <span style={{ fontSize: 22, fontWeight: 800, color: '#fff', letterSpacing: -0.5 }}>Vivienda<span style={{ color: '#22C55E' }}>Ya</span></span>
-                <div style={{ display: 'flex', gap: 8 }}>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center', pointerEvents: 'auto' }}>
+                  <button
+                    onClick={() => router.push('/mapa')}
+                    aria-label="Ver mapa de propiedades"
+                    style={{
+                      background: 'rgba(255,255,255,0.12)',
+                      border: 'none',
+                      borderRadius: '50%',
+                      width: 38,
+                      height: 38,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="2" y1="12" x2="22" y2="12"/>
+                      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                  </button>
                   {p.highlighted && <span style={{ background: 'rgba(245,158,11,0.9)', color: '#fff', padding: '5px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700 }}>DESTACADO</span>}
                 </div>
               </div>
-
               {/* Botones laterales — zIndex 25 para estar por encima del área de tap */}
               <div style={{ position: 'absolute', right: 14, bottom: 100, zIndex: 25, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24 }}>
                 <button onClick={() => requireLogin(() => toggleLike(String(p.id)), 'dar like')} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: 0 }}>
