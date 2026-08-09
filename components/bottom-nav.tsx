@@ -25,8 +25,7 @@ export function BottomNav() {
 
   const col = (id: string) => active === id ? '#fff' : 'rgba(255,255,255,0.45)'
 
-  if (pathname === "/") return null
-
+  if (pathname === "/" || pathname.startsWith("/renovar")) return null
   return (
     <>
       <AuthSheet visible={showSheet} onClose={() => setShowSheet(false)} action="contactar por WhatsApp" />
