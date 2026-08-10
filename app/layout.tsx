@@ -5,6 +5,7 @@ import { AuthProvider } from "@/lib/auth-context"
 import { ActivePropertyProvider } from "@/lib/active-property-context"
 import { ProtectedActionProvider } from "@/lib/protected-action-context"
 import { BottomNav } from "@/components/bottom-nav"
+import { RenewalNotificationModal } from "@/components/renewal-notification-modal"
 import "./globals.css"
 
 export const metadata: Metadata = {
@@ -42,6 +43,7 @@ export default function RootLayout({
         <AuthProvider>
           <ActivePropertyProvider>
             <ProtectedActionProvider>
+              <RenewalNotificationModal />
               <div style={{ width: "100%", position: "relative" }}>
                 <main>{children}</main>
                 <BottomNav />

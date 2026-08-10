@@ -26,6 +26,7 @@ export default function PublicarPage() {
   const totalSteps = 3
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [addressWarning, setAddressWarning] = useState("")
   const [video, setVideo] = useState<File | null>(null)
   const [videoPreview, setVideoPreview] = useState<string | null>(null)
   const [gpsLat, setGpsLat] = useState<number | null>(null)
@@ -46,6 +47,8 @@ export default function PublicarPage() {
   const [stars, setStars] = useState(0)
   const [hotelServices, setHotelServices] = useState<string[]>([])
   const [barrio, setBarrio] = useState("")
+  const [direccion, setDireccion] = useState("")
+  const [numero, setNumero] = useState("")
   const [ciudad, setCiudad] = useState("")
   const [provincia, setProvincia] = useState("")
   const [titulo, setTitulo] = useState("")
@@ -80,6 +83,19 @@ export default function PublicarPage() {
     }
   }, [])
 
+  useEffect(() => {
+    void validateAddressMatch()
+  }, [gpsOk, gpsLat, gpsLng, videoDesdeGaleria, direccion, numero, barrio, ciudad, provincia])
+
+  const handleContinue = () => {
+    if (!direccion || !numero || !barrio || !ciudad || !provincia) {
+      setAddressWarning("Completa la dirección para que la propiedad se ubique bien en el mapa.")
+      return
+    }
+    setAddressWarning("")
+    setStep(3)
+  }
+
   // AGREGADO 3 — Límite de segundos según plan
   const getLimiteSegundos = (plan: string): number => {
     switch (plan) {
@@ -88,6 +104,59 @@ export default function PublicarPage() {
       case "especializado": return 300
       case "senior":        return 300
       default:              return 60
+    }
+  }
+
+  const getDistanceMeters = (lat1: number, lng1: number, lat2: number, lng2: number): number => {
+    const toRad = (value: number) => (value * Math.PI) / 180
+    const dLat = toRad(lat2 - lat1)
+    const dLng = toRad(lng2 - lng1)
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+    return 6371000 * c
+  }
+
+  const validateAddressMatch = async () => {
+    setAddressWarning("")
+    if (!direccion || !numero || !barrio || !ciudad || !provincia) {
+      setAddressWarning("Completa la dirección para que la propiedad se ubique bien en el mapa.")
+      return
+    }
+    if (videoDesdeGaleria || !gpsOk || gpsLat == null || gpsLng == null) {
+      return
+    }
+
+    const direccionClean = sanitizeText(direccion, 100)
+    const numeroClean = sanitizeNumber(numero, 99999)
+    const barrioClean = sanitizeText(barrio, 80)
+    const ciudadClean = sanitizeText(ciudad, 80)
+    const provinciaClean = sanitizeText(provincia, 80)
+    const query = [direccionClean, numeroClean ? numeroClean.toString() : null, barrioClean, ciudadClean, provinciaClean]
+      .filter(Boolean)
+      .join(", ")
+
+    if (!query) return
+
+    try {
+      const geoRes = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query + ", Argentina")}`
+      )
+      const geoData = await geoRes.json()
+      if (!geoData || !geoData[0]) {
+        setAddressWarning("No pudimos verificar la dirección contra el GPS. Revisa que esté completa.")
+        return
+      }
+
+      const targetLat = parseFloat(geoData[0].lat)
+      const targetLng = parseFloat(geoData[0].lon)
+      if (gpsLat == null || gpsLng == null) return
+
+      const distance = getDistanceMeters(gpsLat, gpsLng, targetLat, targetLng)
+      if (distance > 200) {
+        setAddressWarning(`La dirección ingresada parece no coincidir con la ubicación GPS. Diferencia aproximada: ${Math.round(distance)} metros.`)
+      }
+    } catch {
+      setAddressWarning("No pudimos verificar la dirección contra el GPS. Revisa tu conexión e inténtalo de nuevo.")
     }
   }
 
@@ -126,8 +195,10 @@ export default function PublicarPage() {
     setError("")
     try {
       const tituloClean = sanitizeText(titulo, 100)
-      const descripcionClean = sanitizeText(descripcion, 150)
+      const descripcionClean = sanitizeText(descripcion, 1000)
       const barrioClean = sanitizeText(barrio, 80)
+      const direccionClean = sanitizeText(direccion, 100)
+      const numeroClean = numero ? sanitizeNumber(numero, 99999) : null
       const ciudadClean = sanitizeText(ciudad, 80)
       const whatsappClean = sanitizePhone(whatsapp)
       const precioClean = sanitizeNumber(precio, 99999999)
@@ -139,6 +210,8 @@ export default function PublicarPage() {
 
       if (!tituloClean) throw new Error("El título no puede estar vacío")
       if (!ciudadClean) throw new Error("La ciudad no puede estar vacía")
+      if (!direccionClean) throw new Error("La dirección no puede estar vacía")
+      if (!numeroClean) throw new Error("El número de dirección no puede estar vacío")
       if (whatsappClean && whatsappClean.length < 8) throw new Error("El número de WhatsApp no es válido")
 
       const { data: sessionData } = await supabase.auth.getSession()
@@ -170,7 +243,9 @@ export default function PublicarPage() {
       let finalLng = gpsLng
       if (!gpsOk) {
         try {
-          const direccion = [barrioClean, ciudadClean, provincia].filter(Boolean).join(", ")
+          const direccion = [direccionClean, numeroClean ? numeroClean.toString() : null, barrioClean, ciudadClean, provincia]
+            .filter(Boolean)
+            .join(", ")
           const geoRes = await fetch(
             `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(direccion + ", Argentina")}`
           )
@@ -184,6 +259,9 @@ export default function PublicarPage() {
         }
       }
 
+      const direccionCompleta = [direccionClean, numeroClean ? numeroClean.toString() : null, barrioClean, ciudadClean]
+        .filter(Boolean)
+        .join(", ")
       const { error: insertError } = await supabase.from("properties").insert({        user_id: uid,
         owner_name: user?.name || "Propietario",
         owner_avatar: user?.avatar_url || null,
@@ -202,7 +280,7 @@ export default function PublicarPage() {
         neighborhood: barrioClean,
         city: ciudadClean,
         province: provincia || null,
-        location: `${barrioClean}, ${ciudadClean}`,
+        location: direccionCompleta || null,
         title: tituloClean,
         description: descripcionClean,
         whatsapp_number: whatsappClean,
@@ -419,7 +497,7 @@ export default function PublicarPage() {
 
                 <p style={sectionLabel}>Tipo de propiedad</p>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
-                  {["Departamento", "Casa", "PH", "Local", "Oficina", "Terreno", "Loft", "Monoambiente", "Cabana", "Duplex", "Cochera", "Galpon"].map(t => (
+                  {["Departamento", "Casa", "Edificio"].map(t => (
                     <button key={t} onClick={() => setTipoPropiedad(t)} style={chip(tipoPropiedad === t)}>{t}</button>
                   ))}
                 </div>
@@ -429,16 +507,23 @@ export default function PublicarPage() {
             <p style={sectionLabel}>Ubicacion</p>
             <input value={provincia} onChange={e => setProvincia(e.target.value)} onBlur={e => setProvincia(sanitizeText(e.target.value, 80))} placeholder="Provincia" maxLength={80} style={{ ...inp, marginBottom: 10 }} />
             <input value={ciudad} onChange={e => setCiudad(e.target.value)} onBlur={e => setCiudad(sanitizeText(e.target.value, 80))} placeholder="Ciudad" maxLength={80} style={{ ...inp, marginBottom: 10 }} />
-            <input value={barrio} onChange={e => setBarrio(e.target.value)} onBlur={e => setBarrio(sanitizeText(e.target.value, 80))} placeholder="Barrio" maxLength={80} style={{ ...inp, marginBottom: 16 }} />
+            <input value={barrio} onChange={e => setBarrio(e.target.value)} onBlur={e => setBarrio(sanitizeText(e.target.value, 80))} placeholder="Barrio" maxLength={80} style={{ ...inp, marginBottom: 10 }} />
+            <input value={direccion} onChange={e => setDireccion(e.target.value)} onBlur={e => setDireccion(sanitizeText(e.target.value, 100))} placeholder="Dirección" maxLength={100} style={{ ...inp, marginBottom: 10 }} />
+            <input value={numero} onChange={e => setNumero(e.target.value.replace(/[^0-9]/g, ""))} placeholder="Número" maxLength={10} type="number" inputMode="numeric" style={{ ...inp, marginBottom: 16 }} />
+            {addressWarning && (
+              <div style={{ background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.25)", borderRadius: 12, padding: "12px 14px", marginBottom: 16 }}>
+                <p style={{ margin: 0, color: "#F59E0B", fontSize: 13, fontWeight: 600 }}>{addressWarning}</p>
+              </div>
+            )}
 
             <p style={sectionLabel}>Descripcion corta</p>
-            <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} onBlur={e => setDescripcion(sanitizeText(e.target.value, 150))} placeholder="Describe brevemente la propiedad..." maxLength={150} style={{ ...inp, height: 80, resize: "none", marginBottom: 4 }} />
-            <p style={{ textAlign: "right", color: "rgba(255,255,255,0.3)", fontSize: 12, margin: "0 0 16px" }}>{descripcion.length}/150</p>
+            <textarea value={descripcion} onChange={e => setDescripcion(e.target.value)} onBlur={e => setDescripcion(sanitizeText(e.target.value, 1000))} placeholder="Describe brevemente la propiedad..." maxLength={1000} style={{ ...inp, height: 80, resize: "none", marginBottom: 4 }} />
+            <p style={{ textAlign: "right", color: "rgba(255,255,255,0.3)", fontSize: 12, margin: "0 0 16px" }}>{descripcion.length}/1000</p>
 
             <p style={sectionLabel}>WhatsApp de contacto</p>
             <input value={whatsapp} onChange={e => setWhatsapp(sanitizePhone(e.target.value))} placeholder="Ej: 5491112345678" type="tel" maxLength={20} style={{ ...inp, marginBottom: 20 }} />
 
-            <button onClick={() => setStep(3)} style={btn}>Continuar</button>
+            <button onClick={handleContinue} style={btn}>Continuar</button>
           </div>
         )}
 
@@ -455,7 +540,8 @@ export default function PublicarPage() {
                 ["Operacion", operacion],
                 ["Tipo", (operacion === "hotel" || operacion === "camping") ? (hotelName || operacion) : (tipoPropiedad || "No especificado")],
                 ...((operacion !== "hotel" && operacion !== "camping") ? [["Precio", precio ? `${moneda} ${parseInt(precio).toLocaleString()}` : "No especificado"]] : []),
-                ["Ubicacion", [barrio, ciudad].filter(Boolean).join(", ") || "No especificada"],
+                ["Ubicacion", [direccion, numero ? numero : null, barrio, ciudad].filter(Boolean).join(", ") || "No especificada"],
+                ["Tipo", (operacion === "hotel" || operacion === "camping") ? (hotelName || operacion) : (tipoPropiedad || "No especificado")],
                 ["GPS", gpsOk ? "Verificado" : "No verificado"],
               ].map(([label, value], i, arr) => (
                 <div key={label} style={{ display: "flex", justifyContent: "space-between", marginBottom: i < arr.length - 1 ? 10 : 0 }}>

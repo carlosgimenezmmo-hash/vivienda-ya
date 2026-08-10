@@ -3,6 +3,10 @@
     {
       "path": "/api/limpiar-reservas",
       "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/renovar-propiedades-job",
+      "schedule": "0 0 * * *"
     }
   ]
 }

@@ -11,6 +11,9 @@ const params = useParams()
   const id = params?.id
   const [property, setProperty] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [nearbyAmenities, setNearbyAmenities] = useState<{ label: string; count: number; names: string[] }[]>([])
+  const [amenitiesLoading, setAmenitiesLoading] = useState(false)
+  const [amenitiesError, setAmenitiesError] = useState("")
 
   useEffect(() => {
     if (id) fetchProperty()
@@ -22,6 +25,145 @@ const params = useParams()
     setLoading(false)
     if (data) {
       supabase.from("properties").update({ views: (data.views || 0) + 1 }).eq("id", id)
+    }
+    if (data?.lat && data?.lng) {
+      void fetchNearbyAmenities(data.lat, data.lng)
+    }
+  }
+
+  const fetchNearbyAmenities = async (lat: number, lng: number) => {
+    setAmenitiesLoading(true)
+    setAmenitiesError("")
+    setNearbyAmenities([])
+    try {
+      const query = `
+[out:json][timeout:25];
+(
+  node(around:1200,${lat},${lng})[amenity];
+  way(around:1200,${lat},${lng})[amenity];
+  relation(around:1200,${lat},${lng})[amenity];
+  node(around:1200,${lat},${lng})[shop];
+  way(around:1200,${lat},${lng})[shop];
+  relation(around:1200,${lat},${lng})[shop];
+  node(around:1200,${lat},${lng})[tourism];
+  way(around:1200,${lat},${lng})[tourism];
+  relation(around:1200,${lat},${lng})[tourism];
+  node(around:1200,${lat},${lng})[leisure];
+  way(around:1200,${lat},${lng})[leisure];
+  relation(around:1200,${lat},${lng})[leisure];
+);
+out center;
+      `
+      const res = await fetch(`https://overpass-api.de/api/interpreter`, {
+        method: "POST",
+        body: query,
+      })
+      const data = await res.json()
+      const categoryMap: Record<string, string> = {
+        school: "Colegio / Escuela",
+        hospital: "Hospital",
+        clinic: "Clínica",
+        university: "Universidad",
+        college: "Facultad",
+        kindergarten: "Jardín de infantes",
+        pharmacy: "Farmacia",
+        townhall: "Centro cívico",
+        post_office: "Correo",
+        library: "Biblioteca",
+        police: "Comisaría",
+        fire_station: "Bomberos",
+        bank: "Banco",
+        bus_station: "Estación de buses",
+        taxi: "Parada de taxi",
+        place_of_worship: "Templo",
+        supermarket: "Supermercado",
+        mall: "Centro comercial",
+        department_store: "Local comercial",
+        bakery: "Panadería",
+        convenience: "Maxikiosco",
+        clothes: "Indumentaria",
+        electronics: "Electrónica",
+        books: "Librería",
+        furniture: "Muebles",
+        toys: "Juguetería",
+        gift: "Regalería",
+        sports: "Deportes",
+        optical: "Óptica",
+        florist: "Floristería",
+        beauty: "Belleza",
+        jewelry: "Joyería",
+        museum: "Museo",
+        theatre: "Teatro",
+        attraction: "Atracción",
+        viewpoint: "Mirador",
+        hotel: "Hotel",
+        information: "Información turística",
+        gallery: "Galería",
+        zoo: "Zoológico",
+        theme_park: "Parque temático",
+        park: "Parque",
+        playground: "Plaza",
+        sports_centre: "Centro deportivo",
+        stadium: "Estadio",
+        swimming_pool: "Pileta",
+        water_park: "Parque acuático",
+        theater: "Teatro",
+        cinema: "Cine",
+        arts_centre: "Centro cultural",
+        marketplace: "Mercado",
+        daycare: "Guardería",
+        medical_center: "Centro de salud",
+      }
+      const formatLabel = (tag: string) => {
+        if (categoryMap[tag]) return categoryMap[tag]
+        return tag.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())
+      }
+      const collector: Record<string, { label: string; names: Set<string> }> = {}
+      ;(data.elements || []).forEach((element: any) => {
+        const tags = element.tags || {}
+        const key = tags.amenity || tags.shop || tags.tourism || tags.leisure
+        if (!key) return
+        const label = formatLabel(key)
+        const name = tags.name || label
+        if (!collector[label]) collector[label] = { label, names: new Set() }
+        collector[label].names.add(name)
+      })
+      const orderedLabels = [
+        "Colegio / Escuela",
+        "Jardín de infantes",
+        "Hospital",
+        "Clínica",
+        "Centro de salud",
+        "Farmacia",
+        "Supermercado",
+        "Centro comercial",
+        "Mercado",
+        "Comisaría",
+        "Bomberos",
+        "Banco",
+        "Biblioteca",
+        "Teatro",
+        "Museo",
+        "Cine",
+        "Hotel",
+        "Galería",
+        "Parque",
+        "Plaza",
+        "Centro deportivo",
+        "Pileta",
+        "Óptica",
+      ]
+      const sorted = Object.values(collector).sort((a, b) => {
+        const aIndex = orderedLabels.indexOf(a.label)
+        const bIndex = orderedLabels.indexOf(b.label)
+        if (aIndex !== -1 || bIndex !== -1) return (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex)
+        return b.names.size - a.names.size
+      })
+      setNearbyAmenities(sorted.map(item => ({ label: item.label, count: item.names.size, names: Array.from(item.names).slice(0, 10) })))
+    } catch (err) {
+      setAmenitiesError("No se pudo cargar servicios cercanos")
+    } finally {
+      setAmenitiesLoading(false)
     }
   }
 
@@ -131,6 +273,28 @@ const params = useParams()
                 </span>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* AMENITIES CERCANOS */}
+        {(nearbyAmenities.length > 0 || amenitiesLoading || amenitiesError) && (
+          <div style={{ marginBottom: 20, borderRadius: 14, background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", padding: 16 }}>
+            <p style={{ margin: "0 0 12px", fontSize: 12, color: "rgba(255,255,255,0.4)", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>Servicios cercanos</p>
+            {amenitiesLoading ? (
+              <p style={{ margin: 0, color: "rgba(255,255,255,0.6)", fontSize: 13 }}>Buscando colegios, hospitales y centros...</p>
+            ) : amenitiesError ? (
+              <p style={{ margin: 0, color: "#F59E0B", fontSize: 13 }}>{amenitiesError}</p>
+            ) : (
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 10 }}>
+                {nearbyAmenities.map(item => (
+                  <div key={item.label} style={{ background: "rgba(255,255,255,0.06)", borderRadius: 12, padding: 12 }}>
+                    <p style={{ margin: "0 0 4px", fontSize: 14, fontWeight: 700 }}>{item.label}</p>
+                    <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.5)" }}>{item.count} lugar{item.count > 1 ? "es" : ""}</p>
+                    <p style={{ margin: "8px 0 0", fontSize: 11, color: "rgba(255,255,255,0.4)" }}>{item.names.join(", ")}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
