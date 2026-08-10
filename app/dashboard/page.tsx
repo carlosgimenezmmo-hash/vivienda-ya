@@ -20,6 +20,7 @@ interface Property {
   highlighted: boolean
   created_at: string
   video_url: string
+  listing_status?: string
 }
 
 const PLAN_NIVEL: Record<string, number> = {
@@ -36,9 +37,9 @@ export default function DashboardPage() {
   const [properties, setProperties] = useState<Property[]>([])
   const [loading, setLoading] = useState(true)
   const [tab, setTab] = useState<"resumen" | "propiedades" | "zonas" | "reservas">("resumen")
-const [reservas, setReservas] = useState<any[]>([])
-  const [confirmarId, setConfirmarId] = useState<number | null>(null)
-  const [deleting, setDeleting] = useState<number | null>(null)
+  const [reservas, setReservas] = useState<any[]>([])
+  const [processingId, setProcessingId] = useState<number | null>(null)
+  const [processingAction, setProcessingAction] = useState<string | null>(null)
 
   const nivel = PLAN_NIVEL[plan] ?? 0
   const puedeVerContactos = nivel >= 1
@@ -77,19 +78,48 @@ useEffect(() => {
     }
   }
 
-  const handleDelete = async (id: number) => {
-    setConfirmarId(null)
-    setDeleting(id)
-    const { error } = await supabase.from("properties").delete().eq("id", id)
-    if (!error) setProperties(prev => prev.filter(p => p.id !== id))
-    setDeleting(null)
+  const handlePropertyAction = async (id: number, action: "renovar" | "pausar" | "finalizar") => {
+    setProcessingId(id)
+    setProcessingAction(action)
+    try {
+      const { data: sessionData } = await supabase.auth.getSession()
+      const token = sessionData?.session?.access_token
+      if (!token) throw new Error("No autorizado")
+
+      const res = await fetch("/api/cambiar-estado-propiedad", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({ propertyId: id, action }),
+      })
+
+      if (!res.ok) {
+        const data = await res.json()
+        throw new Error(data.error || "Error al procesar")
+      }
+
+      const updatedProperty = await res.json()
+      setProperties(prev => prev.map(p => 
+        p.id === id ? { ...p, listing_status: updatedProperty.status } : p
+      ))
+    } catch (err: any) {
+      console.error("Error:", err)
+      alert(err.message || "Error al procesar")
+    } finally {
+      setProcessingId(null)
+      setProcessingAction(null)
+    }
   }
 
   const totalVistas = properties.reduce((a, p) => a + (p.views || 0), 0)
   const totalLikes = properties.reduce((a, p) => a + (p.likes || 0), 0)
   const totalContactos = properties.reduce((a, p) => a + (p.contacts || 0), 0)
   const totalGuardados = properties.reduce((a, p) => a + (p.saves || 0), 0)
-  const propActivas = properties.length
+  const propActivas = properties.filter(p => p.listing_status === "activa" || !p.listing_status).length
+  const propPausadas = properties.filter(p => p.listing_status === "pausada").length
+  const propFinalizadas = properties.filter(p => p.listing_status === "finalizada").length
 
   const mejorPropiedad = properties.reduce((best, p) =>
     (p.views || 0) > (best?.views || 0) ? p : best, properties[0])
@@ -197,7 +227,10 @@ useEffect(() => {
           <div style={{ flex: 1 }}>
             <h1 style={{ fontSize: 24, fontWeight: 900, margin: 0 }}>Estadisticas</h1>
             <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", margin: "2px 0 0" }}>
-              {propActivas} {propActivas === 1 ? "propiedad activa" : "propiedades activas"}
+              {propActivas} {propActivas === 1 ? "activa" : "activas"} 
+              {propPausadas > 0 && ` · ${propPausadas} pausada${propPausadas > 1 ? "s" : ""}`}
+              {propFinalizadas > 0 && ` · ${propFinalizadas} finalizada${propFinalizadas > 1 ? "s" : ""}`}
+              {properties.length > 0 && ` (Total: ${properties.length})`}
             </p>
           </div>
 
@@ -363,6 +396,12 @@ useEffect(() => {
                           {p.verified && (
                             <span style={{ background: "rgba(16,185,129,0.2)", border: "1px solid rgba(16,185,129,0.4)", borderRadius: 20, padding: "2px 8px", fontSize: 10, fontWeight: 700, color: "#10B981" }}>GPS</span>
                           )}
+                          {p.listing_status === "pausada" && (
+                            <span style={{ background: "rgba(168,85,247,0.2)", border: "1px solid rgba(168,85,247,0.4)", borderRadius: 20, padding: "2px 8px", fontSize: 10, fontWeight: 700, color: "#A855F7" }}>PAUSADA</span>
+                          )}
+                          {p.listing_status === "finalizada" && (
+                            <span style={{ background: "rgba(107,114,128,0.2)", border: "1px solid rgba(107,114,128,0.4)", borderRadius: 20, padding: "2px 8px", fontSize: 10, fontWeight: 700, color: "#6B7280" }}>FINALIZADA</span>
+                          )}
                         </div>
                         <p style={{ margin: 0, fontSize: 12, color: "rgba(255,255,255,0.4)" }}>
                           {p.operation_type?.toUpperCase()} · {p.property_type} · USD {Number(p.price).toLocaleString()}
@@ -381,20 +420,58 @@ useEffect(() => {
                           </div>
                         ))}
                       </div>
-                      <button
-                        onClick={() => setConfirmarId(p.id)}
-                        disabled={deleting === p.id}
-                        style={{
-                          padding: "8px 16px", borderRadius: 10, flexShrink: 0,
-                          border: "1px solid rgba(239,68,68,0.3)",
-                          background: "rgba(239,68,68,0.1)",
-                          color: "#FCA5A5", fontSize: 13, fontWeight: 600,
-                          cursor: "pointer",
-                          fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
-                        }}
-                      >
-                        {deleting === p.id ? "Eliminando..." : "Eliminar"}
-                      </button>
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", flexShrink: 0 }}>
+                        <button
+                          onClick={() => handlePropertyAction(p.id, "renovar")}
+                          disabled={processingId === p.id}
+                          title="Renovar la propiedad por otros 7 días"
+                          style={{
+                            padding: "8px 12px", borderRadius: 8, flexShrink: 0,
+                            border: "1px solid rgba(34,197,94,0.3)",
+                            background: processingId === p.id && processingAction === "renovar" ? "rgba(34,197,94,0.2)" : "rgba(34,197,94,0.1)",
+                            color: "#86EFAC", fontSize: 12, fontWeight: 600,
+                            cursor: processingId === p.id ? "not-allowed" : "pointer",
+                            fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+                            opacity: processingId === p.id ? 0.7 : 1,
+                          }}
+                        >
+                          {processingId === p.id && processingAction === "renovar" ? "..." : "↻ Renovar"}
+                        </button>
+
+                        <button
+                          onClick={() => handlePropertyAction(p.id, "pausar")}
+                          disabled={processingId === p.id}
+                          title="Pausar la propiedad (no se elimina, solo desaparece del feed)"
+                          style={{
+                            padding: "8px 12px", borderRadius: 8, flexShrink: 0,
+                            border: "1px solid rgba(168,85,247,0.3)",
+                            background: processingId === p.id && processingAction === "pausar" ? "rgba(168,85,247,0.2)" : "rgba(168,85,247,0.1)",
+                            color: "#D8B4FE", fontSize: 12, fontWeight: 600,
+                            cursor: processingId === p.id ? "not-allowed" : "pointer",
+                            fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+                            opacity: processingId === p.id ? 0.7 : 1,
+                          }}
+                        >
+                          {processingId === p.id && processingAction === "pausar" ? "..." : "⏸ Pausar"}
+                        </button>
+
+                        <button
+                          onClick={() => handlePropertyAction(p.id, "finalizar")}
+                          disabled={processingId === p.id}
+                          title="Marcar como vendida o alquilada"
+                          style={{
+                            padding: "8px 12px", borderRadius: 8, flexShrink: 0,
+                            border: "1px solid rgba(239,68,68,0.3)",
+                            background: processingId === p.id && processingAction === "finalizar" ? "rgba(239,68,68,0.2)" : "rgba(239,68,68,0.1)",
+                            color: "#FCA5A5", fontSize: 12, fontWeight: 600,
+                            cursor: processingId === p.id ? "not-allowed" : "pointer",
+                            fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+                            opacity: processingId === p.id ? 0.7 : 1,
+                          }}
+                        >
+                          {processingId === p.id && processingAction === "finalizar" ? "..." : "✓ Finalizar"}
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>

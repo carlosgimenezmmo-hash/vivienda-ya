@@ -10,6 +10,12 @@ ALTER TABLE properties ADD COLUMN IF NOT EXISTS last_confirmed_at TIMESTAMP;
 -- (Si la columna no existe, crear con valor por defecto)
 ALTER TABLE properties ADD COLUMN IF NOT EXISTS listing_status TEXT DEFAULT 'activa';
 
+-- Los valores posibles de listing_status son:
+-- 'activa' - propiedad publicada normalmente
+-- 'pausada' - propiedad pausada (no aparece en feed, se mantiene)
+-- 'finalizada' - propiedad vendida/alquilada
+-- 'inactiva_por_renovacion' - propiedad baja del feed por no renovar en 24h
+
 -- 3. Crear índices para optimizar queries de renovación
 CREATE INDEX IF NOT EXISTS idx_properties_renewal 
 ON properties(listing_status, renewal_notified_at, last_confirmed_at);
