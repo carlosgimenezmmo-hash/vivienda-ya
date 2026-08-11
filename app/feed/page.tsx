@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/lib/auth-context';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useActiveProperty } from '@/lib/active-property-context';
 import { AuthSheet } from '@/components/auth-sheet';
 
@@ -26,23 +26,92 @@ export default function ViviendaYaFull() {
   const videoRefs = useRef<HTMLVideoElement[]>([]);
   const { isLoggedIn, user, likedProperties, savedProperties, toggleLike, toggleSave } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const cityFilter = searchParams.get("city")?.trim();
+  const provinceFilter = searchParams.get("province")?.trim();
+  const [geoCity, setGeoCity] = useState<string>("");
+  const [geoProvince, setGeoProvince] = useState<string>("");
+  const [locationLoading, setLocationLoading] = useState(true);
+  const [locationError, setLocationError] = useState("");
+
+  const currentCityFilter = cityFilter || geoCity;
+  const currentProvinceFilter = provinceFilter || geoProvince;
+
   useEffect(() => {
     const done = localStorage.getItem("onboarding_done")
     if (!done) {
       router.push("/bienvenida")
     }
   }, [])
+
+  useEffect(() => {
+    if (cityFilter || provinceFilter) {
+      setLocationLoading(false);
+      return;
+    }
+
+    if (!navigator.geolocation) {
+      setLocationError('La geolocalización no está disponible en este navegador.');
+      setLocationLoading(false);
+      return;
+    }
+
+    const reverseGeocode = async (latitude: number, longitude: number) => {
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&addressdetails=1&accept-language=es&lat=${latitude}&lon=${longitude}`
+        );
+        const data = await response.json();
+        const address = data.address || {};
+        const detectedCity = address.city || address.town || address.village || address.county || address.state_district || address.state;
+        const detectedProvince = address.state || address.region || address.county || '';
+
+        if (detectedCity) {
+          setGeoCity(detectedCity);
+        }
+        if (detectedProvince) {
+          setGeoProvince(detectedProvince);
+        }
+      } catch (error) {
+        console.error('Error al detectar la ciudad:', error);
+        setLocationError('No pudimos detectar tu ciudad. Mostrando propiedades generales.');
+      } finally {
+        setLocationLoading(false);
+      }
+    };
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        reverseGeocode(position.coords.latitude, position.coords.longitude);
+      },
+      (error) => {
+        console.error('Error GPS:', error);
+        setLocationError('No pudimos obtener tu ubicación. Activa el GPS o revisa los permisos.');
+        setLocationLoading(false);
+      },
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
+    );
+  }, [cityFilter, provinceFilter]);
+
   const { setActiveProperty } = useActiveProperty();
 
   useEffect(() => {
     async function fetchProperties() {
       try {
-        const { data, error } = await supabase
+        let query = supabase
           .from('properties')
           .select('*')
           .not('video_url', 'is', null)
-          .eq('status', 'approved')
-          .order('created_at', { ascending: false });
+          .eq('status', 'approved');
+
+        if (currentCityFilter) {
+          query = query.ilike('city', `%${currentCityFilter}%`);
+        }
+        if (currentProvinceFilter) {
+          query = query.ilike('province', `%${currentProvinceFilter}%`);
+        }
+
+        const { data, error } = await query.order('created_at', { ascending: false });
         if (error) throw error;
         setProperties(data || []);
       } catch (err) {
@@ -51,8 +120,11 @@ export default function ViviendaYaFull() {
         setLoading(false);
       }
     }
+    if (!cityFilter && !provinceFilter && locationLoading) {
+      return;
+    }
     fetchProperties();
-  }, []);
+  }, [cityFilter, provinceFilter, currentCityFilter, currentProvinceFilter, locationLoading]);
 
   useEffect(() => {
     async function fetchChannels() {
@@ -216,6 +288,21 @@ supabase.from("properties").update({
 
   return (
     <div style={{ backgroundColor: '#000', height: '100dvh', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif', overflow: 'hidden' }}>
+      <div style={{ position: 'absolute', top: 18, left: 18, zIndex: 30 }}>
+        {currentCityFilter ? (
+          <div style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: 14, padding: '8px 14px', color: '#fff', fontSize: 13, fontWeight: 600, backdropFilter: 'blur(10px)' }}>
+            Mostrando propiedades en: {currentCityFilter}{currentProvinceFilter ? `, ${currentProvinceFilter}` : ''}
+          </div>
+        ) : locationLoading ? (
+          <div style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: 14, padding: '8px 14px', color: '#fff', fontSize: 13, fontWeight: 600, backdropFilter: 'blur(10px)' }}>
+            Detectando tu ciudad...
+          </div>
+        ) : locationError ? (
+          <div style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: 14, padding: '8px 14px', color: '#fff', fontSize: 13, fontWeight: 600, backdropFilter: 'blur(10px)' }}>
+            {locationError}
+          </div>
+        ) : null}
+      </div>
       <div style={{ height: '100dvh', overflowY: 'scroll', scrollSnapType: 'y mandatory' }}>
         {properties.length === 0 ? (
           <div style={{ height: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
@@ -516,8 +603,8 @@ supabase.from("properties").update({
           🔗 Compartir
         </button>
       </div>
-{/* DISPONIBILIDAD - solo para temporario y hotel */}
-      {(p.operation_type === "temporario" || p.operation_type === "hotel") && (
+{/* DISPONIBILIDAD - solo para temporario, hotel y camping */}
+      {(p.operation_type === "temporario" || p.operation_type === "hotel" || p.operation_type === "camping") && (
         <button onClick={() => router.push(p.operation_type === "hotel" ? `/hotel-reservar?id=${p.id}` : `/reservar?id=${p.id}`)} style={{
           width: "100%", padding: "16px", borderRadius: 14, border: "none",
           background: "#F97316", color: "#fff", fontSize: 16, fontWeight: 700,
@@ -525,7 +612,7 @@ supabase.from("properties").update({
           fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
           marginBottom: 10,
         }}>
-          {p.operation_type === "hotel" ? "🏨 Ver habitaciones y reservar" : "📅 Ver disponibilidad y reservar"}
+          {p.operation_type === "hotel" ? "🏨 Ver habitaciones y reservar" : p.operation_type === "camping" ? "🏕️ Ver disponibilidad y reservar" : "📅 Ver disponibilidad y reservar"}
         </button>
       )}
       

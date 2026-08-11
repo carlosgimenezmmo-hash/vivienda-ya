@@ -318,9 +318,9 @@ out center;
             🏨 Ver habitaciones y reservar
           </button>
         )}
-        {property.operation_type === "temporario" && (
+        {(property.operation_type === "temporario" || property.operation_type === "camping") && (
           <button onClick={() => isLoggedIn ? router.push(`/reservar?id=${property.id}`) : router.push(`/registro?returnTo=/propiedad/${id}`)} style={{ width: "100%", padding: "16px", borderRadius: 14, border: "none", background: "#F97316", color: "#fff", fontSize: 16, fontWeight: 700, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
-            📅 Ver disponibilidad y reservar
+            {property.operation_type === "camping" ? "🏕️ Ver disponibilidad y reservar" : "📅 Ver disponibilidad y reservar"}
           </button>
         )}
         {property.whatsapp_number && (

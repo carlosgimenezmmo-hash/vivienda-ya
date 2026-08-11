@@ -42,7 +42,7 @@ export default function DisponibilidadPage() {
     const { data: sessionData } = await supabase.auth.getSession()
     const uid = sessionData?.session?.user?.id
     if (!uid) return
-    const { data } = await supabase.from("properties").select("*").eq("user_id", uid).eq("operation_type", "temporario")
+    const { data } = await supabase.from("properties").select("*").eq("user_id", uid).in("operation_type", ["temporario", "camping"])
     setProperties(data || [])
   }
 

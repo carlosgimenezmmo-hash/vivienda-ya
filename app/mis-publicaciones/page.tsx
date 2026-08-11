@@ -147,7 +147,7 @@ const handleDelete = async (id: number) => {
                       🏨 Gestionar habitaciones
                     </button>
                   )}
-                  {(p.operation_type === "temporario" || p.operation_type === "hotel") && p.status === "approved" && (
+                  {(p.operation_type === "temporario" || p.operation_type === "hotel" || p.operation_type === "camping") && p.status === "approved" && (
                     <button
                       onClick={() => router.push(`/disponibilidad?id=${p.id}`)}
                       style={{ width: "100%", padding: "10px", borderRadius: 10, border: "1px solid rgba(37,99,235,0.3)", background: "rgba(37,99,235,0.1)", color: "#60A5FA", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif" }}>
