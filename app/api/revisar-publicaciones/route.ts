@@ -5,12 +5,18 @@ import { Resend } from "resend"
 const resend = new Resend(process.env.RESEND_API_KEY!)
 const SITE_URL = "https://vivienda-ya.vercel.app"
 
-export async function GET() {
+export async function GET(req: Request) {
+  // Verificar token de seguridad para que nadie más pueda disparar este endpoint
+  const authHeader = req.headers.get("authorization")
+  const cronSecret = process.env.CRON_SECRET
+  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
-
   const ahora = new Date()
   const hace7dias = new Date(ahora.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
   const hace24hs = new Date(ahora.getTime() - 24 * 60 * 60 * 1000).toISOString()
@@ -49,15 +55,26 @@ export async function GET() {
 
     if (errorNotificar) throw errorNotificar
 
-    for (const prop of aNotificar || []) {
+   for (const prop of aNotificar || []) {
       if (!prop.user_id) continue
 
       const { data: userData } = await supabase.auth.admin.getUserById(prop.user_id)
       const email = userData?.user?.email
       if (!email) continue
 
-      const link = `${SITE_URL}/renovar/${prop.renewal_token}`
+      // Si por algún motivo no tiene token generado, lo creamos ahora como respaldo
+      let token = prop.renewal_token
+      if (!token) {
+        const { data: updated } = await supabase
+          .from("properties")
+          .update({ renewal_token: crypto.randomUUID() })
+          .eq("id", prop.id)
+          .select("renewal_token")
+          .single()
+        token = updated?.renewal_token
+      }
 
+      const link = `${SITE_URL}/renovar/${token}`
       await resend.emails.send({
         from: "ViviendaYa <notificaciones@viviendaya.com.ar>",
         to: email,
