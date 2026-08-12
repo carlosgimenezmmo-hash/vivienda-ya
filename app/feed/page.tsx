@@ -107,29 +107,80 @@ export default function ViviendaYaFull() {
   }, [cityFilter, provinceFilter]);
 
   const { setActiveProperty } = useActiveProperty();
+  const [feedMessage, setFeedMessage] = useState("");
 
   useEffect(() => {
     async function fetchProperties() {
       try {
-        let query = supabase
+        setFeedMessage("");
+        const baseQuery = supabase
           .from('properties')
           .select('*')
           .not('video_url', 'is', null)
           .eq('status', 'approved')
           .in('operation_type', ['temporario', 'hotel', 'camping']);
 
-        if (currentCityFilter) {
-          query = query.ilike('city', `%${currentCityFilter}%`);
-        }
-        if (currentProvinceFilter) {
-          query = query.ilike('province', `%${currentProvinceFilter}%`);
+        const cityQuery = currentCityFilter
+          ? supabase
+              .from('properties')
+              .select('*')
+              .not('video_url', 'is', null)
+              .eq('status', 'approved')
+              .in('operation_type', ['temporario', 'hotel', 'camping'])
+              .ilike('city', `%${currentCityFilter}%`)
+          : baseQuery;
+
+        const cityProvinceQuery = currentProvinceFilter
+          ? supabase
+              .from('properties')
+              .select('*')
+              .not('video_url', 'is', null)
+              .eq('status', 'approved')
+              .in('operation_type', ['temporario', 'hotel', 'camping'])
+              .ilike('city', `%${currentCityFilter}%`)
+              .ilike('province', `%${currentProvinceFilter}%`)
+          : cityQuery;
+
+        const { data, error } = await cityProvinceQuery.order('created_at', { ascending: false });
+        if (error) throw error;
+
+        if ((data?.length || 0) > 0) {
+          setProperties(data);
+          return;
         }
 
-        const { data, error } = await query.order('created_at', { ascending: false });
-        if (error) throw error;
+        if (currentCityFilter && currentProvinceFilter) {
+          const { data: provinceData, error: provinceError } = await supabase
+            .from('properties')
+            .select('*')
+            .not('video_url', 'is', null)
+            .eq('status', 'approved')
+            .in('operation_type', ['temporario', 'hotel', 'camping'])
+            .ilike('province', `%${currentProvinceFilter}%`)
+            .order('created_at', { ascending: false });
+
+          if (provinceError) throw provinceError;
+          if ((provinceData?.length || 0) > 0) {
+            setFeedMessage(`No hay propiedades en ${currentCityFilter}. Mostrando ${currentProvinceFilter}.`);
+            setProperties(provinceData);
+            return;
+          }
+        }
+
+        if (currentCityFilter) {
+          const { data: allData, error: allError } = await baseQuery.order('created_at', { ascending: false });
+          if (allError) throw allError;
+          if ((allData?.length || 0) > 0) {
+            setFeedMessage(`No hay propiedades en ${currentCityFilter}. Mostrando todas las propiedades disponibles.`);
+            setProperties(allData);
+            return;
+          }
+        }
+
         setProperties(data || []);
       } catch (err) {
         console.error('Error:', err);
+        setFeedMessage('No pudimos cargar propiedades en este momento.');
       } finally {
         setLoading(false);
       }
@@ -302,10 +353,11 @@ supabase.from("properties").update({
 
   return (
     <div style={{ backgroundColor: '#000', height: '100dvh', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif', overflow: 'hidden' }}>
-      <div style={{ position: 'absolute', top: 18, left: 18, zIndex: 30 }}>
+      <div style={{ position: 'absolute', top: 18, left: 18, zIndex: 30, maxWidth: 'calc(100% - 36px)' }}>
         {currentCityFilter ? (
           <div style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: 14, padding: '8px 14px', color: '#fff', fontSize: 13, fontWeight: 600, backdropFilter: 'blur(10px)' }}>
             Mostrando propiedades en: {currentCityFilter}{currentProvinceFilter ? `, ${currentProvinceFilter}` : ''}
+            {feedMessage ? <div style={{ marginTop: 6, fontSize: 12, color: '#D1D5DB', fontWeight: 500 }}>{feedMessage}</div> : null}
           </div>
         ) : locationLoading ? (
           <div style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.14)', borderRadius: 14, padding: '8px 14px', color: '#fff', fontSize: 13, fontWeight: 600, backdropFilter: 'blur(10px)' }}>
