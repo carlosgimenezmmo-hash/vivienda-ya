@@ -102,7 +102,8 @@ export default function ViviendaYaFull() {
           .from('properties')
           .select('*')
           .not('video_url', 'is', null)
-          .eq('status', 'approved');
+          .eq('status', 'approved')
+          .in('operation_type', ['temporario', 'hotel', 'camping']);
 
         if (currentCityFilter) {
           query = query.ilike('city', `%${currentCityFilter}%`);
@@ -404,6 +405,12 @@ supabase.from("properties").update({
                   <span style={{ color: '#fff', fontSize: 12, fontWeight: 600 }}>Chat</span>
                 </button>
 
+                {(p.operation_type === 'temporario' || p.operation_type === 'hotel' || p.operation_type === 'camping') && (
+                  <button onClick={() => router.push(p.operation_type === 'hotel' ? `/hotel-reservar?id=${p.id}` : `/reservar?id=${p.id}`)} style={{ background: '#F97316', border: 'none', borderRadius: 14, width: 54, height: 54, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 12px 24px rgba(249,115,22,0.35)' }}>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8 7V3m8 4V3M5 11h14M5 19h14M7 11v8m10-8v8"/></svg>
+                  </button>
+                )}
+
                 <button onClick={() => requireLogin(async () => {
                   const { data: sessionData } = await supabase.auth.getSession();
                   const uid = sessionData?.session?.user?.id || user?.id;
@@ -429,7 +436,7 @@ supabase.from("properties").update({
               </div>
 
               {/* Info inferior — zIndex 25 para estar por encima del área de tap */}
-              <div style={{ position: 'absolute', bottom: 90, left: 16, right: 80, zIndex: 25, color: '#fff' }}>
+              <div style={{ position: 'absolute', bottom: 90, left: 16, right: 80, zIndex: 25, color: '#fff', display: 'flex', flexDirection: 'column', gap: 12 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
                   <div style={{ width: 42, height: 42, borderRadius: '50%', background: '#333', border: '2px solid rgba(255,255,255,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, overflow: 'hidden' }}>
                     {p.owner_avatar ? <img src={p.owner_avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 18 }}>U</span>}
@@ -455,7 +462,14 @@ supabase.from("properties").update({
                     </span>
                   )}
                 </div>
-                <p onClick={() => setShowDetails(showDetails === p.id ? null : p.id)} style={{ margin: '8px 0 0 0', fontSize: 17, color: '#22C55E', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
+
+                {(p.operation_type === "temporario" || p.operation_type === "hotel" || p.operation_type === "camping") && (
+                  <button onClick={() => router.push(p.operation_type === 'hotel' ? `/hotel-reservar?id=${p.id}` : `/reservar?id=${p.id}`)} style={{ width: '100%', padding: '14px', borderRadius: 18, border: 'none', background: '#F97316', color: '#fff', fontSize: 15, fontWeight: 800, cursor: 'pointer', fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' }}>
+                    {p.operation_type === 'hotel' ? '🏨 Ver habitaciones y reservar' : p.operation_type === 'camping' ? '🏕️ Ver disponibilidad y reservar' : '📅 Ver disponibilidad y reservar'}
+                  </button>
+                )}
+
+                <p onClick={() => setShowDetails(showDetails === p.id ? null : p.id)} style={{ margin: '0', fontSize: 17, color: '#22C55E', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}>
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#22C55E" strokeWidth="2.5"><path d="M7 17L17 7M17 7H7M17 7v10"/></svg>
                   Ver detalles
                 </p>
