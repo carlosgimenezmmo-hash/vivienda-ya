@@ -10,6 +10,8 @@ interface PropertyPreview {
   isExpired: boolean
 }
 
+export const dynamic = 'force-dynamic';
+
 export default function RenovarPage() {
   const params = useParams()
   const router = useRouter()

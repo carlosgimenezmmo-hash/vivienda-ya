@@ -1,8 +1,9 @@
 ﻿"use client";
+export const dynamic = 'force-dynamic';
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/lib/auth-context';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useActiveProperty } from '@/lib/active-property-context';
 import { AuthSheet } from '@/components/auth-sheet';
 
@@ -26,9 +27,8 @@ export default function ViviendaYaFull() {
   const videoRefs = useRef<HTMLVideoElement[]>([]);
   const { isLoggedIn, user, likedProperties, savedProperties, toggleLike, toggleSave } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const cityFilter = searchParams.get("city")?.trim();
-  const provinceFilter = searchParams.get("province")?.trim();
+  const [cityFilter, setCityFilter] = useState("");
+  const [provinceFilter, setProvinceFilter] = useState("");
   const [geoCity, setGeoCity] = useState<string>("");
   const [geoProvince, setGeoProvince] = useState<string>("");
   const [locationLoading, setLocationLoading] = useState(true);
@@ -43,6 +43,19 @@ export default function ViviendaYaFull() {
       router.push("/bienvenida")
     }
   }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const city = params.get('city')?.trim() || '';
+    const province = params.get('province')?.trim() || '';
+
+    if (city || province) {
+      setCityFilter(city);
+      setProvinceFilter(province);
+      setLocationLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (cityFilter || provinceFilter) {

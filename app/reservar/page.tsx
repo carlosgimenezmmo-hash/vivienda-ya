@@ -6,6 +6,8 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { supabase } from "@/lib/supabaseClient"
 import { useAuth } from "@/lib/auth-context"
 
+export const dynamic = 'force-dynamic';
+
 function ReservarContent() {
   const { isLoggedIn } = useAuth()
   const router = useRouter()
