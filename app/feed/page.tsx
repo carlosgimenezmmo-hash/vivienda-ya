@@ -482,8 +482,7 @@ supabase.from("properties").update({
               </div>
 
               {/* Info inferior — zIndex 25 para estar por encima del área de tap */}
-              <div style={{ position: 'absolute', bottom: 90, left: 16, right: 80, zIndex: 25, color: '#fff', display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+              <div style={{ position: 'absolute', bottom: 170, left: 16, right: 80, zIndex: 25, color: '#fff', display: 'flex', flexDirection: 'column', gap: 12 }}>          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
                   <div style={{ width: 42, height: 42, borderRadius: '50%', background: '#333', border: '2px solid rgba(255,255,255,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, overflow: 'hidden' }}>
                     {p.owner_avatar ? <img src={p.owner_avatar} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <span style={{ fontSize: 18 }}>U</span>}
                   </div>
