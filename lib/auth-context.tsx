@@ -34,21 +34,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const buildUser = async (supabaseUser: any): Promise<User> => {
     try {
-      const meta = supabaseUser.user_metadata || {}
-      const { data: userData } = await supabase
-        .from('users')
-        .select('avatar_url, credits, full_name, phone')
-        .eq('id', supabaseUser.id)
-        .single()
-        .catch(() => ({ data: null }))
-      
-      const { data: subData } = await supabase
-        .from("subscriptions")
-        .select("plan, estado, fecha_vencimiento")
-        .eq("user_id", supabaseUser.id)
-        .eq("estado", "activo")
-        .single()
-        .catch(() => ({ data: null }))
+     const meta = supabaseUser.user_metadata || {}
+
+        let userData: any = null
+        try {
+          const res = await supabase
+            .from('users')
+            .select('avatar_url, credits, full_name, phone')
+            .eq('id', supabaseUser.id)
+            .single()
+          userData = res.data
+        } catch {
+          userData = null
+        }
+
+        let subData: any = null
+        try {
+          const res = await supabase
+            .from("subscriptions")
+            .select("plan, estado, fecha_vencimiento")
+            .eq("user_id", supabaseUser.id)
+            .eq("estado", "activo")
+            .single()
+          subData = res.data
+        } catch {
+          subData = null
+        }
       
       if (subData && new Date(subData.fecha_vencimiento) > new Date()) {
         setPlan(subData.plan)

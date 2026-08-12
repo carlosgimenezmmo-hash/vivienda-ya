@@ -113,32 +113,18 @@ export default function ViviendaYaFull() {
     async function fetchProperties() {
       try {
         setFeedMessage("");
-        const baseQuery = supabase
+        const baseQuery = () => supabase
           .from('properties')
           .select('*')
           .not('video_url', 'is', null)
-          .eq('status', 'approved')
-          .in('operation_type', ['temporario', 'hotel', 'camping']);
+          .eq('status', 'approved');
 
         const cityQuery = currentCityFilter
-          ? supabase
-              .from('properties')
-              .select('*')
-              .not('video_url', 'is', null)
-              .eq('status', 'approved')
-              .in('operation_type', ['temporario', 'hotel', 'camping'])
-              .ilike('city', `%${currentCityFilter}%`)
-          : baseQuery;
+          ? baseQuery().ilike('city', `%${currentCityFilter}%`)
+          : baseQuery();
 
         const cityProvinceQuery = currentProvinceFilter
-          ? supabase
-              .from('properties')
-              .select('*')
-              .not('video_url', 'is', null)
-              .eq('status', 'approved')
-              .in('operation_type', ['temporario', 'hotel', 'camping'])
-              .ilike('city', `%${currentCityFilter}%`)
-              .ilike('province', `%${currentProvinceFilter}%`)
+          ? cityQuery.ilike('province', `%${currentProvinceFilter}%`)
           : cityQuery;
 
         const { data, error } = await cityProvinceQuery.order('created_at', { ascending: false });
@@ -150,12 +136,7 @@ export default function ViviendaYaFull() {
         }
 
         if (currentCityFilter && currentProvinceFilter) {
-          const { data: provinceData, error: provinceError } = await supabase
-            .from('properties')
-            .select('*')
-            .not('video_url', 'is', null)
-            .eq('status', 'approved')
-            .in('operation_type', ['temporario', 'hotel', 'camping'])
+          const { data: provinceData, error: provinceError } = await baseQuery()
             .ilike('province', `%${currentProvinceFilter}%`)
             .order('created_at', { ascending: false });
 
@@ -168,7 +149,7 @@ export default function ViviendaYaFull() {
         }
 
         if (currentCityFilter) {
-          const { data: allData, error: allError } = await baseQuery.order('created_at', { ascending: false });
+          const { data: allData, error: allError } = await baseQuery().order('created_at', { ascending: false });
           if (allError) throw allError;
           if ((allData?.length || 0) > 0) {
             setFeedMessage(`No hay propiedades en ${currentCityFilter}. Mostrando todas las propiedades disponibles.`);
