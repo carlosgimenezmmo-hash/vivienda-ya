@@ -1,5 +1,14 @@
 import { NextResponse } from "next/server"
 
+// Nominatim permite máximo 1 request por segundo. Guardamos el timestamp
+// de la última llamada en memoria del servidor para espaciarlas.
+let ultimaLlamada = 0
+const INTERVALO_MINIMO_MS = 1100 // un poco más de 1seg de margen
+
+function esperar(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
 export async function POST(req: Request) {
   try {
     const { direccion } = await req.json()
@@ -8,13 +17,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Dirección inválida" }, { status: 400 })
     }
 
+    // Rate limiting: si la última llamada fue hace poco, esperamos el resto
+    const ahora = Date.now()
+    const tiempoDesdeUltima = ahora - ultimaLlamada
+    if (tiempoDesdeUltima < INTERVALO_MINIMO_MS) {
+      await esperar(INTERVALO_MINIMO_MS - tiempoDesdeUltima)
+    }
+    ultimaLlamada = Date.now()
+
     const query = `${direccion.trim()}, Argentina`
 
     const geoRes = await fetch(
       `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query)}`,
       {
         headers: {
-          // Requisito de la política de uso de Nominatim: identificar la app que consulta
           "User-Agent": "ViviendaYa/1.0 (contacto: viviendayatresa@gmail.com)",
         },
       }
