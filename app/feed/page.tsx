@@ -6,7 +6,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useRouter } from 'next/navigation';
 import { useActiveProperty } from '@/lib/active-property-context';
 import { AuthSheet } from '@/components/auth-sheet';
-
+import PuntosDeInteres from "@/components/PuntosDeInteres";
 
 export default function ViviendaYaFull() {
   const [properties, setProperties] = useState<any[]>([]);
@@ -610,6 +610,10 @@ supabase.from("properties").update({
           </div>
         ))}
       </div>
+      {/* PUNTOS DE INTERES CERCANOS */}
+      {p.lat && p.lng && (
+        <PuntosDeInteres lat={p.lat} lng={p.lng} />
+      )}
 
       {/* DESCRIPCION */}
       {p.description && (
