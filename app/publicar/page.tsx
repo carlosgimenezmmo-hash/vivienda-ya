@@ -137,20 +137,20 @@ export default function PublicarPage() {
 
     if (!query) return
 
-    try {
-      const geoRes = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(query + ", Argentina")}`
-      )
+   try {
+      const geoRes = await fetch("/api/geocodificar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ direccion: query }),
+      })
       const geoData = await geoRes.json()
-      if (!geoData || !geoData[0]) {
+      if (!geoData?.lat || !geoData?.lng) {
         setAddressWarning("No pudimos verificar la dirección contra el GPS. Revisa que esté completa.")
         return
       }
-
-      const targetLat = parseFloat(geoData[0].lat)
-      const targetLng = parseFloat(geoData[0].lon)
+      const targetLat = geoData.lat
+     const targetLng = geoData.lng
       if (gpsLat == null || gpsLng == null) return
-
       const distance = getDistanceMeters(gpsLat, gpsLng, targetLat, targetLng)
       if (distance > 200) {
         setAddressWarning(`La dirección ingresada parece no coincidir con la ubicación GPS. Diferencia aproximada: ${Math.round(distance)} metros.`)
@@ -241,24 +241,25 @@ export default function PublicarPage() {
       // Si no hay GPS, intentamos geocodificar por dirección (aproximado, gratis via OSM)
       let finalLat = gpsLat
       let finalLng = gpsLng
-      if (!gpsOk) {
+   if (!gpsOk) {
         try {
-          const direccion = [direccionClean, numeroClean ? numeroClean.toString() : null, barrioClean, ciudadClean, provincia]
+          const direccionCompleta = [direccionClean, numeroClean ? numeroClean.toString() : null, barrioClean, ciudadClean, provincia]
             .filter(Boolean)
             .join(", ")
-          const geoRes = await fetch(
-            `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(direccion + ", Argentina")}`
-          )
+          const geoRes = await fetch("/api/geocodificar", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ direccion: direccionCompleta }),
+          })
           const geoData = await geoRes.json()
-          if (geoData && geoData[0]) {
-            finalLat = parseFloat(geoData[0].lat)
-            finalLng = parseFloat(geoData[0].lon)
+          if (geoData?.lat && geoData?.lng) {
+            finalLat = geoData.lat
+            finalLng = geoData.lng
           }
         } catch {
           // si falla la geocodificación, la propiedad se publica sin coordenadas
         }
       }
-
       const direccionCompleta = [direccionClean, numeroClean ? numeroClean.toString() : null, barrioClean, ciudadClean]
         .filter(Boolean)
         .join(", ")
