@@ -35,8 +35,8 @@ export default function PublicarPage() {
   const videoRef = useRef<HTMLInputElement>(null)
   const galeriaRef = useRef<HTMLInputElement>(null)
   const [operacion, setOperacion] = useState("venta")
-  const [tipoPropiedad, setTipoPropiedad] = useState("")
-  const [precio, setPrecio] = useState("")
+ const [tipoPropiedad, setTipoPropiedad] = useState("")
+    const [precio, setPrecio] = useState("")
   const [moneda, setMoneda] = useState("ARS")
   const [ambientes, setAmbientes] = useState("")
   const [superficie, setSuperficie] = useState("")
@@ -496,9 +496,15 @@ export default function PublicarPage() {
                 </div>
 
                 <p style={sectionLabel}>Tipo de propiedad</p>
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
-                  {["Departamento", "Casa", "Edificio"].map(t => (
+              <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
+                  {["Departamento", "Casa", "Edificio de departamentos", "Edificio de oficinas", "Edificio de uso mixto", "PH", "Local", "Oficina", "Terreno", "Loft", "Monoambiente", "Cabana", "Duplex", "Cochera", "Galpon"].map(t => (
                     <button key={t} onClick={() => setTipoPropiedad(t)} style={chip(tipoPropiedad === t)}>{t}</button>
+                  ))}
+                </div>
+                <p style={sectionLabel}>Tipo de construcción</p>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
+                  {[["casa", "Casa"], ["departamento", "Departamento"], ["edificio", "Edificio"]].map(([val, label]) => (
+                    <button key={val} onClick={() => setTipoConstruccion(val)} style={chip(tipoConstruccion === val)}>{label}</button>
                   ))}
                 </div>
               </>
